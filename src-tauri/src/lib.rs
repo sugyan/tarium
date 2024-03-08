@@ -1,43 +1,37 @@
-use atrium_api::agent::{store::MemorySessionStore, AtpAgent};
-use atrium_xrpc_client::reqwest::ReqwestClient;
-use serde::Serialize;
-use thiserror::Error;
+mod commands;
+mod error;
+mod session_store;
+mod state;
 
-#[derive(Debug, Error)]
-enum Error {
-    #[error(transparent)]
-    CreateSession(
-        #[from]
-        atrium_api::xrpc::error::Error<atrium_api::com::atproto::server::create_session::Error>,
-    ),
-}
+use crate::session_store::FileStore;
+use crate::state::State;
+use std::fs::create_dir_all;
+use tauri::{Manager, Wry};
 
-impl Serialize for Error {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.to_string().as_str())
-    }
-}
-
-#[tauri::command]
-async fn sign_in(
-    identifier: &str,
-    password: &str,
-) -> Result<atrium_api::com::atproto::server::create_session::Output, Error> {
-    let agent = AtpAgent::new(
-        ReqwestClient::new("https://bsky.social"),
-        MemorySessionStore::default(),
-    );
-    Ok(agent.login(identifier, password).await?)
+fn setup(app: &mut tauri::App<Wry>) -> Result<(), Box<dyn std::error::Error>> {
+    let data_dir = app.path().app_data_dir()?;
+    create_dir_all(&data_dir)?;
+    // TODO: how switch to different account?
+    let session_store = FileStore::new(data_dir.join("session.json"));
+    app.manage(State {
+        agent: atrium_api::agent::AtpAgent::new(
+            atrium_xrpc_client::reqwest::ReqwestClient::new("https://bsky.social"),
+            session_store,
+        ),
+    });
+    Ok(())
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .setup(setup)
         .plugin(tauri_plugin_shell::init())
-        .invoke_handler(tauri::generate_handler![sign_in])
+        .invoke_handler(tauri::generate_handler![
+            commands::login,
+            commands::get_session,
+            commands::get_timeline
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

@@ -1,18 +1,19 @@
-import { useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import "./App.css";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-function App() {
+const Signin = () => {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   const signin = async () => {
     try {
-      const result = await invoke("sign_in", { identifier, password });
-      setMessage(JSON.stringify(result));
-    } catch (err) {
-      setMessage(err as string);
+      await invoke("login", { identifier, password });
+      navigate("/home");
+    } catch (e) {
+      setMessage(e as string);
     }
   };
 
@@ -48,6 +49,6 @@ function App() {
       <p>{message}</p>
     </div>
   );
-}
+};
 
-export default App;
+export default Signin;

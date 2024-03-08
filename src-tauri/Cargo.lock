@@ -3480,6 +3480,7 @@ checksum = "e1fc403891a21bcfb7c37834ba66a547a8f402146eba7265b5a6d88059c9ff2f"
 name = "tarium"
 version = "0.0.0"
 dependencies = [
+ "async-trait",
  "atrium-api",
  "atrium-xrpc-client",
  "serde",
