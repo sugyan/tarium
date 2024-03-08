@@ -19,8 +19,7 @@ const Home = () => {
     })();
   }, []);
   return (
-    <div>
-      <h1>Home</h1>
+    <div className="dark:text-gray-300 dark:bg-gray-800">
       <Timeline posts={timeline} />
     </div>
   );

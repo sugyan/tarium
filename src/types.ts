@@ -15,6 +15,7 @@ export interface PostView {
 }
 
 export interface ProfileViewBasic {
+  avatar?: string;
   displayName?: string;
   handle: string;
 }

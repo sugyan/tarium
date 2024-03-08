@@ -1,7 +1,7 @@
 {
   "productName": "tarium",
   "version": "0.0.0",
-  "identifier": "com.tauri.dev",
+  "identifier": "com.sugyan.tarium",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
