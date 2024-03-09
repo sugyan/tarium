@@ -1,5 +1,6 @@
+import { formatDistanceToNow, parseISO } from "date-fns";
 import { FC } from "react";
-import { FeedViewPost } from "../types";
+import { FeedViewPost } from "../types/app/bsky/feed/defs";
 
 const Timeline: FC<{ posts: FeedViewPost[] }> = ({ posts }) => {
   return (
@@ -26,11 +27,16 @@ const Timeline: FC<{ posts: FeedViewPost[] }> = ({ posts }) => {
                     @{post.post.author.handle}
                   </span>
                 </div>
-                <div className="flex items-center text-xs">
-                  {post.post.record.createdAt}
+                <div className="flex items-center text-sm">
+                  {formatDistanceToNow(parseISO(post.post.indexedAt))}
                 </div>
               </div>
               <div>{post.post.record.text}</div>
+              <div className="flex text-sm">
+                <div className="mr-4">{post.post.replyCount || 0} replies</div>
+                <div className="mr-4">{post.post.repostCount || 0} reposts</div>
+                <div>{post.post.likeCount || 0} likes</div>
+              </div>
             </div>
           </div>
         </div>
