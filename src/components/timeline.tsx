@@ -1,3 +1,8 @@
+import {
+  ArrowPathRoundedSquareIcon,
+  ChatBubbleBottomCenterIcon,
+  HeartIcon,
+} from "@heroicons/react/24/outline";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import { FC } from "react";
 import { FeedViewPost } from "../types/app/bsky/feed/defs";
@@ -32,10 +37,19 @@ const Timeline: FC<{ posts: FeedViewPost[] }> = ({ posts }) => {
                 </div>
               </div>
               <div>{post.post.record.text}</div>
-              <div className="flex text-sm">
-                <div className="mr-4">{post.post.replyCount || 0} replies</div>
-                <div className="mr-4">{post.post.repostCount || 0} reposts</div>
-                <div>{post.post.likeCount || 0} likes</div>
+              <div className="flex text-sm text-gray-500 mt-2">
+                <div className="flex items-center w-20">
+                  <ChatBubbleBottomCenterIcon className="h-4 w-4 mr-1" />
+                  {post.post.replyCount || ""}
+                </div>
+                <div className="flex items-center w-20">
+                  <ArrowPathRoundedSquareIcon className="h-4 w-4 mr-1" />
+                  {post.post.repostCount || ""}
+                </div>
+                <div className="flex items-center w-20">
+                  <HeartIcon className="h-4 w-4 mr-1" />
+                  {post.post.likeCount || ""}
+                </div>
               </div>
             </div>
           </div>
