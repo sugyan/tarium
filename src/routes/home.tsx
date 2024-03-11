@@ -1,7 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useState } from "react";
 import Timeline from "../components/timeline";
-import { FeedViewPost } from "../types";
+import { FeedViewPost } from "../types/app/bsky/feed/defs";
 
 const Home = () => {
   const [timeline, setTimeline] = useState<FeedViewPost[]>([]);
@@ -18,11 +18,7 @@ const Home = () => {
       }
     })();
   }, []);
-  return (
-    <div className="dark:text-gray-300 dark:bg-gray-800">
-      <Timeline posts={timeline} />
-    </div>
-  );
+  return <Timeline posts={timeline} />;
 };
 
 export default Home;

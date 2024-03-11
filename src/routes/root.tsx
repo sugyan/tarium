@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 
 const Root = () => {
   const navigate = useNavigate();
@@ -14,7 +14,16 @@ const Root = () => {
       }
     })();
   }, []);
-  return <p>Root</p>;
+  return (
+    <div className="dark">
+      <div className="flex min-h-screen dark:text-gray-300 dark:bg-gray-800">
+        <div className="flex-shrink-0 min-w-20 border-r border-gray-500"></div>
+        <div className="flex-grow">
+          <Outlet />
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Root;
