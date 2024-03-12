@@ -6,13 +6,21 @@ import {
 } from "@heroicons/react/24/outline";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import { FC } from "react";
-import { FeedViewPost, PostView } from "../types/app/bsky/feed/defs";
+import {
+  FeedViewPost,
+  PostView,
+  ReplyRef,
+  isPostView,
+} from "../types/app/bsky/feed/defs";
 
-const TimelineCell: FC<{ post: PostView }> = ({ post }) => {
+const TimelineCell: FC<{ post: PostView; isParent: boolean }> = ({
+  post,
+  isParent,
+}) => {
   return (
     <div className="flex overflow-hidden break-all">
-      <div className="mr-2">
-        <div className="h-12 w-12 rounded-full overflow-hidden">
+      <div className="flex flex-col items-center mr-2">
+        <div className="min-h-12 w-12 rounded-full overflow-hidden">
           {post.author.avatar ? (
             <img src={post.author.avatar} />
           ) : (
@@ -21,8 +29,9 @@ const TimelineCell: FC<{ post: PostView }> = ({ post }) => {
             </div>
           )}
         </div>
+        {isParent && <div className="w-0.5 h-full bg-gray-600" />}
       </div>
-      <div className="w-full">
+      <div className="w-full pb-3">
         <div className="flex justify-between">
           <div className="flex items-center">
             <span className="font-semibold">{post.author.displayName}</span>
@@ -56,18 +65,26 @@ const TimelineCell: FC<{ post: PostView }> = ({ post }) => {
   );
 };
 
+const ReplyCell: FC<{ reply: ReplyRef }> = ({ reply }) => {
+  return (
+    <>
+      {isPostView(reply.parent) && (
+        <TimelineCell post={reply.parent} isParent={true} />
+      )}
+    </>
+  );
+};
+
 const Timeline: FC<{ posts: FeedViewPost[] }> = ({ posts }) => {
   return (
-    <div>
+    <>
       {posts.map((post, index) => (
-        <div
-          key={index}
-          className="border-b-2 border-gray-300 p-3 dark:border-gray-700"
-        >
-          <TimelineCell post={post.post} />
+        <div key={index} className="border-b border-gray-500 px-3 pt-3">
+          {post.reply && <ReplyCell reply={post.reply} />}
+          <TimelineCell post={post.post} isParent={false} />
         </div>
       ))}
-    </div>
+    </>
   );
 };
 

@@ -70,7 +70,7 @@ pub async fn get_timeline(
         .get_timeline(atrium_api::app::bsky::feed::get_timeline::Parameters {
             algorithm: None,
             cursor: None,
-            limit: None,
+            limit: 30.try_into().ok(),
         })
         .await?)
 }

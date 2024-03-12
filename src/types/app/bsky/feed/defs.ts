@@ -1,4 +1,8 @@
-import { ProfileViewBasic } from "../actor/defs";
+import { isType } from "../../../utils";
+import {
+  ProfileViewBasic,
+  ViewerState as ActorViewerState,
+} from "../actor/defs";
 
 export interface PostView {
   uri: string;
@@ -23,8 +27,45 @@ export interface PostView {
   // threadgate?: ThreadgateView
 }
 
+export function isPostView(v: unknown): v is PostView {
+  return isType(v, "app.bsky.feed.defs#postView");
+}
+
+export interface NotFoundPost {
+  uri: string;
+  notFound: true;
+}
+
+export function isNotFoundPost(v: unknown): v is PostView {
+  return isType(v, "app.bsky.feed.defs#notFound");
+}
+
+export interface BlockedPost {
+  uri: string;
+  blocked: true;
+  author: BlockedAuthor;
+}
+
+export function isBlockedPost(v: unknown): v is PostView {
+  return isType(v, "app.bsky.feed.defs#blocked");
+}
+
+export interface BlockedAuthor {
+  did: string;
+  viwer?: ActorViewerState;
+}
+
 export interface FeedViewPost {
   post: PostView;
-  reply?: any; // TODO
+  reply?: ReplyRef; // TODO
   reason?: any; // TODO
 }
+
+export interface ReplyRef {
+  root: ReplyRefRoot;
+  parent: ReplyRefParent;
+}
+
+export type ReplyRefRoot = PostView | NotFoundPost | BlockedPost;
+
+export type ReplyRefParent = PostView | NotFoundPost | BlockedPost;
