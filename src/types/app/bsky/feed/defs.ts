@@ -3,6 +3,10 @@ import {
   ProfileViewBasic,
   ViewerState as ActorViewerState,
 } from "../actor/defs";
+import { View as ImagesView } from "../embed/images";
+import { View as ExternalView } from "../embed/external";
+import { View as RecordView } from "../embed/record";
+import { View as RecordWithMediaView } from "../embed/recordWithMedia";
 
 export interface PostView {
   uri: string;
@@ -12,7 +16,7 @@ export interface PostView {
     createdAt: string;
     text: string;
   }; // TODO
-  // embed?:
+  embed?: EmbedViewUnion;
   //   | AppBskyEmbedImages.View
   //   | AppBskyEmbedExternal.View
   //   | AppBskyEmbedRecord.View
@@ -27,27 +31,15 @@ export interface PostView {
   // threadgate?: ThreadgateView
 }
 
-export function isPostView(v: unknown): v is PostView {
-  return isType(v, "app.bsky.feed.defs#postView");
-}
-
 export interface NotFoundPost {
   uri: string;
   notFound: true;
-}
-
-export function isNotFoundPost(v: unknown): v is PostView {
-  return isType(v, "app.bsky.feed.defs#notFound");
 }
 
 export interface BlockedPost {
   uri: string;
   blocked: true;
   author: BlockedAuthor;
-}
-
-export function isBlockedPost(v: unknown): v is PostView {
-  return isType(v, "app.bsky.feed.defs#blocked");
 }
 
 export interface BlockedAuthor {
@@ -62,10 +54,46 @@ export interface FeedViewPost {
 }
 
 export interface ReplyRef {
-  root: ReplyRefRoot;
-  parent: ReplyRefParent;
+  root: ReplyRefRootUnion;
+  parent: ReplyRefParentUnion;
 }
 
-export type ReplyRefRoot = PostView | NotFoundPost | BlockedPost;
+export function isPostView(v: unknown): v is PostView {
+  return isType(v, "app.bsky.feed.defs#postView");
+}
 
-export type ReplyRefParent = PostView | NotFoundPost | BlockedPost;
+export function isNotFoundPost(v: unknown): v is PostView {
+  return isType(v, "app.bsky.feed.defs#notFound");
+}
+
+export function isBlockedPost(v: unknown): v is PostView {
+  return isType(v, "app.bsky.feed.defs#blocked");
+}
+
+export type ReplyRefRootUnion = PostView | NotFoundPost | BlockedPost;
+
+export type ReplyRefParentUnion = PostView | NotFoundPost | BlockedPost;
+
+export function isEmbedImagesView(v: unknown): v is ImagesView {
+  return isType(v, "app.bsky.embed.images#view");
+}
+
+export function isEmbedExternalView(v: unknown): v is ExternalView {
+  return isType(v, "app.bsky.embed.external#view");
+}
+
+export function isEmbedRecordView(v: unknown): v is RecordView {
+  return isType(v, "app.bsky.embed.record#view");
+}
+
+export function isEmbedRecordWithMediaView(
+  v: unknown
+): v is RecordWithMediaView {
+  return isType(v, "app.bsky.embed.recordWithMedia#view");
+}
+
+export type EmbedViewUnion =
+  | ImagesView
+  | ExternalView
+  | RecordView
+  | RecordWithMediaView;

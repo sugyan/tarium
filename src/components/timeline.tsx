@@ -10,6 +10,7 @@ import {
   FeedViewPost,
   PostView,
   ReplyRef,
+  isEmbedImagesView,
   isPostView,
 } from "../types/app/bsky/feed/defs";
 
@@ -46,6 +47,15 @@ const TimelineCell: FC<{ post: PostView; isParent: boolean }> = ({
           </div>
         </div>
         <div className="flex-wrap">{post.record.text}</div>
+        {post.embed &&
+          isEmbedImagesView(post.embed) &&
+          post.embed.images.map((image, index) => {
+            return (
+              <div key={index} className="mt-2 max-h-64 overflow-hidden">
+                <img src={image.thumb} className="object-cover w-full" />
+              </div>
+            );
+          })}
         <div className="flex text-sm text-gray-500 mt-2">
           <div className="flex items-center w-20">
             <ChatBubbleBottomCenterIcon className="h-4 w-4 mr-1" />
