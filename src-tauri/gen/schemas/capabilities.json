@@ -1,1 +1,1 @@
-{}
+{"dialog-capability":{"identifier":"dialog-capability","description":"","local":true,"windows":["main"],"permissions":["dialog:allow-confirm"],"platforms":["linux","macOS","windows"]}}

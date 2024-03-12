@@ -4,8 +4,12 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum Error {
+    #[error("no agent")]
+    NoAgent,
     #[error(transparent)]
     CreateSession(#[from] XrpcError<atrium_api::com::atproto::server::create_session::Error>),
+    #[error(transparent)]
+    DeleteSession(#[from] XrpcError<atrium_api::com::atproto::server::delete_session::Error>),
     #[error(transparent)]
     GetSession(#[from] XrpcError<atrium_api::com::atproto::server::get_session::Error>),
     #[error(transparent)]

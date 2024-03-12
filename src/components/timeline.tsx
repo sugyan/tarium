@@ -2,34 +2,25 @@ import {
   ArrowPathRoundedSquareIcon,
   ChatBubbleBottomCenterIcon,
   HeartIcon,
+  UserIcon,
 } from "@heroicons/react/24/outline";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import { FC } from "react";
 import { FeedViewPost, PostView } from "../types/app/bsky/feed/defs";
 
-const Timeline: FC<{ posts: FeedViewPost[] }> = ({ posts }) => {
-  return (
-    <div>
-      {posts.map((post, index) => (
-        <div
-          key={index}
-          className="border-b-2 border-gray-300 p-3 dark:border-gray-700"
-        >
-          <TimelineCell post={post.post} />
-        </div>
-      ))}
-    </div>
-  );
-};
-
 const TimelineCell: FC<{ post: PostView }> = ({ post }) => {
   return (
     <div className="flex overflow-hidden break-all">
-      <div className="mr-4">
-        <img
-          src={post.author.avatar}
-          className="max-h-12 max-w-12 rounded-full"
-        />
+      <div className="mr-2">
+        <div className="h-12 w-12 rounded-full overflow-hidden">
+          {post.author.avatar ? (
+            <img src={post.author.avatar} />
+          ) : (
+            <div className="bg-blue-500">
+              <UserIcon className="py-2" />
+            </div>
+          )}
+        </div>
       </div>
       <div className="w-full">
         <div className="flex justify-between">
@@ -61,6 +52,21 @@ const TimelineCell: FC<{ post: PostView }> = ({ post }) => {
           </div>
         </div>
       </div>
+    </div>
+  );
+};
+
+const Timeline: FC<{ posts: FeedViewPost[] }> = ({ posts }) => {
+  return (
+    <div>
+      {posts.map((post, index) => (
+        <div
+          key={index}
+          className="border-b-2 border-gray-300 p-3 dark:border-gray-700"
+        >
+          <TimelineCell post={post.post} />
+        </div>
+      ))}
     </div>
   );
 };

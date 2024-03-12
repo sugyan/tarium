@@ -12,19 +12,23 @@ const router = createBrowserRouter([
     element: <Root />,
     children: [
       {
-        path: "/signin",
-        element: <Signin />,
-      },
-      {
         path: "/home",
         element: <Home />,
       },
     ],
   },
+  {
+    path: "/signin",
+    element: <Signin />,
+  },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <div className="dark">
+      <div className=" dark:text-gray-300 dark:bg-gray-800">
+        <RouterProvider router={router} />
+      </div>
+    </div>
   </React.StrictMode>
 );
