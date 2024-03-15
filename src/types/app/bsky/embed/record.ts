@@ -1,8 +1,13 @@
+import { isType } from "../../../utils";
 import { ProfileViewBasic } from "../actor/defs";
 import { BlockedAuthor, EmbedViewUnion } from "../feed/defs";
 
 export interface View {
   record: ViewRecordUnion;
+}
+
+export function isView(v: unknown): v is View {
+  return isType(v, "app.bsky.embed.record#view");
 }
 
 export interface ViewRecord {

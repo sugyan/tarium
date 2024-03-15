@@ -1,4 +1,4 @@
-import React from "react";
+import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import "./index.css";
@@ -24,11 +24,11 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <React.StrictMode>
+  <StrictMode>
     <div className="dark">
-      <div className=" dark:text-gray-300 dark:bg-gray-800">
+      <div className="dark:text-gray-200 dark:bg-gray-800">
         <RouterProvider router={router} />
       </div>
     </div>
-  </React.StrictMode>
+  </StrictMode>
 );

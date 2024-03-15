@@ -74,24 +74,6 @@ export type ReplyRefRootUnion = PostView | NotFoundPost | BlockedPost;
 
 export type ReplyRefParentUnion = PostView | NotFoundPost | BlockedPost;
 
-export function isEmbedImagesView(v: unknown): v is ImagesView {
-  return isType(v, "app.bsky.embed.images#view");
-}
-
-export function isEmbedExternalView(v: unknown): v is ExternalView {
-  return isType(v, "app.bsky.embed.external#view");
-}
-
-export function isEmbedRecordView(v: unknown): v is RecordView {
-  return isType(v, "app.bsky.embed.record#view");
-}
-
-export function isEmbedRecordWithMediaView(
-  v: unknown
-): v is RecordWithMediaView {
-  return isType(v, "app.bsky.embed.recordWithMedia#view");
-}
-
 export type EmbedViewUnion =
   | ImagesView
   | ExternalView
