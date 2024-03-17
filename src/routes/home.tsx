@@ -1,7 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import { UnlistenFn, listen } from "@tauri-apps/api/event";
 import { useEffect, useRef, useState } from "react";
-import Timeline from "../components/timeline";
+import Feed from "../components/Feed";
 import { FeedViewPost } from "../types/app/bsky/feed/defs";
 
 const Home = () => {
@@ -29,7 +29,7 @@ const Home = () => {
       }
     })();
   }, []);
-  return <Timeline posts={timeline} />;
+  return <Feed posts={timeline} />;
 };
 
 export default Home;

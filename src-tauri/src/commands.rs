@@ -93,7 +93,7 @@ async fn background_task(
             }
             _ = interval.tick() => {
                 println!("checking for new posts");
-                if  agent.api.app.bsky.feed.get_timeline(atrium_api::app::bsky::feed::get_timeline::Parameters {
+                if agent.api.app.bsky.feed.get_timeline(atrium_api::app::bsky::feed::get_timeline::Parameters {
                     algorithm: None,
                     cursor: None,
                     limit: 1.try_into().ok(),

@@ -5,5 +5,5 @@ export default {
     extend: {},
   },
   plugins: [],
-  darkMode: 'selector'
+  darkMode: "selector",
 };
