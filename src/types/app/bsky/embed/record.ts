@@ -14,7 +14,10 @@ export interface ViewRecord {
   uri: string;
   cid: string;
   author: ProfileViewBasic;
-  value: {};
+  value: {
+    createdAt: string;
+    text: string;
+  }; // TODO
   // labels?: ComAtprotoLabelDefs.Label[]
   embeds?: EmbedViewUnion[];
   indexedAt: string;
@@ -29,6 +32,18 @@ export interface ViewBlocked {
   uri: string;
   blocked: true;
   author: BlockedAuthor;
+}
+
+export function isViewRecord(v: unknown): v is ViewRecord {
+  return isType(v, "app.bsky.embed.record#viewRecord");
+}
+
+export function isViewNotFound(v: unknown): v is ViewNotFound {
+  return isType(v, "app.bsky.embed.record#viewNotFound");
+}
+
+export function isViewBlocked(v: unknown): v is ViewBlocked {
+  return isType(v, "app.bsky.embed.record#viewBlocked");
 }
 
 type ViewRecordUnion = ViewRecord | ViewNotFound | ViewBlocked; // TODO

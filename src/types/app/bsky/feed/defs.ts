@@ -17,11 +17,6 @@ export interface PostView {
     text: string;
   }; // TODO
   embed?: EmbedViewUnion;
-  //   | AppBskyEmbedImages.View
-  //   | AppBskyEmbedExternal.View
-  //   | AppBskyEmbedRecord.View
-  //   | AppBskyEmbedRecordWithMedia.View
-  //   | { $type: string; [k: string]: unknown }
   replyCount?: number;
   repostCount?: number;
   likeCount?: number;
