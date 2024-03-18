@@ -6,6 +6,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { formatDistanceToNowStrict, parseISO } from "date-fns";
 import { FC, useEffect, useRef, useState } from "react";
+import { isView as isExternalView } from "../types/app/bsky/embed/external";
 import {
   ViewImage,
   isView as isImagesView,
@@ -25,6 +26,26 @@ const PostEmbed: FC<{ embed?: EmbedViewUnion }> = ({ embed }) => {
   );
   if (isImagesView(embed)) {
     return renderImages(embed.images);
+  }
+  if (isExternalView(embed)) {
+    const url = new URL(embed.external.uri);
+    return (
+      <div className="border border-gray-500 rounded w-full overflow-hidden mt-2 mb-4">
+        <a href={embed.external.uri} target="_blank" rel="noreferrer">
+          <img
+            src={embed.external.thumb}
+            className="w-full max-h-64 object-cover"
+          />
+          <div className="px-3 py-2">
+            <div className="text-gray-500 text-sm">{url.host}</div>
+            <div className="font-semibold mb-2">{embed.external.title}</div>
+            <div className="text-sm line-clamp-2 overflow-hidden">
+              {embed.external.description}
+            </div>
+          </div>
+        </a>
+      </div>
+    );
   }
   if (isRecordWithMediaView(embed)) {
     const media = embed.media;
@@ -66,7 +87,7 @@ const Post: FC<{ post: PostView; isParent: boolean }> = ({
     };
   }, []);
   return (
-    <div className="flex overflow-hidden break-all">
+    <div className="flex overflow-hidden break-words">
       <div className="flex flex-col items-center mr-2">
         <div className="min-h-12 w-12 rounded-full overflow-hidden">
           {post.author.avatar ? (
@@ -91,7 +112,7 @@ const Post: FC<{ post: PostView; isParent: boolean }> = ({
             {distance}
           </div>
         </div>
-        <div className="flex-wrap">{post.record.text}</div>
+        <div className="whitespace-pre-wrap">{post.record.text}</div>
         <PostEmbed embed={post.embed} />
         <div className="flex text-sm text-gray-500 mt-2">
           <div className="flex items-center w-20">
