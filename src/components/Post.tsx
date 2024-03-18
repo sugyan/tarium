@@ -46,28 +46,25 @@ const Post: FC<{ post: PostView; isParent: boolean }> = ({
   isParent,
 }) => {
   const indexedAt = parseISO(post.indexedAt);
-  const [distance, setDistance] = useState<string>(
-    formatDistanceToNowStrict(indexedAt)
-  );
+  const [distance, setDistance] = useState<string>();
   const timeoutId = useRef<number>();
   useEffect(() => {
-    const d = new Date().getTime() - indexedAt.getTime();
-    const refresh = REFRESHES.find(({ threshold }) => d < threshold);
-    if (refresh) {
-      timeoutId.current = setTimeout(() => {
-        setDistance(formatDistanceToNowStrict(indexedAt));
-      }, refresh.interval - (d % refresh.interval));
-    } else {
-      timeoutId.current = setTimeout(() => {
-        setDistance(formatDistanceToNowStrict(indexedAt));
-      }, 3600_000);
-    }
+    const updateDistance = () => {
+      setDistance(formatDistanceToNowStrict(indexedAt));
+      const d = new Date().getTime() - indexedAt.getTime();
+      const refresh = REFRESHES.find(({ threshold }) => d < threshold);
+      timeoutId.current = setTimeout(
+        updateDistance,
+        refresh ? refresh.interval - (d % refresh.interval) : 3600_000
+      );
+    };
+    updateDistance();
     return () => {
       if (timeoutId.current) {
         clearTimeout(timeoutId.current);
       }
     };
-  }, [distance]);
+  }, []);
   return (
     <div className="flex overflow-hidden break-all">
       <div className="flex flex-col items-center mr-2">
@@ -86,11 +83,13 @@ const Post: FC<{ post: PostView; isParent: boolean }> = ({
         <div className="flex justify-between">
           <div className="flex items-center">
             <span className="font-semibold">{post.author.displayName}</span>
-            <span className="text-sm font-mono pl-2">
+            <span className="text-sm font-mono pl-2 text-gray-400">
               @{post.author.handle}
             </span>
           </div>
-          <div className="flex items-center text-sm">{distance}</div>
+          <div className="flex items-center text-sm text-gray-400">
+            {distance}
+          </div>
         </div>
         <div className="flex-wrap">{post.record.text}</div>
         <PostEmbed embed={post.embed} />
