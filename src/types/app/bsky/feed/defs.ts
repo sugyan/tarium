@@ -49,8 +49,8 @@ export interface BlockedAuthor {
 
 export interface FeedViewPost {
   post: PostView;
-  reply?: ReplyRef; // TODO
-  reason?: any; // TODO
+  reply?: ReplyRef;
+  reason?: ReasonUnion;
 }
 
 export interface ReplyRef {
@@ -58,21 +58,32 @@ export interface ReplyRef {
   parent: ReplyRefParentUnion;
 }
 
+export interface ReasonRepost {
+  by: ProfileViewBasic;
+  indexedAt: string;
+}
+
 export function isPostView(v: unknown): v is PostView {
   return isType(v, "app.bsky.feed.defs#postView");
 }
 
-export function isNotFoundPost(v: unknown): v is PostView {
+export function isNotFoundPost(v: unknown): v is NotFoundPost {
   return isType(v, "app.bsky.feed.defs#notFound");
 }
 
-export function isBlockedPost(v: unknown): v is PostView {
+export function isBlockedPost(v: unknown): v is BlockedPost {
   return isType(v, "app.bsky.feed.defs#blocked");
+}
+
+export function isReasonRepost(v: unknown): v is ReasonRepost {
+  return isType(v, "app.bsky.feed.defs#reasonRepost");
 }
 
 export type ReplyRefRootUnion = PostView | NotFoundPost | BlockedPost;
 
 export type ReplyRefParentUnion = PostView | NotFoundPost | BlockedPost;
+
+export type ReasonUnion = ReasonRepost | never;
 
 export type EmbedViewUnion =
   | ImagesView

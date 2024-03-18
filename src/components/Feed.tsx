@@ -1,6 +1,11 @@
 import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { ArrowPathRoundedSquareIcon } from "@heroicons/react/24/outline";
 import { FC } from "react";
-import { FeedViewPost, isPostView } from "../types/app/bsky/feed/defs";
+import {
+  FeedViewPost,
+  isPostView,
+  isReasonRepost,
+} from "../types/app/bsky/feed/defs";
 import Post from "./Post";
 
 const Feed: FC<{ posts: FeedViewPost[] }> = ({ posts }) => {
@@ -16,7 +21,16 @@ const Feed: FC<{ posts: FeedViewPost[] }> = ({ posts }) => {
             {post.reply && isPostView(post.reply.parent) && (
               <Post post={post.reply.parent} isParent={true} />
             )}
-            <Post post={post.post} isParent={false} />
+            {post.reason && isReasonRepost(post.reason) && (
+              <div className="flex">
+                <div className="flex w-10"></div>
+                <div className="w-full text-gray-400 font-semibold text-sm">
+                  <ArrowPathRoundedSquareIcon className="flex w-4 h-4 mr-1" />
+                  Reposted by {post.reason.by.displayName}
+                </div>
+              </div>
+            )}
+            <Post post={post.post} />
           </div>
         );
       })}

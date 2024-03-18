@@ -62,9 +62,9 @@ const REFRESHES = [
   { threshold: 3600_000, interval: 60_000 },
 ];
 
-const Post: FC<{ post: PostView; isParent: boolean }> = ({
+const Post: FC<{ post: PostView; isParent?: boolean }> = ({
   post,
-  isParent,
+  isParent = false,
 }) => {
   const indexedAt = parseISO(post.indexedAt);
   const [distance, setDistance] = useState<string>();
