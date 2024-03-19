@@ -9,7 +9,7 @@ import {
 import Post from "./Post";
 
 const Feed: FC<{ posts: FeedViewPost[] }> = ({ posts }) => {
-  const [parent, _] = useAutoAnimate({ duration: 150 });
+  const [parent, _] = useAutoAnimate();
   return (
     <div ref={parent}>
       {posts.map((post) => {

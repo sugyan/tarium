@@ -111,7 +111,6 @@ async fn background_task(
                         }
                         cids.insert(cid);
                         println!("emit {cid}");
-                        tokio::time::sleep(Duration::from_millis(200)).await;
                         app_handle.emit("post", post).ok();
                     }
                 }
