@@ -1,3 +1,4 @@
+import { RecordUnion } from "../../../records";
 import { isType } from "../../../utils";
 import { ProfileViewBasic } from "../actor/defs";
 import { BlockedAuthor, EmbedViewUnion } from "../feed/defs";
@@ -14,10 +15,7 @@ export interface ViewRecord {
   uri: string;
   cid: string;
   author: ProfileViewBasic;
-  value: {
-    createdAt: string;
-    text: string;
-  }; // TODO
+  value: RecordUnion;
   // labels?: ComAtprotoLabelDefs.Label[]
   embeds?: EmbedViewUnion[];
   indexedAt: string;

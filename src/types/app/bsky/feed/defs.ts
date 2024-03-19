@@ -7,15 +7,13 @@ import { View as ImagesView } from "../embed/images";
 import { View as ExternalView } from "../embed/external";
 import { View as RecordView } from "../embed/record";
 import { View as RecordWithMediaView } from "../embed/recordWithMedia";
+import { RecordUnion } from "../../../records";
 
 export interface PostView {
   uri: string;
   cid: string;
   author: ProfileViewBasic;
-  record: {
-    createdAt: string;
-    text: string;
-  }; // TODO
+  record: RecordUnion;
   embed?: EmbedViewUnion;
   replyCount?: number;
   repostCount?: number;

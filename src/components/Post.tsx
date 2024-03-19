@@ -6,8 +6,10 @@ import {
 } from "@heroicons/react/24/outline";
 import { FC } from "react";
 import { PostView } from "../types/app/bsky/feed/defs";
+import { isRecord } from "../types/app/bsky/feed/post";
 import DistanceToNow from "./DistanceToNow";
 import PostEmbed from "./PostEmbed";
+import PostText from "./PostText";
 
 const Post: FC<{ post: PostView; isParent?: boolean }> = ({
   post,
@@ -41,7 +43,7 @@ const Post: FC<{ post: PostView; isParent?: boolean }> = ({
             <DistanceToNow date={post.indexedAt} />
           </div>
         </div>
-        <div className="whitespace-pre-wrap">{post.record.text}</div>
+        {isRecord(post.record) && <PostText record={post.record} />}
         <PostEmbed embed={post.embed} />
         <div className="flex text-sm text-gray-500 mt-2">
           <div className="flex items-center w-20">

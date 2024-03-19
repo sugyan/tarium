@@ -12,6 +12,7 @@ import {
 } from "../types/app/bsky/embed/record";
 import { isView as isRecordWithMediaView } from "../types/app/bsky/embed/recordWithMedia";
 import { EmbedViewUnion } from "../types/app/bsky/feed/defs";
+import { isRecord } from "../types/app/bsky/feed/post";
 import DistanceToNow from "./DistanceToNow";
 
 const Images: FC<{ images: ViewImage[] }> = ({ images }) => {
@@ -53,7 +54,9 @@ const Record: FC<{ record: ViewRecord }> = ({ record }) => {
               <DistanceToNow date={record.indexedAt} />
             </div>
           </div>
-          <div className="whitespace-pre-wrap">{record.value.text}</div>
+          {isRecord(record.value) && (
+            <div className="whitespace-pre-wrap">{record.value.text}</div>
+          )}
           {record.embeds?.map((embed, index) => (
             <PostEmbed key={index} embed={embed} />
           ))}

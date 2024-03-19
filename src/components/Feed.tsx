@@ -26,7 +26,8 @@ const Feed: FC<{ posts: FeedViewPost[] }> = ({ posts }) => {
                 <div className="flex w-10"></div>
                 <div className="w-full text-gray-400 font-semibold text-sm">
                   <ArrowPathRoundedSquareIcon className="flex w-4 h-4 mr-1" />
-                  Reposted by {post.reason.by.displayName}
+                  Reposted by{" "}
+                  {post.reason.by.displayName || post.reason.by.handle}
                 </div>
               </div>
             )}
