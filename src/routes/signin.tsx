@@ -29,13 +29,15 @@ const Signin = () => {
         >
           <input
             type="text"
-            className="px-4 py-2 border rounded-md"
+            className="px-4 py-2 border rounded-md text-gray-800"
             placeholder="Identifier"
+            spellCheck={false}
+            autoCorrect="off"
             onChange={(e) => setIdentifier(e.currentTarget.value)}
           />
           <input
             type="password"
-            className="px-4 py-2 border rounded-md"
+            className="px-4 py-2 border rounded-md text-gray-800"
             placeholder="Password"
             onChange={(e) => setPassword(e.currentTarget.value)}
           />
