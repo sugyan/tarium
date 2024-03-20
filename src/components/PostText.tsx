@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, Fragment } from "react";
 import { Record } from "../types/app/bsky/feed/post";
 import { Main, isLink } from "../types/app/bsky/richtext/facet";
 
@@ -51,10 +51,16 @@ const PostText: FC<{ record: Record }> = ({ record }) => {
           return <div className="text-blue-500 cursor-pointer">{decoded}</div>;
         }
       } else {
-        return <span>{decoded}</span>;
+        return <>{decoded}</>;
       }
     });
-  return <div className="whitespace-pre-wrap">{elements}</div>;
+  return (
+    <div className="whitespace-pre-wrap">
+      {elements.map((e, index) => {
+        return <Fragment key={index}>{e}</Fragment>;
+      })}
+    </div>
+  );
 };
 
 export default PostText;
