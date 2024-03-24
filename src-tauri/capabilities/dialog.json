@@ -10,6 +10,7 @@
     "windows"
   ],
   "permissions": [
-    "dialog:allow-confirm"
+    "dialog:allow-confirm",
+    "dialog:allow-message"
   ]
 }
