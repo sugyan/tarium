@@ -1,6 +1,6 @@
 {
   "productName": "Tarium",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "identifier": "com.sugyan.tarium",
   "build": {
     "beforeDevCommand": "npm run dev",
