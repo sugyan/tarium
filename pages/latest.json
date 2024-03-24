@@ -1,0 +1,23 @@
+{
+  "version": "0.0.2",
+  "notes": "See the assets to download this version and install.",
+  "pub_date": "2024-03-21T13:15:33.400Z",
+  "platforms": {
+    "darwin-aarch64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUeE5QRmVxU0poWTNaaU5SR3A1ZDhhR1pDSDVyS0IvU2hQSm5ibk9GRS9xWlY4Mis2Y1BrVUFrZkg4Q2h0NXpzdlYvWmFyU3RhRFovUnB6T0tCZ3pVT09mWVpMUHJ5NFE4PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzExMDI2NzYzCWZpbGU6VGFyaXVtLmFwcC50YXIuZ3oKQnRMT1l3Y3I4Y3NwZnFrVVVFUzdjbitCT09xWDNDbko3YlQ2WVRHYjE2RzRDeUNhSlM5ZGJsUTFyUjYyczNZQ3lZWENFQVpMSWx5Y0w4ZzlQOUlFQWc9PQo=",
+      "url": "https://github.com/sugyan/tarium/releases/download/tarium-v0.0.2/Tarium_aarch64.app.tar.gz"
+    },
+    "linux-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUeE5QRmVxU0poWXdueHZhN3VBeE05eEZUd0UxK2wrZ3B5VnZxU1pUMWduOW1ldWREVzJ2UWZ5eEx4b2Nqc1VSd244RHVkeDJPblFsODhhUmZZZmJaUHh5Rjh6eWR4UmdjPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzExMDI2NzgzCWZpbGU6dGFyaXVtXzAuMC4yX2FtZDY0LkFwcEltYWdlLnRhci5negpPMHdncWs1djVhdmp4WGxybDY0ZzlhV3RKcVhqY01jY2pxVmRDZDR4MklRU1ROOUZTd3cyd1FUMDlZcXcyeGFxb1NoOFNFaTFZdDBiNFowNXNwbUhDZz09Cg==",
+      "url": "https://github.com/sugyan/tarium/releases/download/tarium-v0.0.2/tarium_0.0.2_amd64.AppImage.tar.gz"
+    },
+    "darwin-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUeE5QRmVxU0poWXovKy9XbVk5U1lBZVZsRUNPT1NJaXpQcmRSZ2xYS3AzRFkvN01sYUtXR2h3cjRNY2U4YTFxVnF4cHg0czRvNHJkRWpITmozUWhWSXZObVg3VUtvN3dBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzExMDI2ODY5CWZpbGU6VGFyaXVtLmFwcC50YXIuZ3oKN2p6WmVLdmNKQWZ1RHVKbVdHMUZoL01QVFBSMHUxR3ZDbnZHZC9oOU90RUhmOEpINFhsK2lVdFFZb3NNMkV6MG5wU2FWTDZzNDkrWW5xakx6TWViQmc9PQo=",
+      "url": "https://github.com/sugyan/tarium/releases/download/tarium-v0.0.2/Tarium_x64.app.tar.gz"
+    },
+    "windows-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUeE5QRmVxU0poWTRGSE5xdDVzV2lMT3RONU5FOTI2bjFDdHFHUjE2MG1nZFRPa3B1S1Z5WGdzWkFQNSt1ZHJSTG9IM3ZBVm5WODl6VFJrM0V3SVpKbE5CUE56NG1rK0FJPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzExMDI2OTI5CWZpbGU6VGFyaXVtXzAuMC4yX3g2NF9lbi1VUy5tc2kuemlwCjVlaUcra1VxV1BtdUM2cEowcFZEeW1tNERBUUx2RHl0SlN1N01NWE1zYUVZa2pNcjNXRGNONXhGc2dDYXptbTF5VDFyczFZUzZFTnRwZ1JOeXowQURBPT0K",
+      "url": "https://github.com/sugyan/tarium/releases/download/tarium-v0.0.2/Tarium_0.0.2_x64_en-US.msi.zip"
+    }
+  }
+}

@@ -82,7 +82,7 @@ const PostEmbed: FC<{ embed?: EmbedViewUnion }> = ({ embed }) => {
           <div className="px-3 py-2">
             <div className="text-gray-500 text-sm">{url.host}</div>
             <div className="font-semibold mb-2">{embed.external.title}</div>
-            <div className="text-sm line-clamp-2 overflow-hidden">
+            <div className="text-sm line-clamp-2 overflow-hidden break-anywhere">
               {embed.external.description}
             </div>
           </div>
