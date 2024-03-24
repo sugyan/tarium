@@ -1,4 +1,4 @@
-import { relaunch } from "@tauri-apps/plugin-process";
+import { message } from "@tauri-apps/plugin-dialog";
 import { check } from "@tauri-apps/plugin-updater";
 import { useEffect, useRef } from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
@@ -32,8 +32,8 @@ const App = () => {
     (async () => {
       const update = await check();
       if (update) {
-        await update.downloadAndInstall();
-        await relaunch();
+        // TODO: downloadAndInstall
+        message(`${update.version} is now avaiable`);
       }
     })();
   }, []);
