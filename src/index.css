@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/* https://github.com/tailwindlabs/tailwindcss/discussions/12127 */
+@supports (overflow-wrap: anywhere) {
+  .break-anywhere {
+    overflow-wrap: anywhere;
+  }
+}
+@supports not (overflow-wrap: anywhere) {
+  .break-anywhere {
+    word-break: break-word;
+  }
+}
+
 html {
   overscroll-behavior: none;
 }

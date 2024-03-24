@@ -30,8 +30,8 @@ const Post: FC<{ post: PostView; isParent?: boolean }> = ({
         {isParent && <div className="w-0.5 h-full bg-gray-600" />}
       </div>
       <div className="w-full pb-3">
-        <div className="flex justify-between">
-          <div className="flex items-center">
+        <div className="flex justify-between items-center">
+          <div className="break-all mr-2 line-clamp-1">
             <span className="font-semibold">
               {post.author.displayName || post.author.handle}
             </span>
@@ -39,7 +39,7 @@ const Post: FC<{ post: PostView; isParent?: boolean }> = ({
               @{post.author.handle}
             </span>
           </div>
-          <div className="flex items-center text-sm text-gray-400">
+          <div className="text-sm text-gray-400 whitespace-nowrap">
             <DistanceToNow date={post.indexedAt} />
           </div>
         </div>
