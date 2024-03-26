@@ -48,7 +48,9 @@ const PostText: FC<{ record: Record }> = ({ record }) => {
             </a>
           );
         } else {
-          return <div className="text-blue-500 cursor-pointer">{decoded}</div>;
+          return (
+            <span className="text-blue-500 cursor-pointer">{decoded}</span>
+          );
         }
       } else {
         return <>{decoded}</>;

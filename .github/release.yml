@@ -1,0 +1,23 @@
+changelog:
+  categories:
+    - title: Added
+      labels:
+        - add
+    - title: Changed
+      labels:
+        - change
+    - title: Deprecated
+      labels:
+        - deprecate
+    - title: Removed
+      labels:
+        - remove
+    - title: Fixed
+      labels:
+        - fix
+    - title: Security
+      labels:
+        - security
+    - title: Others
+      labels:
+        - "*"
