@@ -71,6 +71,7 @@ pub fn run() {
             commands::get_session,
             commands::subscribe,
             commands::unsubscribe,
+            commands::create_post,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
