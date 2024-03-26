@@ -15,7 +15,9 @@
         "x": 0,
         "y": 0,
         "width": 600,
-        "height": 800
+        "height": 900,
+        "minWidth": 600,
+        "minHeight": 800
       }
     ],
     "security": {

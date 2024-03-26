@@ -7,6 +7,8 @@ pub enum Error {
     #[error("no agent")]
     NoAgent,
     #[error(transparent)]
+    CreateRecord(#[from] XrpcError<atrium_api::com::atproto::repo::create_record::Error>),
+    #[error(transparent)]
     CreateSession(#[from] XrpcError<atrium_api::com::atproto::server::create_session::Error>),
     #[error(transparent)]
     DeleteSession(#[from] XrpcError<atrium_api::com::atproto::server::delete_session::Error>),

@@ -2,6 +2,7 @@ use crate::error::Error;
 use crate::session_store::FileStore;
 use crate::state::State;
 use atrium_api::agent::AtpAgent;
+use atrium_api::types::Collection;
 use atrium_xrpc_client::reqwest::ReqwestClient;
 use std::collections::HashSet;
 use std::ops::DerefMut;
@@ -124,4 +125,55 @@ pub async fn unsubscribe(state: tauri::State<'_, State>) -> Result<(), Error> {
         sender.send(()).expect("failed to send");
     }
     Ok(())
+}
+
+#[tauri::command]
+pub async fn create_post(
+    text: String,
+    state: tauri::State<'_, State>,
+) -> Result<atrium_api::com::atproto::repo::create_record::Output, Error> {
+    // TODO: store session
+    let agent = state
+        .inner()
+        .agent
+        .lock()
+        .await
+        .as_ref()
+        .ok_or(Error::NoAgent)?
+        .clone();
+    let session = agent.api.com.atproto.server.get_session().await?;
+    Ok(state
+        .inner()
+        .agent
+        .lock()
+        .await
+        .as_ref()
+        .ok_or(Error::NoAgent)?
+        .api
+        .com
+        .atproto
+        .repo
+        .create_record(atrium_api::com::atproto::repo::create_record::Input {
+            collection: atrium_api::app::bsky::feed::Post::NSID
+                .parse()
+                .expect("failed to parse NSID"),
+            record: atrium_api::records::Record::AppBskyFeedPost(Box::new(
+                atrium_api::app::bsky::feed::post::Record {
+                    created_at: atrium_api::types::string::Datetime::now(),
+                    embed: None,
+                    entities: None,
+                    facets: None,
+                    labels: None,
+                    langs: None,
+                    reply: None,
+                    tags: None,
+                    text,
+                },
+            )),
+            repo: atrium_api::types::string::AtIdentifier::Did(session.did),
+            rkey: None,
+            swap_commit: None,
+            validate: None,
+        })
+        .await?)
 }
