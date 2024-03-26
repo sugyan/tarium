@@ -1,7 +1,9 @@
+import { listen } from "@tauri-apps/api/event";
 import { message } from "@tauri-apps/plugin-dialog";
 import { check } from "@tauri-apps/plugin-updater";
 import { useEffect, useRef } from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { EVENT_MENU_RELOAD } from "./constants";
 import "./index.css";
 import Home from "./routes/home";
 import Root from "./routes/root";
@@ -24,11 +26,11 @@ const router = createBrowserRouter([
   },
 ]);
 
-const App = () => {
-  const checking = useRef(false);
+async function useCheckForUpdate() {
+  const isChecking = useRef(false);
   useEffect(() => {
-    if (checking.current) return;
-    checking.current = true;
+    if (isChecking.current) return;
+    isChecking.current = true;
     (async () => {
       const update = await check();
       if (update) {
@@ -37,6 +39,26 @@ const App = () => {
       }
     })();
   }, []);
+}
+
+async function useListen() {
+  const isListening = useRef(false);
+  const unlisten = useRef(() => {});
+  useEffect(() => {
+    if (isListening.current) return;
+    isListening.current = true;
+    (async () => {
+      unlisten.current = await listen<null>(EVENT_MENU_RELOAD, () => {
+        window.location.reload();
+      });
+    })();
+    return () => unlisten.current();
+  }, []);
+}
+
+const App = () => {
+  useCheckForUpdate();
+  useListen();
   return (
     <div className="dark">
       <div className="dark:text-gray-200 dark:bg-gray-800">

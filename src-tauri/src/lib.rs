@@ -1,4 +1,5 @@
 mod commands;
+mod consts;
 mod error;
 mod session_store;
 mod state;
@@ -10,6 +11,7 @@ use atrium_xrpc_client::reqwest::ReqwestClient;
 use std::fs::create_dir_all;
 use std::sync::Arc;
 use tauri::async_runtime::Mutex;
+use tauri::menu::{Menu, MenuItemBuilder, MenuItemKind};
 use tauri::{Manager, Wry};
 
 fn setup(app: &mut tauri::App<Wry>) -> Result<(), Box<dyn std::error::Error>> {
@@ -36,6 +38,28 @@ fn setup(app: &mut tauri::App<Wry>) -> Result<(), Box<dyn std::error::Error>> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .menu(|handle| {
+            let menu = Menu::default(handle)?;
+            for item in menu.items()? {
+                if let MenuItemKind::Submenu(submenu) = &item {
+                    if submenu.text()? == "View" {
+                        if let Some(MenuItemKind::Submenu(submenu)) = menu.get(item.id()) {
+                            submenu.append(
+                                &MenuItemBuilder::with_id(consts::MENU_ID_RELOAD, "Reload")
+                                    .accelerator("cmd+r")
+                                    .build(handle)?,
+                            )?;
+                        }
+                    }
+                }
+            }
+            handle.on_menu_event(|handle, event| {
+                handle
+                    .emit(event.id().as_ref(), ())
+                    .expect("failed to emit event");
+            });
+            Ok(menu)
+        })
         .setup(setup)
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_process::init())
@@ -45,8 +69,8 @@ pub fn run() {
             commands::login,
             commands::logout,
             commands::get_session,
-            commands::get_timeline,
             commands::subscribe,
+            commands::unsubscribe,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
