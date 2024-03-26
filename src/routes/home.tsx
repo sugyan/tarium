@@ -10,15 +10,18 @@ const Home = () => {
   const unlisten = useRef<UnlistenFn>(() => {});
   useEffect(() => {
     (async () => {
-      if (!isListening.current) {
-        isListening.current = true;
-        unlisten.current = await listen<FeedViewPost>("post", (event) => {
-          console.log("got post event: ", event.payload.post.cid);
-          setTimeline((prev) => [event.payload, ...prev]);
-        });
-      }
+      if (isListening.current) return;
+      isListening.current = true;
+      unlisten.current = await listen<FeedViewPost>("post", (event) => {
+        setTimeline((prev) => [event.payload, ...prev]);
+      });
     })();
-    return unlisten.current;
+    return () => {
+      unlisten.current();
+      (async () => {
+        await invoke("unsubscribe", {});
+      })();
+    };
   }, []);
   useEffect(() => {
     (async () => {

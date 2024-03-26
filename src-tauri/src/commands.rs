@@ -55,29 +55,6 @@ pub async fn get_session(
         .await?)
 }
 
-#[tauri::command]
-pub async fn get_timeline(
-    state: tauri::State<'_, State>,
-) -> Result<atrium_api::app::bsky::feed::get_timeline::Output, Error> {
-    Ok(state
-        .inner()
-        .agent
-        .lock()
-        .await
-        .as_ref()
-        .ok_or(Error::NoAgent)?
-        .api
-        .app
-        .bsky
-        .feed
-        .get_timeline(atrium_api::app::bsky::feed::get_timeline::Parameters {
-            algorithm: None,
-            cursor: None,
-            limit: 30.try_into().ok(),
-        })
-        .await?)
-}
-
 async fn background_task(
     agent: Arc<AtpAgent<FileStore, ReqwestClient>>,
     mut receiver: tokio::sync::oneshot::Receiver<()>,
@@ -111,7 +88,7 @@ async fn background_task(
                         }
                         cids.insert(cid);
                         println!("emit {cid}");
-                        app_handle.emit("post", post).ok();
+                        app_handle.emit("post", post).expect("failed to emit post event");
                     }
                 }
             }
@@ -137,6 +114,14 @@ pub async fn subscribe(
             .ok_or(Error::NoAgent)?
             .clone();
         tauri::async_runtime::spawn(background_task(agent, receiver, app_handle));
+    }
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn unsubscribe(state: tauri::State<'_, State>) -> Result<(), Error> {
+    if let Some(sender) = state.inner().sender.lock().await.take() {
+        sender.send(()).expect("failed to send");
     }
     Ok(())
 }
