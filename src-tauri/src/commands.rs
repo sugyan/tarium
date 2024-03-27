@@ -1,10 +1,13 @@
+use crate::consts::EmitEvent;
 use crate::error::Error;
+use crate::events::PostEvent;
 use crate::session_store::FileStore;
 use crate::state::State;
 use atrium_api::agent::AtpAgent;
+use atrium_api::app::bsky::feed::defs::{FeedViewPost, ReplyRefParentEnum};
 use atrium_api::types::Collection;
 use atrium_xrpc_client::reqwest::ReqwestClient;
-use std::collections::HashSet;
+use std::collections::HashMap;
 use std::ops::DerefMut;
 use std::sync::Arc;
 use std::time::Duration;
@@ -61,7 +64,57 @@ async fn background_task(
     mut receiver: tokio::sync::oneshot::Receiver<()>,
     app_handle: tauri::AppHandle,
 ) -> Result<(), Error> {
-    let mut cids = HashSet::new();
+    async fn check_new_post(
+        app_handle: &tauri::AppHandle,
+        agent: &Arc<AtpAgent<FileStore, ReqwestClient>>,
+        cids: &mut HashMap<String, FeedViewPost>,
+    ) -> Result<(), Error> {
+        println!("checking posts");
+        let output = agent
+            .api
+            .app
+            .bsky
+            .feed
+            .get_timeline(atrium_api::app::bsky::feed::get_timeline::Parameters {
+                algorithm: None,
+                cursor: None,
+                limit: 30.try_into().ok(),
+            })
+            .await?;
+        for post in output.feed.iter().rev() {
+            let cid = post.post.cid.as_ref().to_string();
+            if let Some(prev) = cids.get(&cid) {
+                if post.reason != prev.reason
+                    || post.post.reply_count != prev.post.reply_count
+                    || post.post.repost_count != prev.post.repost_count
+                    || post.post.like_count != prev.post.like_count
+                {
+                    app_handle
+                        .emit(EmitEvent::Post.as_ref(), PostEvent::Update(post.clone()))
+                        .expect("failed to emit post event");
+                }
+            } else {
+                if let Some(reply) = &post.reply {
+                    if let ReplyRefParentEnum::PostView(post_view) = &reply.parent {
+                        if let Some(prev) = cids.get(&post_view.cid.as_ref().to_string()) {
+                            app_handle
+                                .emit(
+                                    EmitEvent::Post.as_ref(),
+                                    PostEvent::Delete(prev.post.clone()),
+                                )
+                                .expect("failed to emit post event");
+                        }
+                    }
+                }
+                app_handle
+                    .emit(EmitEvent::Post.as_ref(), PostEvent::Add(post.clone()))
+                    .expect("failed to emit post event");
+            }
+            cids.insert(cid, post.clone());
+        }
+        Ok(())
+    }
+    let mut cids = HashMap::new();
     let mut interval = tokio::time::interval(Duration::from_secs(60));
     loop {
         tokio::select! {
@@ -69,30 +122,7 @@ async fn background_task(
                 println!("cancelling");
                 break;
             }
-            _ = interval.tick() => {
-                println!("checking for new posts");
-                if agent.api.app.bsky.feed.get_timeline(atrium_api::app::bsky::feed::get_timeline::Parameters {
-                    algorithm: None,
-                    cursor: None,
-                    limit: 1.try_into().ok(),
-                }).await?.feed.first().map(|post| !cids.contains(post.post.cid.as_ref())).unwrap_or_default() {
-                    println!("found new post");
-                    let output = agent.api.app.bsky.feed.get_timeline(atrium_api::app::bsky::feed::get_timeline::Parameters {
-                        algorithm: None,
-                        cursor: None,
-                        limit: 30.try_into().ok(),
-                    }).await?;
-                    for post in output.feed.iter().rev() {
-                        let cid = *post.post.cid.as_ref();
-                        if cids.contains(&cid) {
-                            continue;
-                        }
-                        cids.insert(cid);
-                        println!("emit {cid}");
-                        app_handle.emit("post", post).expect("failed to emit post event");
-                    }
-                }
-            }
+            _ = interval.tick() => check_new_post(&app_handle, &agent, &mut cids).await?,
         }
     }
     Ok(())
