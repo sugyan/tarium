@@ -26,7 +26,7 @@ const Sidebar: FC<{ onNewPost: () => void }> = ({ onNewPost }) => {
     }
   };
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full select-none">
       <Link to="/home">
         <HomeIcon className="h-8 w-8 m-4" />
       </Link>

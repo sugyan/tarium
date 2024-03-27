@@ -1,6 +1,7 @@
 mod commands;
 mod consts;
 mod error;
+mod events;
 mod session_store;
 mod state;
 

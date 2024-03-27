@@ -3,6 +3,12 @@ import { UnlistenFn, listen } from "@tauri-apps/api/event";
 import { useEffect, useRef, useState } from "react";
 import Feed from "../components/Feed";
 import { FeedViewPost } from "../types/app/bsky/feed/defs";
+import {
+  FeedPostEvent,
+  isFeedPostAdd,
+  isFeedPostDelete,
+  isFeedPostUpdate,
+} from "../types/post";
 
 const Home = () => {
   const [timeline, setTimeline] = useState<FeedViewPost[]>([]);
@@ -12,8 +18,24 @@ const Home = () => {
     (async () => {
       if (isListening.current) return;
       isListening.current = true;
-      unlisten.current = await listen<FeedViewPost>("post", (event) => {
-        setTimeline((prev) => [event.payload, ...prev]);
+      unlisten.current = await listen<FeedPostEvent>("post", (event) => {
+        const payload = event.payload;
+        console.log(payload);
+        if (isFeedPostAdd(payload)) {
+          setTimeline((prev) => [payload, ...prev]);
+        }
+        if (isFeedPostUpdate(payload)) {
+          setTimeline((prev) =>
+            prev.map((post) => {
+              return post.post.cid === payload.post.cid ? payload : post;
+            })
+          );
+        }
+        if (isFeedPostDelete(payload)) {
+          setTimeline((prev) =>
+            prev.filter((post) => post.post.cid !== payload.cid)
+          );
+        }
       });
     })();
     return () => {
