@@ -2,17 +2,20 @@
   "name": "gen-types",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "esbuild src/index.ts --bundle --platform=node --outdir=dist --external:prettier --watch"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@atproto/lex-cli": "^0.4.0"
+    "@atproto/lex-cli": "^0.4.0",
+    "@atproto/lexicon": "^0.4.0",
+    "prettier": "^3.2.5",
+    "ts-morph": "^22.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.4.3"
+    "@types/node": "^20.11.30",
+    "esbuild": "0.20.2"
   }
 }
