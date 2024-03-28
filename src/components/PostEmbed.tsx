@@ -38,7 +38,9 @@ const External: FC<{ external: ViewExternal }> = ({ external }) => {
         <img src={external.thumb} className="w-full max-h-64 object-cover" />
         <div className="px-3 py-2">
           <div className="text-gray-500 text-sm">{url.host}</div>
-          <div className="font-semibold mb-2">{external.title}</div>
+          <div className="font-semibold mb-2">
+            {external.title || url.toString()}
+          </div>
           <div className="text-sm line-clamp-2 overflow-hidden break-anywhere">
             {external.description}
           </div>
