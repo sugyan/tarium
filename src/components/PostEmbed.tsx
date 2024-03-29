@@ -23,7 +23,11 @@ import {
 import { isRecord } from "../atproto/types/app/bsky/feed/post";
 import DistanceToNow from "./DistanceToNow";
 
-type EmbedView = ExternalView | ImagesView | RecordView | RecordWithMediaView;
+export type EmbedView =
+  | ExternalView
+  | ImagesView
+  | RecordView
+  | RecordWithMediaView;
 
 const Images: FC<{ images: ViewImage[] }> = ({ images }) => {
   return (
