@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { ValidationResult, BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atproto/lexicon";
 import { isObj, hasProp } from "../../../../util";
 import { CID } from "multiformats/cid";
 import * as ComAtprotoRepoStrongRef from "../../../com/atproto/repo/strongRef";
@@ -28,10 +28,6 @@ export function isMain(v: unknown): v is Main {
   );
 }
 
-export function validateMain(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.embed.record#main", v);
-}
-
 export interface View {
   record:
     | ViewRecord
@@ -48,10 +44,6 @@ export function isView(v: unknown): v is View {
   return (
     isObj(v) && hasProp(v, "$type") && v.$type === "app.bsky.embed.record#view"
   );
-}
-
-export function validateView(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.embed.record#view", v);
 }
 
 export interface ViewRecord {
@@ -80,10 +72,6 @@ export function isViewRecord(v: unknown): v is ViewRecord {
   );
 }
 
-export function validateViewRecord(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.embed.record#viewRecord", v);
-}
-
 export interface ViewNotFound {
   uri: string;
   notFound: true;
@@ -96,10 +84,6 @@ export function isViewNotFound(v: unknown): v is ViewNotFound {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.embed.record#viewNotFound"
   );
-}
-
-export function validateViewNotFound(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.embed.record#viewNotFound", v);
 }
 
 export interface ViewBlocked {
@@ -115,8 +99,4 @@ export function isViewBlocked(v: unknown): v is ViewBlocked {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.embed.record#viewBlocked"
   );
-}
-
-export function validateViewBlocked(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.embed.record#viewBlocked", v);
 }

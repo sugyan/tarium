@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { ValidationResult, BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atproto/lexicon";
 import { isObj, hasProp } from "../../../../util";
 import { CID } from "multiformats/cid";
 
@@ -42,8 +42,4 @@ export function isRecord(v: unknown): v is Record {
     hasProp(v, "$type") &&
     v.$type === "com.atproto.repo.listRecords#record"
   );
-}
-
-export function validateRecord(v: unknown): ValidationResult {
-  return lexicons.validate("com.atproto.repo.listRecords#record", v);
 }

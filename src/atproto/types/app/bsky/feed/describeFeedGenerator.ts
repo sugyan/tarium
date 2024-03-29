@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { ValidationResult, BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atproto/lexicon";
 import { isObj, hasProp } from "../../../../util";
 import { CID } from "multiformats/cid";
 
@@ -29,10 +29,6 @@ export function isFeed(v: unknown): v is Feed {
   );
 }
 
-export function validateFeed(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.feed.describeFeedGenerator#feed", v);
-}
-
 export interface Links {
   privacyPolicy?: string;
   termsOfService?: string;
@@ -45,8 +41,4 @@ export function isLinks(v: unknown): v is Links {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.feed.describeFeedGenerator#links"
   );
-}
-
-export function validateLinks(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.feed.describeFeedGenerator#links", v);
 }

@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { ValidationResult, BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atproto/lexicon";
 import { isObj, hasProp } from "../../../../util";
 import { CID } from "multiformats/cid";
 
@@ -26,12 +26,5 @@ export function isSuggestion(v: unknown): v is Suggestion {
     isObj(v) &&
     hasProp(v, "$type") &&
     v.$type === "app.bsky.unspecced.getTaggedSuggestions#suggestion"
-  );
-}
-
-export function validateSuggestion(v: unknown): ValidationResult {
-  return lexicons.validate(
-    "app.bsky.unspecced.getTaggedSuggestions#suggestion",
-    v,
   );
 }

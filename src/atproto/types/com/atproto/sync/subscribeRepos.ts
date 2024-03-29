@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { ValidationResult, BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atproto/lexicon";
 import { isObj, hasProp } from "../../../../util";
 import { CID } from "multiformats/cid";
 
@@ -40,10 +40,6 @@ export function isCommit(v: unknown): v is Commit {
   );
 }
 
-export function validateCommit(v: unknown): ValidationResult {
-  return lexicons.validate("com.atproto.sync.subscribeRepos#commit", v);
-}
-
 /** Represents a change to an account's identity. Could be an updated handle, signing key, or pds hosting endpoint. Serves as a prod to all downstream services to refresh their identity cache. */
 export interface Identity {
   seq: number;
@@ -58,10 +54,6 @@ export function isIdentity(v: unknown): v is Identity {
     hasProp(v, "$type") &&
     v.$type === "com.atproto.sync.subscribeRepos#identity"
   );
-}
-
-export function validateIdentity(v: unknown): ValidationResult {
-  return lexicons.validate("com.atproto.sync.subscribeRepos#identity", v);
 }
 
 /** Represents an update of the account's handle, or transition to/from invalid state. NOTE: Will be deprecated in favor of #identity. */
@@ -81,10 +73,6 @@ export function isHandle(v: unknown): v is Handle {
   );
 }
 
-export function validateHandle(v: unknown): ValidationResult {
-  return lexicons.validate("com.atproto.sync.subscribeRepos#handle", v);
-}
-
 /** Represents an account moving from one PDS instance to another. NOTE: not implemented; account migration uses #identity instead */
 export interface Migrate {
   seq: number;
@@ -100,10 +88,6 @@ export function isMigrate(v: unknown): v is Migrate {
     hasProp(v, "$type") &&
     v.$type === "com.atproto.sync.subscribeRepos#migrate"
   );
-}
-
-export function validateMigrate(v: unknown): ValidationResult {
-  return lexicons.validate("com.atproto.sync.subscribeRepos#migrate", v);
 }
 
 /** Indicates that an account has been deleted. NOTE: may be deprecated in favor of #identity or a future #account event */
@@ -122,10 +106,6 @@ export function isTombstone(v: unknown): v is Tombstone {
   );
 }
 
-export function validateTombstone(v: unknown): ValidationResult {
-  return lexicons.validate("com.atproto.sync.subscribeRepos#tombstone", v);
-}
-
 export interface Info {
   name: "OutdatedCursor" | (string & {});
   message?: string;
@@ -138,10 +118,6 @@ export function isInfo(v: unknown): v is Info {
     hasProp(v, "$type") &&
     v.$type === "com.atproto.sync.subscribeRepos#info"
   );
-}
-
-export function validateInfo(v: unknown): ValidationResult {
-  return lexicons.validate("com.atproto.sync.subscribeRepos#info", v);
 }
 
 /** A repo operation, ie a mutation of a single record. */
@@ -159,8 +135,4 @@ export function isRepoOp(v: unknown): v is RepoOp {
     hasProp(v, "$type") &&
     v.$type === "com.atproto.sync.subscribeRepos#repoOp"
   );
-}
-
-export function validateRepoOp(v: unknown): ValidationResult {
-  return lexicons.validate("com.atproto.sync.subscribeRepos#repoOp", v);
 }

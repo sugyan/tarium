@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { ValidationResult, BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atproto/lexicon";
 import { isObj, hasProp } from "../../../../util";
 import { CID } from "multiformats/cid";
 import * as ComAtprotoLabelDefs from "./defs";
@@ -20,10 +20,6 @@ export function isLabels(v: unknown): v is Labels {
   );
 }
 
-export function validateLabels(v: unknown): ValidationResult {
-  return lexicons.validate("com.atproto.label.subscribeLabels#labels", v);
-}
-
 export interface Info {
   name: "OutdatedCursor" | (string & {});
   message?: string;
@@ -36,8 +32,4 @@ export function isInfo(v: unknown): v is Info {
     hasProp(v, "$type") &&
     v.$type === "com.atproto.label.subscribeLabels#info"
   );
-}
-
-export function validateInfo(v: unknown): ValidationResult {
-  return lexicons.validate("com.atproto.label.subscribeLabels#info", v);
 }

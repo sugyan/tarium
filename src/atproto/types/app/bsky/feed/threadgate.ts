@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { ValidationResult, BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atproto/lexicon";
 import { isObj, hasProp } from "../../../../util";
 import { CID } from "multiformats/cid";
 
@@ -27,10 +27,6 @@ export function isRecord(v: unknown): v is Record {
   );
 }
 
-export function validateRecord(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.feed.threadgate#main", v);
-}
-
 /** Allow replies from actors mentioned in your post. */
 export interface MentionRule {
   [k: string]: unknown;
@@ -42,10 +38,6 @@ export function isMentionRule(v: unknown): v is MentionRule {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.feed.threadgate#mentionRule"
   );
-}
-
-export function validateMentionRule(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.feed.threadgate#mentionRule", v);
 }
 
 /** Allow replies from actors you follow. */
@@ -61,10 +53,6 @@ export function isFollowingRule(v: unknown): v is FollowingRule {
   );
 }
 
-export function validateFollowingRule(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.feed.threadgate#followingRule", v);
-}
-
 /** Allow replies from actors on a list. */
 export interface ListRule {
   list: string;
@@ -77,8 +65,4 @@ export function isListRule(v: unknown): v is ListRule {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.feed.threadgate#listRule"
   );
-}
-
-export function validateListRule(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.feed.threadgate#listRule", v);
 }

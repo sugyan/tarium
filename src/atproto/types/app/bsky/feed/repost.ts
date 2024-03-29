@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { ValidationResult, BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atproto/lexicon";
 import { isObj, hasProp } from "../../../../util";
 import { CID } from "multiformats/cid";
 import * as ComAtprotoRepoStrongRef from "../../../com/atproto/repo/strongRef";
@@ -19,8 +19,4 @@ export function isRecord(v: unknown): v is Record {
     (v.$type === "app.bsky.feed.repost#main" ||
       v.$type === "app.bsky.feed.repost")
   );
-}
-
-export function validateRecord(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.feed.repost#main", v);
 }

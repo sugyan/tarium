@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { ValidationResult, BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atproto/lexicon";
 import { isObj, hasProp } from "../../../../util";
 import { CID } from "multiformats/cid";
 import * as AppBskyActorDefs from "../actor/defs";
@@ -40,10 +40,6 @@ export function isPostView(v: unknown): v is PostView {
   );
 }
 
-export function validatePostView(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.feed.defs#postView", v);
-}
-
 /** Metadata about the requesting account's relationship with the subject content. Only has meaningful content for authed requests. */
 export interface ViewerState {
   repost?: string;
@@ -60,10 +56,6 @@ export function isViewerState(v: unknown): v is ViewerState {
   );
 }
 
-export function validateViewerState(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.feed.defs#viewerState", v);
-}
-
 export interface FeedViewPost {
   post: PostView;
   reply?: ReplyRef;
@@ -77,10 +69,6 @@ export function isFeedViewPost(v: unknown): v is FeedViewPost {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.feed.defs#feedViewPost"
   );
-}
-
-export function validateFeedViewPost(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.feed.defs#feedViewPost", v);
 }
 
 export interface ReplyRef {
@@ -103,10 +91,6 @@ export function isReplyRef(v: unknown): v is ReplyRef {
   );
 }
 
-export function validateReplyRef(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.feed.defs#replyRef", v);
-}
-
 export interface ReasonRepost {
   by: AppBskyActorDefs.ProfileViewBasic;
   indexedAt: string;
@@ -119,10 +103,6 @@ export function isReasonRepost(v: unknown): v is ReasonRepost {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.feed.defs#reasonRepost"
   );
-}
-
-export function validateReasonRepost(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.feed.defs#reasonRepost", v);
 }
 
 export interface ThreadViewPost {
@@ -149,10 +129,6 @@ export function isThreadViewPost(v: unknown): v is ThreadViewPost {
   );
 }
 
-export function validateThreadViewPost(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.feed.defs#threadViewPost", v);
-}
-
 export interface NotFoundPost {
   uri: string;
   notFound: true;
@@ -165,10 +141,6 @@ export function isNotFoundPost(v: unknown): v is NotFoundPost {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.feed.defs#notFoundPost"
   );
-}
-
-export function validateNotFoundPost(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.feed.defs#notFoundPost", v);
 }
 
 export interface BlockedPost {
@@ -186,10 +158,6 @@ export function isBlockedPost(v: unknown): v is BlockedPost {
   );
 }
 
-export function validateBlockedPost(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.feed.defs#blockedPost", v);
-}
-
 export interface BlockedAuthor {
   did: string;
   viewer?: AppBskyActorDefs.ViewerState;
@@ -202,10 +170,6 @@ export function isBlockedAuthor(v: unknown): v is BlockedAuthor {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.feed.defs#blockedAuthor"
   );
-}
-
-export function validateBlockedAuthor(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.feed.defs#blockedAuthor", v);
 }
 
 export interface GeneratorView {
@@ -232,10 +196,6 @@ export function isGeneratorView(v: unknown): v is GeneratorView {
   );
 }
 
-export function validateGeneratorView(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.feed.defs#generatorView", v);
-}
-
 export interface GeneratorViewerState {
   like?: string;
   [k: string]: unknown;
@@ -247,10 +207,6 @@ export function isGeneratorViewerState(v: unknown): v is GeneratorViewerState {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.feed.defs#generatorViewerState"
   );
-}
-
-export function validateGeneratorViewerState(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.feed.defs#generatorViewerState", v);
 }
 
 export interface SkeletonFeedPost {
@@ -267,10 +223,6 @@ export function isSkeletonFeedPost(v: unknown): v is SkeletonFeedPost {
   );
 }
 
-export function validateSkeletonFeedPost(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.feed.defs#skeletonFeedPost", v);
-}
-
 export interface SkeletonReasonRepost {
   repost: string;
   [k: string]: unknown;
@@ -282,10 +234,6 @@ export function isSkeletonReasonRepost(v: unknown): v is SkeletonReasonRepost {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.feed.defs#skeletonReasonRepost"
   );
-}
-
-export function validateSkeletonReasonRepost(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.feed.defs#skeletonReasonRepost", v);
 }
 
 export interface ThreadgateView {
@@ -302,8 +250,4 @@ export function isThreadgateView(v: unknown): v is ThreadgateView {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.feed.defs#threadgateView"
   );
-}
-
-export function validateThreadgateView(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.feed.defs#threadgateView", v);
 }

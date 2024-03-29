@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { ValidationResult, BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atproto/lexicon";
 import { isObj, hasProp } from "../../../../util";
 import { CID } from "multiformats/cid";
 
@@ -20,10 +20,6 @@ export function isMain(v: unknown): v is Main {
   );
 }
 
-export function validateMain(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.embed.external#main", v);
-}
-
 export interface External {
   uri: string;
   title: string;
@@ -40,10 +36,6 @@ export function isExternal(v: unknown): v is External {
   );
 }
 
-export function validateExternal(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.embed.external#external", v);
-}
-
 export interface View {
   external: ViewExternal;
   [k: string]: unknown;
@@ -55,10 +47,6 @@ export function isView(v: unknown): v is View {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.embed.external#view"
   );
-}
-
-export function validateView(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.embed.external#view", v);
 }
 
 export interface ViewExternal {
@@ -75,8 +63,4 @@ export function isViewExternal(v: unknown): v is ViewExternal {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.embed.external#viewExternal"
   );
-}
-
-export function validateViewExternal(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.embed.external#viewExternal", v);
 }

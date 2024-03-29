@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { ValidationResult, BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atproto/lexicon";
 import { isObj, hasProp } from "../../../../util";
 import { CID } from "multiformats/cid";
 import * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs";
@@ -27,8 +27,4 @@ export function isRecord(v: unknown): v is Record {
     (v.$type === "app.bsky.actor.profile#main" ||
       v.$type === "app.bsky.actor.profile")
   );
-}
-
-export function validateRecord(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.actor.profile#main", v);
 }

@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { ValidationResult, BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atproto/lexicon";
 import { isObj, hasProp } from "../../../../util";
 import { CID } from "multiformats/cid";
 import * as AppBskyRichtextFacet from "../richtext/facet";
@@ -46,10 +46,6 @@ export function isRecord(v: unknown): v is Record {
   );
 }
 
-export function validateRecord(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.feed.post#main", v);
-}
-
 export interface ReplyRef {
   root: ComAtprotoRepoStrongRef.Main;
   parent: ComAtprotoRepoStrongRef.Main;
@@ -60,10 +56,6 @@ export function isReplyRef(v: unknown): v is ReplyRef {
   return (
     isObj(v) && hasProp(v, "$type") && v.$type === "app.bsky.feed.post#replyRef"
   );
-}
-
-export function validateReplyRef(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.feed.post#replyRef", v);
 }
 
 /** Deprecated: use facets instead. */
@@ -81,10 +73,6 @@ export function isEntity(v: unknown): v is Entity {
   );
 }
 
-export function validateEntity(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.feed.post#entity", v);
-}
-
 /** Deprecated. Use app.bsky.richtext instead -- A text segment. Start is inclusive, end is exclusive. Indices are for utf16-encoded strings. */
 export interface TextSlice {
   start: number;
@@ -98,8 +86,4 @@ export function isTextSlice(v: unknown): v is TextSlice {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.feed.post#textSlice"
   );
-}
-
-export function validateTextSlice(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.feed.post#textSlice", v);
 }

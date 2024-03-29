@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { ValidationResult, BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atproto/lexicon";
 import { isObj, hasProp } from "../../../../util";
 import { CID } from "multiformats/cid";
 
@@ -25,12 +25,5 @@ export function isAppPassword(v: unknown): v is AppPassword {
     isObj(v) &&
     hasProp(v, "$type") &&
     v.$type === "com.atproto.server.listAppPasswords#appPassword"
-  );
-}
-
-export function validateAppPassword(v: unknown): ValidationResult {
-  return lexicons.validate(
-    "com.atproto.server.listAppPasswords#appPassword",
-    v,
   );
 }

@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { ValidationResult, BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atproto/lexicon";
 import { isObj, hasProp } from "../../../../util";
 import { CID } from "multiformats/cid";
 import * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs";
@@ -28,10 +28,6 @@ export function isListViewBasic(v: unknown): v is ListViewBasic {
   );
 }
 
-export function validateListViewBasic(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.graph.defs#listViewBasic", v);
-}
-
 export interface ListView {
   uri: string;
   cid: string;
@@ -55,10 +51,6 @@ export function isListView(v: unknown): v is ListView {
   );
 }
 
-export function validateListView(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.graph.defs#listView", v);
-}
-
 export interface ListItemView {
   uri: string;
   subject: AppBskyActorDefs.ProfileView;
@@ -71,10 +63,6 @@ export function isListItemView(v: unknown): v is ListItemView {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.graph.defs#listItemView"
   );
-}
-
-export function validateListItemView(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.graph.defs#listItemView", v);
 }
 
 export type ListPurpose =
@@ -101,10 +89,6 @@ export function isListViewerState(v: unknown): v is ListViewerState {
   );
 }
 
-export function validateListViewerState(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.graph.defs#listViewerState", v);
-}
-
 /** indicates that a handle or DID could not be resolved */
 export interface NotFoundActor {
   actor: string;
@@ -118,10 +102,6 @@ export function isNotFoundActor(v: unknown): v is NotFoundActor {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.graph.defs#notFoundActor"
   );
-}
-
-export function validateNotFoundActor(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.graph.defs#notFoundActor", v);
 }
 
 /** lists the bi-directional graph relationships between one actor (not indicated in the object), and the target actors (the DID included in the object) */
@@ -140,8 +120,4 @@ export function isRelationship(v: unknown): v is Relationship {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.graph.defs#relationship"
   );
-}
-
-export function validateRelationship(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.graph.defs#relationship", v);
 }

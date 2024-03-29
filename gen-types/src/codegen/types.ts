@@ -5,9 +5,7 @@ import {
 } from "@atproto/lex-cli/node_modules/ts-morph";
 import {
   genImports,
-  genObjHelpers,
   genObject,
-  genUserType,
   genXrpcInput,
   genXrpcOutput,
   genXrpcParams,
@@ -15,6 +13,7 @@ import {
 import { GeneratedAPI } from "@atproto/lex-cli/src/types";
 import { LexiconDoc, Lexicons } from "@atproto/lexicon";
 import { gen, utilTs } from "./common";
+import { genObjHelpers, genUserType } from "./lex-gen";
 
 export async function genTypes(
   lexiconDocs: LexiconDoc[]
@@ -43,13 +42,12 @@ const lexiconTs = (
     async (file) => {
       const imports: Set<string> = new Set();
 
-      const main = lexiconDoc.defs.main;
       //= import {ValidationResult, BlobRef} from '@atproto/lexicon'
       file
         .addImportDeclaration({
           moduleSpecifier: "@atproto/lexicon",
         })
-        .addNamedImports([{ name: "ValidationResult" }, { name: "BlobRef" }]);
+        .addNamedImports([{ name: "BlobRef" }]);
       //= import {isObj, hasProp} from '../../util.ts'
       file
         .addImportDeclaration({

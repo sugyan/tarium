@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { ValidationResult, BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atproto/lexicon";
 import { isObj, hasProp } from "../../../../util";
 import { CID } from "multiformats/cid";
 
@@ -30,8 +30,4 @@ export function isRecordBlob(v: unknown): v is RecordBlob {
     hasProp(v, "$type") &&
     v.$type === "com.atproto.repo.listMissingBlobs#recordBlob"
   );
-}
-
-export function validateRecordBlob(v: unknown): ValidationResult {
-  return lexicons.validate("com.atproto.repo.listMissingBlobs#recordBlob", v);
 }

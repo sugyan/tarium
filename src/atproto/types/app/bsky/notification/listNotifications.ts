@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { ValidationResult, BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atproto/lexicon";
 import { isObj, hasProp } from "../../../../util";
 import { CID } from "multiformats/cid";
 import * as AppBskyActorDefs from "../actor/defs";
@@ -48,12 +48,5 @@ export function isNotification(v: unknown): v is Notification {
     isObj(v) &&
     hasProp(v, "$type") &&
     v.$type === "app.bsky.notification.listNotifications#notification"
-  );
-}
-
-export function validateNotification(v: unknown): ValidationResult {
-  return lexicons.validate(
-    "app.bsky.notification.listNotifications#notification",
-    v,
   );
 }

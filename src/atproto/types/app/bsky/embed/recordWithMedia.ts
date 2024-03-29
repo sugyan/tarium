@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { ValidationResult, BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atproto/lexicon";
 import { isObj, hasProp } from "../../../../util";
 import { CID } from "multiformats/cid";
 import * as AppBskyEmbedRecord from "./record";
@@ -26,10 +26,6 @@ export function isMain(v: unknown): v is Main {
   );
 }
 
-export function validateMain(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.embed.recordWithMedia#main", v);
-}
-
 export interface View {
   record: AppBskyEmbedRecord.View;
   media:
@@ -45,8 +41,4 @@ export function isView(v: unknown): v is View {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.embed.recordWithMedia#view"
   );
-}
-
-export function validateView(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.embed.recordWithMedia#view", v);
 }

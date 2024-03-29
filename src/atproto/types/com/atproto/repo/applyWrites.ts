@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { ValidationResult, BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atproto/lexicon";
 import { isObj, hasProp } from "../../../../util";
 import { CID } from "multiformats/cid";
 
@@ -34,10 +34,6 @@ export function isCreate(v: unknown): v is Create {
   );
 }
 
-export function validateCreate(v: unknown): ValidationResult {
-  return lexicons.validate("com.atproto.repo.applyWrites#create", v);
-}
-
 /** Operation which updates an existing record. */
 export interface Update {
   collection: string;
@@ -54,10 +50,6 @@ export function isUpdate(v: unknown): v is Update {
   );
 }
 
-export function validateUpdate(v: unknown): ValidationResult {
-  return lexicons.validate("com.atproto.repo.applyWrites#update", v);
-}
-
 /** Operation which deletes an existing record. */
 export interface Delete {
   collection: string;
@@ -71,8 +63,4 @@ export function isDelete(v: unknown): v is Delete {
     hasProp(v, "$type") &&
     v.$type === "com.atproto.repo.applyWrites#delete"
   );
-}
-
-export function validateDelete(v: unknown): ValidationResult {
-  return lexicons.validate("com.atproto.repo.applyWrites#delete", v);
 }

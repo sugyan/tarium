@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { ValidationResult, BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atproto/lexicon";
 import { isObj, hasProp } from "../../../../util";
 import { CID } from "multiformats/cid";
 import * as AppBskyActorDefs from "../actor/defs";
@@ -36,8 +36,4 @@ export function isLike(v: unknown): v is Like {
   return (
     isObj(v) && hasProp(v, "$type") && v.$type === "app.bsky.feed.getLikes#like"
   );
-}
-
-export function validateLike(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.feed.getLikes#like", v);
 }

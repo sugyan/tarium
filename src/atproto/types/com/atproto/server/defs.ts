@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { ValidationResult, BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atproto/lexicon";
 import { isObj, hasProp } from "../../../../util";
 import { CID } from "multiformats/cid";
 
@@ -24,10 +24,6 @@ export function isInviteCode(v: unknown): v is InviteCode {
   );
 }
 
-export function validateInviteCode(v: unknown): ValidationResult {
-  return lexicons.validate("com.atproto.server.defs#inviteCode", v);
-}
-
 export interface InviteCodeUse {
   usedBy: string;
   usedAt: string;
@@ -40,8 +36,4 @@ export function isInviteCodeUse(v: unknown): v is InviteCodeUse {
     hasProp(v, "$type") &&
     v.$type === "com.atproto.server.defs#inviteCodeUse"
   );
-}
-
-export function validateInviteCodeUse(v: unknown): ValidationResult {
-  return lexicons.validate("com.atproto.server.defs#inviteCodeUse", v);
 }

@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { ValidationResult, BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atproto/lexicon";
 import { isObj, hasProp } from "../../../../util";
 import { CID } from "multiformats/cid";
 
@@ -36,10 +36,6 @@ export function isLinks(v: unknown): v is Links {
   );
 }
 
-export function validateLinks(v: unknown): ValidationResult {
-  return lexicons.validate("com.atproto.server.describeServer#links", v);
-}
-
 export interface Contact {
   email?: string;
   [k: string]: unknown;
@@ -51,8 +47,4 @@ export function isContact(v: unknown): v is Contact {
     hasProp(v, "$type") &&
     v.$type === "com.atproto.server.describeServer#contact"
   );
-}
-
-export function validateContact(v: unknown): ValidationResult {
-  return lexicons.validate("com.atproto.server.describeServer#contact", v);
 }

@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { ValidationResult, BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atproto/lexicon";
 import { isObj, hasProp } from "../../../../util";
 import { CID } from "multiformats/cid";
 
@@ -27,8 +27,4 @@ export function isTemplateView(v: unknown): v is TemplateView {
     hasProp(v, "$type") &&
     v.$type === "tools.ozone.communication.defs#templateView"
   );
-}
-
-export function validateTemplateView(v: unknown): ValidationResult {
-  return lexicons.validate("tools.ozone.communication.defs#templateView", v);
 }

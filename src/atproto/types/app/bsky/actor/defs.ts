@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { ValidationResult, BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atproto/lexicon";
 import { isObj, hasProp } from "../../../../util";
 import { CID } from "multiformats/cid";
 import * as ComAtprotoLabelDefs from "../../../com/atproto/label/defs";
@@ -26,10 +26,6 @@ export function isProfileViewBasic(v: unknown): v is ProfileViewBasic {
   );
 }
 
-export function validateProfileViewBasic(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.actor.defs#profileViewBasic", v);
-}
-
 export interface ProfileView {
   did: string;
   handle: string;
@@ -49,10 +45,6 @@ export function isProfileView(v: unknown): v is ProfileView {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.actor.defs#profileView"
   );
-}
-
-export function validateProfileView(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.actor.defs#profileView", v);
 }
 
 export interface ProfileViewDetailed {
@@ -80,10 +72,6 @@ export function isProfileViewDetailed(v: unknown): v is ProfileViewDetailed {
   );
 }
 
-export function validateProfileViewDetailed(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.actor.defs#profileViewDetailed", v);
-}
-
 export interface ProfileAssociated {
   lists?: number;
   feedgens?: number;
@@ -97,10 +85,6 @@ export function isProfileAssociated(v: unknown): v is ProfileAssociated {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.actor.defs#profileAssociated"
   );
-}
-
-export function validateProfileAssociated(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.actor.defs#profileAssociated", v);
 }
 
 /** Metadata about the requesting account's relationship with the subject account. Only has meaningful content for authed requests. */
@@ -121,10 +105,6 @@ export function isViewerState(v: unknown): v is ViewerState {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.actor.defs#viewerState"
   );
-}
-
-export function validateViewerState(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.actor.defs#viewerState", v);
 }
 
 export type Preferences = (
@@ -153,10 +133,6 @@ export function isAdultContentPref(v: unknown): v is AdultContentPref {
   );
 }
 
-export function validateAdultContentPref(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.actor.defs#adultContentPref", v);
-}
-
 export interface ContentLabelPref {
   /** Which labeler does this preference apply to? If undefined, applies globally. */
   labelerDid?: string;
@@ -171,10 +147,6 @@ export function isContentLabelPref(v: unknown): v is ContentLabelPref {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.actor.defs#contentLabelPref"
   );
-}
-
-export function validateContentLabelPref(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.actor.defs#contentLabelPref", v);
 }
 
 export interface SavedFeedsPref {
@@ -192,10 +164,6 @@ export function isSavedFeedsPref(v: unknown): v is SavedFeedsPref {
   );
 }
 
-export function validateSavedFeedsPref(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.actor.defs#savedFeedsPref", v);
-}
-
 export interface PersonalDetailsPref {
   /** The birth date of account owner. */
   birthDate?: string;
@@ -208,10 +176,6 @@ export function isPersonalDetailsPref(v: unknown): v is PersonalDetailsPref {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.actor.defs#personalDetailsPref"
   );
-}
-
-export function validatePersonalDetailsPref(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.actor.defs#personalDetailsPref", v);
 }
 
 export interface FeedViewPref {
@@ -238,10 +202,6 @@ export function isFeedViewPref(v: unknown): v is FeedViewPref {
   );
 }
 
-export function validateFeedViewPref(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.actor.defs#feedViewPref", v);
-}
-
 export interface ThreadViewPref {
   /** Sorting mode for threads. */
   sort?: "oldest" | "newest" | "most-likes" | "random" | (string & {});
@@ -258,10 +218,6 @@ export function isThreadViewPref(v: unknown): v is ThreadViewPref {
   );
 }
 
-export function validateThreadViewPref(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.actor.defs#threadViewPref", v);
-}
-
 export interface InterestsPref {
   /** A list of tags which describe the account owner's interests gathered during onboarding. */
   tags: string[];
@@ -274,10 +230,6 @@ export function isInterestsPref(v: unknown): v is InterestsPref {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.actor.defs#interestsPref"
   );
-}
-
-export function validateInterestsPref(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.actor.defs#interestsPref", v);
 }
 
 export type MutedWordTarget = "content" | "tag" | (string & {});
@@ -299,10 +251,6 @@ export function isMutedWord(v: unknown): v is MutedWord {
   );
 }
 
-export function validateMutedWord(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.actor.defs#mutedWord", v);
-}
-
 export interface MutedWordsPref {
   /** A list of words the account owner has muted. */
   items: MutedWord[];
@@ -315,10 +263,6 @@ export function isMutedWordsPref(v: unknown): v is MutedWordsPref {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.actor.defs#mutedWordsPref"
   );
-}
-
-export function validateMutedWordsPref(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.actor.defs#mutedWordsPref", v);
 }
 
 export interface HiddenPostsPref {
@@ -335,10 +279,6 @@ export function isHiddenPostsPref(v: unknown): v is HiddenPostsPref {
   );
 }
 
-export function validateHiddenPostsPref(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.actor.defs#hiddenPostsPref", v);
-}
-
 export interface LabelersPref {
   labelers: LabelerPrefItem[];
   [k: string]: unknown;
@@ -352,10 +292,6 @@ export function isLabelersPref(v: unknown): v is LabelersPref {
   );
 }
 
-export function validateLabelersPref(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.actor.defs#labelersPref", v);
-}
-
 export interface LabelerPrefItem {
   did: string;
   [k: string]: unknown;
@@ -367,8 +303,4 @@ export function isLabelerPrefItem(v: unknown): v is LabelerPrefItem {
     hasProp(v, "$type") &&
     v.$type === "app.bsky.actor.defs#labelerPrefItem"
   );
-}
-
-export function validateLabelerPrefItem(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.actor.defs#labelerPrefItem", v);
 }

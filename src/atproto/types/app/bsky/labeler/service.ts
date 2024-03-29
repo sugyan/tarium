@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { ValidationResult, BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atproto/lexicon";
 import { isObj, hasProp } from "../../../../util";
 import { CID } from "multiformats/cid";
 import * as AppBskyLabelerDefs from "./defs";
@@ -23,8 +23,4 @@ export function isRecord(v: unknown): v is Record {
     (v.$type === "app.bsky.labeler.service#main" ||
       v.$type === "app.bsky.labeler.service")
   );
-}
-
-export function validateRecord(v: unknown): ValidationResult {
-  return lexicons.validate("app.bsky.labeler.service#main", v);
 }

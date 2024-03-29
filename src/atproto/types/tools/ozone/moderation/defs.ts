@@ -1,7 +1,7 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { ValidationResult, BlobRef } from "@atproto/lexicon";
+import { BlobRef } from "@atproto/lexicon";
 import { isObj, hasProp } from "../../../../util";
 import { CID } from "multiformats/cid";
 import * as ComAtprotoAdminDefs from "../../../com/atproto/admin/defs";
@@ -45,10 +45,6 @@ export function isModEventView(v: unknown): v is ModEventView {
   );
 }
 
-export function validateModEventView(v: unknown): ValidationResult {
-  return lexicons.validate("tools.ozone.moderation.defs#modEventView", v);
-}
-
 export interface ModEventViewDetail {
   id: number;
   event:
@@ -82,10 +78,6 @@ export function isModEventViewDetail(v: unknown): v is ModEventViewDetail {
     hasProp(v, "$type") &&
     v.$type === "tools.ozone.moderation.defs#modEventViewDetail"
   );
-}
-
-export function validateModEventViewDetail(v: unknown): ValidationResult {
-  return lexicons.validate("tools.ozone.moderation.defs#modEventViewDetail", v);
 }
 
 export interface SubjectStatusView {
@@ -125,10 +117,6 @@ export function isSubjectStatusView(v: unknown): v is SubjectStatusView {
   );
 }
 
-export function validateSubjectStatusView(v: unknown): ValidationResult {
-  return lexicons.validate("tools.ozone.moderation.defs#subjectStatusView", v);
-}
-
 export type SubjectReviewState =
   | "lex:tools.ozone.moderation.defs#reviewOpen"
   | "lex:tools.ozone.moderation.defs#reviewEscalated"
@@ -161,10 +149,6 @@ export function isModEventTakedown(v: unknown): v is ModEventTakedown {
   );
 }
 
-export function validateModEventTakedown(v: unknown): ValidationResult {
-  return lexicons.validate("tools.ozone.moderation.defs#modEventTakedown", v);
-}
-
 /** Revert take down action on a subject */
 export interface ModEventReverseTakedown {
   /** Describe reasoning behind the reversal. */
@@ -179,13 +163,6 @@ export function isModEventReverseTakedown(
     isObj(v) &&
     hasProp(v, "$type") &&
     v.$type === "tools.ozone.moderation.defs#modEventReverseTakedown"
-  );
-}
-
-export function validateModEventReverseTakedown(v: unknown): ValidationResult {
-  return lexicons.validate(
-    "tools.ozone.moderation.defs#modEventReverseTakedown",
-    v,
   );
 }
 
@@ -206,13 +183,6 @@ export function isModEventResolveAppeal(
   );
 }
 
-export function validateModEventResolveAppeal(v: unknown): ValidationResult {
-  return lexicons.validate(
-    "tools.ozone.moderation.defs#modEventResolveAppeal",
-    v,
-  );
-}
-
 /** Add a comment to a subject */
 export interface ModEventComment {
   comment: string;
@@ -229,10 +199,6 @@ export function isModEventComment(v: unknown): v is ModEventComment {
   );
 }
 
-export function validateModEventComment(v: unknown): ValidationResult {
-  return lexicons.validate("tools.ozone.moderation.defs#modEventComment", v);
-}
-
 /** Report a subject */
 export interface ModEventReport {
   comment?: string;
@@ -246,10 +212,6 @@ export function isModEventReport(v: unknown): v is ModEventReport {
     hasProp(v, "$type") &&
     v.$type === "tools.ozone.moderation.defs#modEventReport"
   );
-}
-
-export function validateModEventReport(v: unknown): ValidationResult {
-  return lexicons.validate("tools.ozone.moderation.defs#modEventReport", v);
 }
 
 /** Apply/Negate labels on a subject */
@@ -268,10 +230,6 @@ export function isModEventLabel(v: unknown): v is ModEventLabel {
   );
 }
 
-export function validateModEventLabel(v: unknown): ValidationResult {
-  return lexicons.validate("tools.ozone.moderation.defs#modEventLabel", v);
-}
-
 export interface ModEventAcknowledge {
   comment?: string;
   [k: string]: unknown;
@@ -282,13 +240,6 @@ export function isModEventAcknowledge(v: unknown): v is ModEventAcknowledge {
     isObj(v) &&
     hasProp(v, "$type") &&
     v.$type === "tools.ozone.moderation.defs#modEventAcknowledge"
-  );
-}
-
-export function validateModEventAcknowledge(v: unknown): ValidationResult {
-  return lexicons.validate(
-    "tools.ozone.moderation.defs#modEventAcknowledge",
-    v,
   );
 }
 
@@ -303,10 +254,6 @@ export function isModEventEscalate(v: unknown): v is ModEventEscalate {
     hasProp(v, "$type") &&
     v.$type === "tools.ozone.moderation.defs#modEventEscalate"
   );
-}
-
-export function validateModEventEscalate(v: unknown): ValidationResult {
-  return lexicons.validate("tools.ozone.moderation.defs#modEventEscalate", v);
 }
 
 /** Mute incoming reports on a subject */
@@ -325,10 +272,6 @@ export function isModEventMute(v: unknown): v is ModEventMute {
   );
 }
 
-export function validateModEventMute(v: unknown): ValidationResult {
-  return lexicons.validate("tools.ozone.moderation.defs#modEventMute", v);
-}
-
 /** Unmute action on a subject */
 export interface ModEventUnmute {
   /** Describe reasoning behind the reversal. */
@@ -342,10 +285,6 @@ export function isModEventUnmute(v: unknown): v is ModEventUnmute {
     hasProp(v, "$type") &&
     v.$type === "tools.ozone.moderation.defs#modEventUnmute"
   );
-}
-
-export function validateModEventUnmute(v: unknown): ValidationResult {
-  return lexicons.validate("tools.ozone.moderation.defs#modEventUnmute", v);
 }
 
 /** Keep a log of outgoing email to a user */
@@ -367,10 +306,6 @@ export function isModEventEmail(v: unknown): v is ModEventEmail {
   );
 }
 
-export function validateModEventEmail(v: unknown): ValidationResult {
-  return lexicons.validate("tools.ozone.moderation.defs#modEventEmail", v);
-}
-
 /** Divert a record's blobs to a 3rd party service for further scanning/tagging */
 export interface ModEventDivert {
   comment?: string;
@@ -383,10 +318,6 @@ export function isModEventDivert(v: unknown): v is ModEventDivert {
     hasProp(v, "$type") &&
     v.$type === "tools.ozone.moderation.defs#modEventDivert"
   );
-}
-
-export function validateModEventDivert(v: unknown): ValidationResult {
-  return lexicons.validate("tools.ozone.moderation.defs#modEventDivert", v);
 }
 
 /** Add/Remove a tag on a subject */
@@ -408,10 +339,6 @@ export function isModEventTag(v: unknown): v is ModEventTag {
   );
 }
 
-export function validateModEventTag(v: unknown): ValidationResult {
-  return lexicons.validate("tools.ozone.moderation.defs#modEventTag", v);
-}
-
 export interface RepoView {
   did: string;
   handle: string;
@@ -431,10 +358,6 @@ export function isRepoView(v: unknown): v is RepoView {
     hasProp(v, "$type") &&
     v.$type === "tools.ozone.moderation.defs#repoView"
   );
-}
-
-export function validateRepoView(v: unknown): ValidationResult {
-  return lexicons.validate("tools.ozone.moderation.defs#repoView", v);
 }
 
 export interface RepoViewDetail {
@@ -461,10 +384,6 @@ export function isRepoViewDetail(v: unknown): v is RepoViewDetail {
   );
 }
 
-export function validateRepoViewDetail(v: unknown): ValidationResult {
-  return lexicons.validate("tools.ozone.moderation.defs#repoViewDetail", v);
-}
-
 export interface RepoViewNotFound {
   did: string;
   [k: string]: unknown;
@@ -476,10 +395,6 @@ export function isRepoViewNotFound(v: unknown): v is RepoViewNotFound {
     hasProp(v, "$type") &&
     v.$type === "tools.ozone.moderation.defs#repoViewNotFound"
   );
-}
-
-export function validateRepoViewNotFound(v: unknown): ValidationResult {
-  return lexicons.validate("tools.ozone.moderation.defs#repoViewNotFound", v);
 }
 
 export interface RecordView {
@@ -499,10 +414,6 @@ export function isRecordView(v: unknown): v is RecordView {
     hasProp(v, "$type") &&
     v.$type === "tools.ozone.moderation.defs#recordView"
   );
-}
-
-export function validateRecordView(v: unknown): ValidationResult {
-  return lexicons.validate("tools.ozone.moderation.defs#recordView", v);
 }
 
 export interface RecordViewDetail {
@@ -525,10 +436,6 @@ export function isRecordViewDetail(v: unknown): v is RecordViewDetail {
   );
 }
 
-export function validateRecordViewDetail(v: unknown): ValidationResult {
-  return lexicons.validate("tools.ozone.moderation.defs#recordViewDetail", v);
-}
-
 export interface RecordViewNotFound {
   uri: string;
   [k: string]: unknown;
@@ -540,10 +447,6 @@ export function isRecordViewNotFound(v: unknown): v is RecordViewNotFound {
     hasProp(v, "$type") &&
     v.$type === "tools.ozone.moderation.defs#recordViewNotFound"
   );
-}
-
-export function validateRecordViewNotFound(v: unknown): ValidationResult {
-  return lexicons.validate("tools.ozone.moderation.defs#recordViewNotFound", v);
 }
 
 export interface Moderation {
@@ -559,10 +462,6 @@ export function isModeration(v: unknown): v is Moderation {
   );
 }
 
-export function validateModeration(v: unknown): ValidationResult {
-  return lexicons.validate("tools.ozone.moderation.defs#moderation", v);
-}
-
 export interface ModerationDetail {
   subjectStatus?: SubjectStatusView;
   [k: string]: unknown;
@@ -574,10 +473,6 @@ export function isModerationDetail(v: unknown): v is ModerationDetail {
     hasProp(v, "$type") &&
     v.$type === "tools.ozone.moderation.defs#moderationDetail"
   );
-}
-
-export function validateModerationDetail(v: unknown): ValidationResult {
-  return lexicons.validate("tools.ozone.moderation.defs#moderationDetail", v);
 }
 
 export interface BlobView {
@@ -601,10 +496,6 @@ export function isBlobView(v: unknown): v is BlobView {
   );
 }
 
-export function validateBlobView(v: unknown): ValidationResult {
-  return lexicons.validate("tools.ozone.moderation.defs#blobView", v);
-}
-
 export interface ImageDetails {
   width: number;
   height: number;
@@ -617,10 +508,6 @@ export function isImageDetails(v: unknown): v is ImageDetails {
     hasProp(v, "$type") &&
     v.$type === "tools.ozone.moderation.defs#imageDetails"
   );
-}
-
-export function validateImageDetails(v: unknown): ValidationResult {
-  return lexicons.validate("tools.ozone.moderation.defs#imageDetails", v);
 }
 
 export interface VideoDetails {
@@ -636,8 +523,4 @@ export function isVideoDetails(v: unknown): v is VideoDetails {
     hasProp(v, "$type") &&
     v.$type === "tools.ozone.moderation.defs#videoDetails"
   );
-}
-
-export function validateVideoDetails(v: unknown): ValidationResult {
-  return lexicons.validate("tools.ozone.moderation.defs#videoDetails", v);
 }
