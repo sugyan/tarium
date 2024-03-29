@@ -3,7 +3,6 @@
  */
 import { ValidationResult, BlobRef } from "@atproto/lexicon";
 import { isObj, hasProp } from "../../../../util";
-import { lexicons } from "../../../../lexicons";
 import { CID } from "multiformats/cid";
 
 /** Annotation of a sub-string within rich text. */

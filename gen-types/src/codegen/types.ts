@@ -14,7 +14,7 @@ import {
 } from "@atproto/lex-cli/src/codegen/lex-gen";
 import { GeneratedAPI } from "@atproto/lex-cli/src/types";
 import { LexiconDoc, Lexicons } from "@atproto/lexicon";
-import { gen, lexiconsTs, utilTs } from "./common";
+import { gen, utilTs } from "./common";
 
 export async function genTypes(
   lexiconDocs: LexiconDoc[]
@@ -29,7 +29,6 @@ export async function genTypes(
     api.files.push(await lexiconTs(project, lexicons, lexiconDoc));
   }
   api.files.push(await utilTs(project));
-  api.files.push(await lexiconsTs(project, lexiconDocs));
   return api;
 }
 
@@ -45,17 +44,6 @@ const lexiconTs = (
       const imports: Set<string> = new Set();
 
       const main = lexiconDoc.defs.main;
-      // if (
-      //   main?.type === "query" ||
-      //   main?.type === "subscription" ||
-      //   main?.type === "procedure"
-      // ) {
-      //   //= import {Headers, XRPCError} from '@atproto/xrpc'
-      //   const xrpcImport = file.addImportDeclaration({
-      //     moduleSpecifier: "@atproto/xrpc",
-      //   });
-      //   xrpcImport.addNamedImports([{ name: "Headers" }, { name: "XRPCError" }]);
-      // }
       //= import {ValidationResult, BlobRef} from '@atproto/lexicon'
       file
         .addImportDeclaration({
@@ -71,15 +59,6 @@ const lexiconTs = (
             .join("/")}/util`,
         })
         .addNamedImports([{ name: "isObj" }, { name: "hasProp" }]);
-      //= import {lexicons} from '../../lexicons.ts'
-      file
-        .addImportDeclaration({
-          moduleSpecifier: `${lexiconDoc.id
-            .split(".")
-            .map((_str) => "..")
-            .join("/")}/lexicons`,
-        })
-        .addNamedImports([{ name: "lexicons" }]);
       //= import {CID} from 'multiformats/cid'
       file
         .addImportDeclaration({
@@ -95,7 +74,6 @@ const lexiconTs = (
             genXrpcParams(file, lexicons, lexUri, false);
             genXrpcInput(file, imports, lexicons, lexUri, false);
             genXrpcOutput(file, imports, lexicons, lexUri);
-            // genClientXrpcCommon(file, lexicons, lexUri);
           } else if (def.type === "subscription") {
             continue;
           } else if (def.type === "record") {
