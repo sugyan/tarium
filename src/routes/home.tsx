@@ -1,9 +1,9 @@
 import { HomeIcon } from "@heroicons/react/24/outline";
 import Feed from "../components/Feed";
-import { useFeedviewPost } from "../hooks/useFeedViewPosts";
+import { useFeedViewPosts } from "../hooks/useFeedViewPosts";
 
 const Home = () => {
-  const posts = useFeedviewPost();
+  const posts = useFeedViewPosts();
   return (
     <>
       <div className="flex items-center p-2 border-b sticky top-0 bg-gray-800">

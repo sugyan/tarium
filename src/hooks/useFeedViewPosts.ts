@@ -9,7 +9,7 @@ import {
   isFeedPostUpdate,
 } from "../events";
 
-export function useFeedviewPost(uri?: string) {
+export function useFeedViewPosts(uri?: string) {
   const [posts, setPosts] = useState<FeedViewPost[]>([]);
   const isListening = useRef(false);
   const unlisten = useRef<UnlistenFn>(() => {});
@@ -43,6 +43,7 @@ export function useFeedviewPost(uri?: string) {
     })();
     return () => {
       unlisten.current();
+      isListening.current = false;
       (async () => {
         await invoke("unsubscribe", {});
       })();

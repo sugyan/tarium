@@ -2,11 +2,11 @@ import { RssIcon } from "@heroicons/react/24/solid";
 import { useLocation } from "react-router-dom";
 import { GeneratorView } from "../atproto/types/app/bsky/feed/defs";
 import Feed from "../components/Feed";
-import { useFeedviewPost } from "../hooks/useFeedViewPosts";
+import { useFeedViewPosts } from "../hooks/useFeedViewPosts";
 
 const FeedGenerator = () => {
   const { state: view }: { state: GeneratorView } = useLocation();
-  const posts = useFeedviewPost(view.uri);
+  const posts = useFeedViewPosts(view.uri);
   return (
     <>
       <div className="flex items-center p-2 border-b sticky top-0 bg-gray-800">
