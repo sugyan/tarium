@@ -1,7 +1,7 @@
-mod commands;
+mod command;
 mod consts;
 mod error;
-mod events;
+mod event;
 mod session_store;
 mod state;
 
@@ -9,6 +9,7 @@ use crate::session_store::FileStore;
 use crate::state::State;
 use atrium_api::agent::AtpAgent;
 use atrium_xrpc_client::reqwest::ReqwestClient;
+use session_store::FileSessionStore;
 use std::fs::create_dir_all;
 use std::sync::Arc;
 use tauri::async_runtime::Mutex;
@@ -20,17 +21,20 @@ fn setup(app: &mut tauri::App<Wry>) -> Result<(), Box<dyn std::error::Error>> {
     create_dir_all(&data_dir)?;
     // TODO: how switch to different account?
     let session_path = data_dir.join("session.json");
+    let mut store = Mutex::new(None);
     let agent = Mutex::new(if session_path.exists() {
-        let session_store = FileStore::new(session_path);
+        let file_store = Arc::new(FileStore::new(session_path));
+        store = Mutex::new(Some(file_store.clone()));
         Some(Arc::new(AtpAgent::new(
             ReqwestClient::new("https://bsky.social"),
-            session_store,
+            FileSessionStore { store: file_store },
         )))
     } else {
         None
     });
     app.manage(State {
         agent,
+        store,
         ..Default::default()
     });
     Ok(())
@@ -67,12 +71,14 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
-            commands::login,
-            commands::logout,
-            commands::get_session,
-            commands::subscribe,
-            commands::unsubscribe,
-            commands::create_post,
+            command::login,
+            command::logout,
+            command::get_session,
+            command::get_preferences,
+            command::get_feed_generators,
+            command::subscribe,
+            command::unsubscribe,
+            command::create_post,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

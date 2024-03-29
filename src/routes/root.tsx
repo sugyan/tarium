@@ -1,16 +1,41 @@
 import {
+  BellIcon,
   HomeIcon,
   PencilSquareIcon,
   UserMinusIcon,
 } from "@heroicons/react/24/outline";
+import { RssIcon } from "@heroicons/react/24/solid";
 import { invoke } from "@tauri-apps/api/core";
 import { confirm } from "@tauri-apps/plugin-dialog";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import Modal from "react-modal";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { GeneratorView } from "../atproto/types/app/bsky/feed/defs";
 import NewPostForm from "../components/NewPostForm";
 
+function useFeedGenerators() {
+  const [feedGenerators, setFeedGenerators] = useState<GeneratorView[]>([]);
+  const isLoading = useRef(false);
+  useEffect(() => {
+    if (isLoading.current) return;
+    isLoading.current = true;
+    (async () => {
+      try {
+        const result = await invoke<{ feeds: GeneratorView[] }>(
+          "get_feed_generators",
+          {}
+        );
+        setFeedGenerators(result.feeds);
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+  }, []);
+  return feedGenerators;
+}
+
 const Sidebar: FC<{ onNewPost: () => void }> = ({ onNewPost }) => {
+  const feedGenerators = useFeedGenerators();
   const navigate = useNavigate();
   const onSignout = async () => {
     const ok = await confirm("Are you sure you want to sign out?", {
@@ -26,17 +51,38 @@ const Sidebar: FC<{ onNewPost: () => void }> = ({ onNewPost }) => {
     }
   };
   return (
-    <div className="flex flex-col h-full select-none">
+    <div className="w-16 flex flex-col h-full items-center select-none">
       <Link to="/home">
-        <HomeIcon className="h-8 w-8 m-4" />
+        <HomeIcon className="h-10 w-10 m-3" />
       </Link>
+      <BellIcon className="h-10 w-10 m-3 text-gray-500" />
+      {feedGenerators.map((view) => {
+        return (
+          <Link
+            key={view.cid}
+            to="/feed_generator"
+            state={view}
+            className="rounded-lg overflow-hidden m-2"
+          >
+            <div className="h-12 w-12 opacity-80">
+              {view.avatar ? (
+                <img src={view.avatar} />
+              ) : (
+                <div className="h-12 bg-blue-500 flex justify-center items-center">
+                  <RssIcon className="h-10 w-10" />
+                </div>
+              )}
+            </div>
+          </Link>
+        );
+      })}
       <div className="flex-grow" />
       <PencilSquareIcon
-        className="h-8 w-8 m-4 text-blue-500 cursor-pointer"
+        className="h-10 w-10 m-3 text-blue-500 cursor-pointer"
         onClick={onNewPost}
       />
       <UserMinusIcon
-        className="h-8 w-8 m-4 text-red-500 cursor-pointer"
+        className="h-10 w-10 m-3 text-red-500 cursor-pointer"
         onClick={onSignout}
       />
     </div>
