@@ -1,0 +1,20 @@
+/**
+ * GENERATED CODE - DO NOT MODIFY
+ */
+import { ValidationResult, BlobRef } from "@atproto/lexicon";
+import { isObj, hasProp } from "../../../../util";
+import { lexicons } from "../../../../lexicons";
+import { CID } from "multiformats/cid";
+
+export interface QueryParams {}
+
+export type InputSchema = undefined;
+
+export interface OutputSchema {
+  /** Recommended rotation keys for PLC dids. Should be undefined (or ignored) for did:webs. */
+  rotationKeys?: string[];
+  alsoKnownAs?: string[];
+  verificationMethods?: {};
+  services?: {};
+  [k: string]: unknown;
+}

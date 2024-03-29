@@ -1,14 +1,14 @@
 import { invoke } from "@tauri-apps/api/core";
 import { UnlistenFn, listen } from "@tauri-apps/api/event";
 import { useEffect, useRef, useState } from "react";
+import { FeedViewPost } from "../atproto/types/app/bsky/feed/defs";
 import Feed from "../components/Feed";
-import { FeedViewPost } from "../types/app/bsky/feed/defs";
 import {
   FeedPostEvent,
   isFeedPostAdd,
   isFeedPostDelete,
   isFeedPostUpdate,
-} from "../types/post";
+} from "../events";
 
 const Home = () => {
   const [timeline, setTimeline] = useState<FeedViewPost[]>([]);

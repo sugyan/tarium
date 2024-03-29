@@ -5,8 +5,8 @@ import {
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import { FC } from "react";
-import { PostView } from "../types/app/bsky/feed/defs";
-import { isRecord } from "../types/app/bsky/feed/post";
+import { PostView } from "../atproto/types/app/bsky/feed/defs";
+import { isRecord } from "../atproto/types/app/bsky/feed/post";
 import DistanceToNow from "./DistanceToNow";
 import PostEmbed from "./PostEmbed";
 import PostText from "./PostText";
