@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import { UnlistenFn, listen } from "@tauri-apps/api/event";
+import { Event, UnlistenFn, listen } from "@tauri-apps/api/event";
 import { useEffect, useRef, useState } from "react";
 import { FeedViewPost } from "../atproto/types/app/bsky/feed/defs";
 import Feed from "../components/Feed";
@@ -14,31 +14,34 @@ const Home = () => {
   const [timeline, setTimeline] = useState<FeedViewPost[]>([]);
   const isListening = useRef(false);
   const unlisten = useRef<UnlistenFn>(() => {});
+  const onPostEvent = (event: Event<FeedPostEvent>) => {
+    const payload = event.payload;
+    console.log(payload);
+    if (isFeedPostAdd(payload)) {
+      setTimeline((prev) =>
+        prev.some((post) => post.post.cid === payload.post.cid)
+          ? prev
+          : [payload, ...prev]
+      );
+    }
+    if (isFeedPostUpdate(payload)) {
+      setTimeline((prev) =>
+        prev.map((post) => {
+          return post.post.cid === payload.post.cid ? payload : post;
+        })
+      );
+    }
+    if (isFeedPostDelete(payload)) {
+      setTimeline((prev) =>
+        prev.filter((post) => post.post.cid !== payload.cid)
+      );
+    }
+  };
   useEffect(() => {
     (async () => {
       if (isListening.current) return;
       isListening.current = true;
-      unlisten.current = await listen<FeedPostEvent>("post", (event) => {
-        const payload = event.payload;
-        console.log(payload);
-        if (isFeedPostAdd(payload)) {
-          if (!timeline.find((post) => post.post.cid === payload.post.cid)) {
-            setTimeline((prev) => [payload, ...prev]);
-          }
-        }
-        if (isFeedPostUpdate(payload)) {
-          setTimeline((prev) =>
-            prev.map((post) => {
-              return post.post.cid === payload.post.cid ? payload : post;
-            })
-          );
-        }
-        if (isFeedPostDelete(payload)) {
-          setTimeline((prev) =>
-            prev.filter((post) => post.post.cid !== payload.cid)
-          );
-        }
-      });
+      unlisten.current = await listen("post", onPostEvent);
     })();
     return () => {
       unlisten.current();
