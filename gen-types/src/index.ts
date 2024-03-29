@@ -12,9 +12,9 @@ const program = new Command();
 program.name("gen-types").description("Generate Types CLI").version("0.0.0");
 
 program
+  .argument("<outdir>", "path of the directory to write to", toPath)
   .argument("<lexicons...>", "paths of the lexicon files to include", toPaths)
-  .action(async (lexiconPaths: string[]) => {
-    const outDir = "./tmp/";
+  .action(async (outDir: string, lexiconPaths: string[]) => {
     const lexicons = readAllLexicons(lexiconPaths);
     const api = await genTypes(lexicons);
     const diff = genFileDiff(outDir, api);
@@ -25,6 +25,10 @@ program
   });
 
 program.parse();
+
+function toPath(v: string) {
+  return v ? path.resolve(v) : undefined;
+}
 
 function toPaths(v: string, acc: string[]) {
   acc = acc || [];

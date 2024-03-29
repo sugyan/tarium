@@ -12,13 +12,9 @@ import {
   genXrpcOutput,
   genXrpcParams,
 } from "@atproto/lex-cli/src/codegen/lex-gen";
-import {
-  lexiconsToDefTree,
-  schemasToNsidTokens,
-} from "@atproto/lex-cli/src/codegen/util";
 import { GeneratedAPI } from "@atproto/lex-cli/src/types";
 import { LexiconDoc, Lexicons } from "@atproto/lexicon";
-import { gen } from "./common";
+import { gen, lexiconsTs, utilTs } from "./common";
 
 export async function genTypes(
   lexiconDocs: LexiconDoc[]
@@ -29,11 +25,11 @@ export async function genTypes(
   });
   const api: GeneratedAPI = { files: [] };
   const lexicons = new Lexicons(lexiconDocs);
-  const nsidTree = lexiconsToDefTree(lexiconDocs);
-  const nsidTokens = schemasToNsidTokens(lexiconDocs);
   for (const lexiconDoc of lexiconDocs) {
     api.files.push(await lexiconTs(project, lexicons, lexiconDoc));
   }
+  api.files.push(await utilTs(project));
+  api.files.push(await lexiconsTs(project, lexiconDocs));
   return api;
 }
 
@@ -42,74 +38,78 @@ const lexiconTs = (
   lexicons: Lexicons,
   lexiconDoc: LexiconDoc
 ) =>
-  gen(project, `/${lexiconDoc.id.split(".").join("/")}.ts`, async (file) => {
-    const imports: Set<string> = new Set();
+  gen(
+    project,
+    `/types/${lexiconDoc.id.split(".").join("/")}.ts`,
+    async (file) => {
+      const imports: Set<string> = new Set();
 
-    const main = lexiconDoc.defs.main;
-    // if (
-    //   main?.type === "query" ||
-    //   main?.type === "subscription" ||
-    //   main?.type === "procedure"
-    // ) {
-    //   //= import {Headers, XRPCError} from '@atproto/xrpc'
-    //   const xrpcImport = file.addImportDeclaration({
-    //     moduleSpecifier: "@atproto/xrpc",
-    //   });
-    //   xrpcImport.addNamedImports([{ name: "Headers" }, { name: "XRPCError" }]);
-    // }
-    //= import {ValidationResult, BlobRef} from '@atproto/lexicon'
-    file
-      .addImportDeclaration({
-        moduleSpecifier: "@atproto/lexicon",
-      })
-      .addNamedImports([{ name: "ValidationResult" }, { name: "BlobRef" }]);
-    //= import {isObj, hasProp} from '../../util.ts'
-    file
-      .addImportDeclaration({
-        moduleSpecifier: `${lexiconDoc.id
-          .split(".")
-          .map((_str) => "..")
-          .join("/")}/util`,
-      })
-      .addNamedImports([{ name: "isObj" }, { name: "hasProp" }]);
-    //= import {lexicons} from '../../lexicons.ts'
-    file
-      .addImportDeclaration({
-        moduleSpecifier: `${lexiconDoc.id
-          .split(".")
-          .map((_str) => "..")
-          .join("/")}/lexicons`,
-      })
-      .addNamedImports([{ name: "lexicons" }]);
-    //= import {CID} from 'multiformats/cid'
-    file
-      .addImportDeclaration({
-        moduleSpecifier: "multiformats/cid",
-      })
-      .addNamedImports([{ name: "CID" }]);
+      const main = lexiconDoc.defs.main;
+      // if (
+      //   main?.type === "query" ||
+      //   main?.type === "subscription" ||
+      //   main?.type === "procedure"
+      // ) {
+      //   //= import {Headers, XRPCError} from '@atproto/xrpc'
+      //   const xrpcImport = file.addImportDeclaration({
+      //     moduleSpecifier: "@atproto/xrpc",
+      //   });
+      //   xrpcImport.addNamedImports([{ name: "Headers" }, { name: "XRPCError" }]);
+      // }
+      //= import {ValidationResult, BlobRef} from '@atproto/lexicon'
+      file
+        .addImportDeclaration({
+          moduleSpecifier: "@atproto/lexicon",
+        })
+        .addNamedImports([{ name: "ValidationResult" }, { name: "BlobRef" }]);
+      //= import {isObj, hasProp} from '../../util.ts'
+      file
+        .addImportDeclaration({
+          moduleSpecifier: `${lexiconDoc.id
+            .split(".")
+            .map((_str) => "..")
+            .join("/")}/util`,
+        })
+        .addNamedImports([{ name: "isObj" }, { name: "hasProp" }]);
+      //= import {lexicons} from '../../lexicons.ts'
+      file
+        .addImportDeclaration({
+          moduleSpecifier: `${lexiconDoc.id
+            .split(".")
+            .map((_str) => "..")
+            .join("/")}/lexicons`,
+        })
+        .addNamedImports([{ name: "lexicons" }]);
+      //= import {CID} from 'multiformats/cid'
+      file
+        .addImportDeclaration({
+          moduleSpecifier: "multiformats/cid",
+        })
+        .addNamedImports([{ name: "CID" }]);
 
-    for (const defId in lexiconDoc.defs) {
-      const def = lexiconDoc.defs[defId];
-      const lexUri = `${lexiconDoc.id}#${defId}`;
-      if (defId === "main") {
-        if (def.type === "query" || def.type === "procedure") {
-          genXrpcParams(file, lexicons, lexUri, false);
-          genXrpcInput(file, imports, lexicons, lexUri, false);
-          genXrpcOutput(file, imports, lexicons, lexUri);
-          // genClientXrpcCommon(file, lexicons, lexUri);
-        } else if (def.type === "subscription") {
-          continue;
-        } else if (def.type === "record") {
-          genClientRecord(file, imports, lexicons, lexUri);
+      for (const defId in lexiconDoc.defs) {
+        const def = lexiconDoc.defs[defId];
+        const lexUri = `${lexiconDoc.id}#${defId}`;
+        if (defId === "main") {
+          if (def.type === "query" || def.type === "procedure") {
+            genXrpcParams(file, lexicons, lexUri, false);
+            genXrpcInput(file, imports, lexicons, lexUri, false);
+            genXrpcOutput(file, imports, lexicons, lexUri);
+            // genClientXrpcCommon(file, lexicons, lexUri);
+          } else if (def.type === "subscription") {
+            continue;
+          } else if (def.type === "record") {
+            genClientRecord(file, imports, lexicons, lexUri);
+          } else {
+            genUserType(file, imports, lexicons, lexUri);
+          }
         } else {
           genUserType(file, imports, lexicons, lexUri);
         }
-      } else {
-        genUserType(file, imports, lexicons, lexUri);
       }
+      genImports(file, imports, lexiconDoc.id);
     }
-    genImports(file, imports, lexiconDoc.id);
-  });
+  );
 
 function genClientRecord(
   file: SourceFile,
