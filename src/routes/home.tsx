@@ -22,7 +22,9 @@ const Home = () => {
         const payload = event.payload;
         console.log(payload);
         if (isFeedPostAdd(payload)) {
-          setTimeline((prev) => [payload, ...prev]);
+          if (!timeline.find((post) => post.post.cid === payload.post.cid)) {
+            setTimeline((prev) => [payload, ...prev]);
+          }
         }
         if (isFeedPostUpdate(payload)) {
           setTimeline((prev) =>
