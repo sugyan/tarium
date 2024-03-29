@@ -3,8 +3,10 @@ name: Node.js
 on:
   push:
     branches: ["main"]
+    paths-ignore: "src-tauri/**"
   pull_request:
     branches: ["main"]
+    paths-ignore: "src-tauri/**"
 
 jobs:
   build:
