@@ -5,7 +5,7 @@ import {
   FeedViewPost,
   isPostView,
   isReasonRepost,
-} from "../types/app/bsky/feed/defs";
+} from "../atproto/types/app/bsky/feed/defs";
 import Post from "./Post";
 
 const Feed: FC<{ posts: FeedViewPost[] }> = ({ posts }) => {

@@ -1,0 +1,14 @@
+/**
+ * GENERATED CODE - DO NOT MODIFY
+ */
+import { BlobRef } from "@atproto/lexicon";
+import { isObj, hasProp } from "../../../../util";
+import { CID } from "multiformats/cid";
+import * as ToolsOzoneModerationDefs from "./defs";
+
+export interface QueryParams {
+  id: number;
+}
+
+export type InputSchema = undefined;
+export type OutputSchema = ToolsOzoneModerationDefs.ModEventViewDetail;

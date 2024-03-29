@@ -1,22 +1,29 @@
 import { UserCircleIcon } from "@heroicons/react/24/outline";
 import { FC } from "react";
 import {
+  View as ExternalView,
   ViewExternal,
   isView as isExternalView,
-} from "../types/app/bsky/embed/external";
+} from "../atproto/types/app/bsky/embed/external";
 import {
+  View as ImagesView,
   ViewImage,
   isView as isImagesView,
-} from "../types/app/bsky/embed/images";
+} from "../atproto/types/app/bsky/embed/images";
 import {
+  View as RecordView,
   ViewRecord,
   isView as isRecordView,
   isViewRecord,
-} from "../types/app/bsky/embed/record";
-import { isView as isRecordWithMediaView } from "../types/app/bsky/embed/recordWithMedia";
-import { EmbedViewUnion } from "../types/app/bsky/feed/defs";
-import { isRecord } from "../types/app/bsky/feed/post";
+} from "../atproto/types/app/bsky/embed/record";
+import {
+  View as RecordWithMediaView,
+  isView as isRecordWithMediaView,
+} from "../atproto/types/app/bsky/embed/recordWithMedia";
+import { isRecord } from "../atproto/types/app/bsky/feed/post";
 import DistanceToNow from "./DistanceToNow";
+
+type EmbedView = ExternalView | ImagesView | RecordView | RecordWithMediaView;
 
 const Images: FC<{ images: ViewImage[] }> = ({ images }) => {
   return (
@@ -81,7 +88,7 @@ const Record: FC<{ record: ViewRecord }> = ({ record }) => {
             <div className="whitespace-pre-wrap">{record.value.text}</div>
           )}
           {record.embeds?.map((embed, index) => (
-            <PostEmbed key={index} embed={embed} />
+            <PostEmbed key={index} embed={embed as EmbedView} />
           ))}
         </div>
       </div>
@@ -89,7 +96,7 @@ const Record: FC<{ record: ViewRecord }> = ({ record }) => {
   );
 };
 
-const PostEmbed: FC<{ embed?: EmbedViewUnion }> = ({ embed }) => {
+const PostEmbed: FC<{ embed?: EmbedView }> = ({ embed }) => {
   if (isImagesView(embed)) {
     return (
       <div className="pb-2">
