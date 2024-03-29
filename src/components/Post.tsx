@@ -8,7 +8,7 @@ import { FC } from "react";
 import { PostView } from "../atproto/types/app/bsky/feed/defs";
 import { isRecord } from "../atproto/types/app/bsky/feed/post";
 import DistanceToNow from "./DistanceToNow";
-import PostEmbed from "./PostEmbed";
+import PostEmbed, { EmbedView } from "./PostEmbed";
 import PostText from "./PostText";
 
 const Post: FC<{ post: PostView; isParent?: boolean }> = ({
@@ -44,7 +44,7 @@ const Post: FC<{ post: PostView; isParent?: boolean }> = ({
           </div>
         </div>
         {isRecord(post.record) && <PostText record={post.record} />}
-        <PostEmbed embed={post.embed} />
+        <PostEmbed embed={post.embed as EmbedView} />
         <div className="flex text-sm text-gray-500 mt-2">
           <div className="flex items-center w-20">
             <ChatBubbleBottomCenterIcon className="h-4 w-4 mr-1" />

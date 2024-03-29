@@ -1,5 +1,8 @@
 import {
+  ImportDeclarationStructure,
+  ImportSpecifierStructure,
   IndentationText,
+  OptionalKind,
   Project,
   SourceFile,
 } from "@atproto/lex-cli/node_modules/ts-morph";
@@ -43,26 +46,32 @@ const lexiconTs = (
       const imports: Set<string> = new Set();
 
       //= import {ValidationResult, BlobRef} from '@atproto/lexicon'
-      file
-        .addImportDeclaration({
+      genIgnorableImport(
+        file,
+        {
           moduleSpecifier: "@atproto/lexicon",
-        })
-        .addNamedImports([{ name: "BlobRef" }]);
+        },
+        [{ name: "BlobRef" }]
+      );
       //= import {isObj, hasProp} from '../../util.ts'
-      file
-        .addImportDeclaration({
+      genIgnorableImport(
+        file,
+        {
           moduleSpecifier: `${lexiconDoc.id
             .split(".")
             .map((_str) => "..")
             .join("/")}/util`,
-        })
-        .addNamedImports([{ name: "isObj" }, { name: "hasProp" }]);
+        },
+        [{ name: "isObj" }, { name: "hasProp" }]
+      );
       //= import {CID} from 'multiformats/cid'
-      file
-        .addImportDeclaration({
+      genIgnorableImport(
+        file,
+        {
           moduleSpecifier: "multiformats/cid",
-        })
-        .addNamedImports([{ name: "CID" }]);
+        },
+        [{ name: "CID" }]
+      );
 
       for (const defId in lexiconDoc.defs) {
         const def = lexiconDoc.defs[defId];
@@ -99,4 +108,17 @@ function genClientRecord(
   genObject(file, imports, lexUri, def.record, "Record");
   //= export function isRecord(v: unknown): v is Record {...}
   genObjHelpers(file, lexUri, "Record");
+}
+
+function genIgnorableImport(
+  file: SourceFile,
+  structure: OptionalKind<ImportDeclarationStructure>,
+  namedImports: ReadonlyArray<OptionalKind<ImportSpecifierStructure>>
+) {
+  const importDeclaration = file.addImportDeclaration(structure);
+  importDeclaration.addNamedImports(namedImports);
+  file.insertStatements(
+    importDeclaration.getStartLineNumber() - 1,
+    "// @ts-ignore"
+  );
 }
