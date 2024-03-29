@@ -1,14 +1,14 @@
 use crate::consts::EmitEvent;
-use crate::error::Error;
-use crate::events::PostEvent;
-use crate::session_store::FileStore;
+use crate::error::{Error, Result};
+use crate::event::PostEvent;
+use crate::session_store::{FileSessionStore, FileStore};
 use crate::state::State;
+use atrium_api::agent::store::SessionStore;
 use atrium_api::agent::AtpAgent;
-use atrium_api::app::bsky::feed::defs::{FeedViewPost, ReplyRefParentEnum};
-use atrium_api::types::Collection;
+use atrium_api::records::Record;
+use atrium_api::types::{Collection, Union};
 use atrium_xrpc_client::reqwest::ReqwestClient;
 use std::collections::HashMap;
-use std::ops::DerefMut;
 use std::sync::Arc;
 use std::time::Duration;
 use tauri::Manager;
@@ -19,33 +19,37 @@ pub async fn login(
     password: &str,
     app_handle: tauri::AppHandle,
     state: tauri::State<'_, State>,
-) -> Result<atrium_api::com::atproto::server::create_session::Output, Error> {
+) -> Result<atrium_api::com::atproto::server::create_session::Output> {
     let session_path = app_handle
         .path()
         .app_data_dir()
         .expect("failed to get app data dir")
         .join("session.json");
+    let store = Arc::new(FileStore::new(session_path));
     let agent = AtpAgent::new(
         ReqwestClient::new("https://bsky.social"),
-        FileStore::new(session_path),
+        FileSessionStore {
+            store: store.clone(),
+        },
     );
     let result = agent.login(identifier, password).await?;
-    *state.inner().agent.lock().await.deref_mut() = Some(Arc::new(agent));
+    state.agent.lock().await.replace(Arc::new(agent));
+    state.store.lock().await.replace(store);
     Ok(result)
 }
 
 #[tauri::command]
-pub async fn logout(state: tauri::State<'_, State>) -> Result<(), Error> {
-    *state.inner().agent.lock().await = None;
+pub async fn logout(state: tauri::State<'_, State>) -> Result<()> {
+    *state.agent.lock().await = None;
+    *state.store.lock().await = None;
     Ok(())
 }
 
 #[tauri::command]
 pub async fn get_session(
     state: tauri::State<'_, State>,
-) -> Result<atrium_api::com::atproto::server::get_session::Output, Error> {
+) -> Result<atrium_api::com::atproto::server::get_session::Output> {
     Ok(state
-        .inner()
         .agent
         .lock()
         .await
@@ -59,29 +63,101 @@ pub async fn get_session(
         .await?)
 }
 
+#[tauri::command]
+pub async fn get_preferences(
+    state: tauri::State<'_, State>,
+) -> Result<atrium_api::app::bsky::actor::get_preferences::Output> {
+    Ok(state
+        .agent
+        .lock()
+        .await
+        .as_ref()
+        .ok_or(Error::NoAgent)?
+        .api
+        .app
+        .bsky
+        .actor
+        .get_preferences(atrium_api::app::bsky::actor::get_preferences::Parameters {})
+        .await?)
+}
+
+#[tauri::command]
+pub async fn get_feed_generators(
+    state: tauri::State<'_, State>,
+) -> Result<atrium_api::app::bsky::feed::get_feed_generators::Output> {
+    let agent = state
+        .agent
+        .lock()
+        .await
+        .as_ref()
+        .ok_or(Error::NoAgent)?
+        .clone();
+    let preferences = get_preferences(state).await?;
+    let feeds = preferences
+        .preferences
+        .iter()
+        .find_map(|pref| {
+            if let Union::Refs(
+                atrium_api::app::bsky::actor::defs::PreferencesItem::SavedFeedsPref(p),
+            ) = pref
+            {
+                Some(p.pinned.clone())
+            } else {
+                None
+            }
+        })
+        .unwrap_or_default();
+    Ok(agent
+        .api
+        .app
+        .bsky
+        .feed
+        .get_feed_generators(atrium_api::app::bsky::feed::get_feed_generators::Parameters { feeds })
+        .await?)
+}
+
 async fn background_task(
-    agent: Arc<AtpAgent<FileStore, ReqwestClient>>,
+    uri: Option<String>,
+    agent: Arc<AtpAgent<FileSessionStore, ReqwestClient>>,
     mut receiver: tokio::sync::oneshot::Receiver<()>,
     app_handle: tauri::AppHandle,
-) -> Result<(), Error> {
+) -> Result<()> {
+    use atrium_api::app::bsky::feed::defs::{FeedViewPost, ReplyRefParentRefs};
     async fn check_new_post(
+        uri: &Option<String>,
         app_handle: &tauri::AppHandle,
-        agent: &Arc<AtpAgent<FileStore, ReqwestClient>>,
+        agent: &Arc<AtpAgent<FileSessionStore, ReqwestClient>>,
         cids: &mut HashMap<String, FeedViewPost>,
-    ) -> Result<(), Error> {
+    ) -> Result<()> {
         println!("checking posts");
-        let output = agent
-            .api
-            .app
-            .bsky
-            .feed
-            .get_timeline(atrium_api::app::bsky::feed::get_timeline::Parameters {
-                algorithm: None,
-                cursor: None,
-                limit: 30.try_into().ok(),
-            })
-            .await?;
-        for post in output.feed.iter().rev() {
+        let posts = if let Some(feed) = uri {
+            agent
+                .api
+                .app
+                .bsky
+                .feed
+                .get_feed(atrium_api::app::bsky::feed::get_feed::Parameters {
+                    cursor: None,
+                    feed: feed.into(),
+                    limit: 30.try_into().ok(),
+                })
+                .await?
+                .feed
+        } else {
+            agent
+                .api
+                .app
+                .bsky
+                .feed
+                .get_timeline(atrium_api::app::bsky::feed::get_timeline::Parameters {
+                    algorithm: None,
+                    cursor: None,
+                    limit: 30.try_into().ok(),
+                })
+                .await?
+                .feed
+        };
+        for post in posts.iter().rev() {
             let cid = post.post.cid.as_ref().to_string();
             if let Some(prev) = cids.get(&cid) {
                 if post.reason != prev.reason
@@ -95,7 +171,7 @@ async fn background_task(
                 }
             } else {
                 if let Some(reply) = &post.reply {
-                    if let ReplyRefParentEnum::PostView(post_view) = &reply.parent {
+                    if let Union::Refs(ReplyRefParentRefs::PostView(post_view)) = &reply.parent {
                         if let Some(prev) = cids.get(&post_view.cid.as_ref().to_string()) {
                             app_handle
                                 .emit(
@@ -122,7 +198,7 @@ async fn background_task(
                 println!("cancelling");
                 break;
             }
-            _ = interval.tick() => check_new_post(&app_handle, &agent, &mut cids).await?,
+            _ = interval.tick() => check_new_post(&uri, &app_handle, &agent, &mut cids).await?,
         }
     }
     Ok(())
@@ -130,28 +206,28 @@ async fn background_task(
 
 #[tauri::command]
 pub async fn subscribe(
+    uri: Option<String>,
     app_handle: tauri::AppHandle,
     state: tauri::State<'_, State>,
-) -> Result<(), Error> {
-    if state.inner().sender.lock().await.is_none() {
+) -> Result<()> {
+    if state.sender.lock().await.is_none() {
         let (sender, receiver) = tokio::sync::oneshot::channel();
-        state.inner().sender.lock().await.replace(sender);
+        state.sender.lock().await.replace(sender);
         let agent = state
-            .inner()
             .agent
             .lock()
             .await
             .as_ref()
             .ok_or(Error::NoAgent)?
             .clone();
-        tauri::async_runtime::spawn(background_task(agent, receiver, app_handle));
+        tauri::async_runtime::spawn(background_task(uri, agent, receiver, app_handle));
     }
     Ok(())
 }
 
 #[tauri::command]
-pub async fn unsubscribe(state: tauri::State<'_, State>) -> Result<(), Error> {
-    if let Some(sender) = state.inner().sender.lock().await.take() {
+pub async fn unsubscribe(state: tauri::State<'_, State>) -> Result<()> {
+    if let Some(sender) = state.sender.lock().await.take() {
         sender.send(()).expect("failed to send");
     }
     Ok(())
@@ -161,19 +237,17 @@ pub async fn unsubscribe(state: tauri::State<'_, State>) -> Result<(), Error> {
 pub async fn create_post(
     text: String,
     state: tauri::State<'_, State>,
-) -> Result<atrium_api::com::atproto::repo::create_record::Output, Error> {
-    // TODO: store session
-    let agent = state
-        .inner()
-        .agent
+) -> Result<atrium_api::com::atproto::repo::create_record::Output> {
+    let session = state
+        .store
         .lock()
         .await
         .as_ref()
-        .ok_or(Error::NoAgent)?
-        .clone();
-    let session = agent.api.com.atproto.server.get_session().await?;
+        .ok_or(Error::NoStore)?
+        .get_session()
+        .await
+        .ok_or(Error::NoSession)?;
     Ok(state
-        .inner()
         .agent
         .lock()
         .await
@@ -187,7 +261,7 @@ pub async fn create_post(
             collection: atrium_api::app::bsky::feed::Post::NSID
                 .parse()
                 .expect("failed to parse NSID"),
-            record: atrium_api::records::Record::AppBskyFeedPost(Box::new(
+            record: Record::Known(atrium_api::records::KnownRecord::AppBskyFeedPost(Box::new(
                 atrium_api::app::bsky::feed::post::Record {
                     created_at: atrium_api::types::string::Datetime::now(),
                     embed: None,
@@ -199,7 +273,7 @@ pub async fn create_post(
                     tags: None,
                     text,
                 },
-            )),
+            ))),
             repo: atrium_api::types::string::AtIdentifier::Did(session.did),
             rkey: None,
             swap_commit: None,

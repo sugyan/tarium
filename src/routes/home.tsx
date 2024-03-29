@@ -1,65 +1,22 @@
-import { invoke } from "@tauri-apps/api/core";
-import { Event, UnlistenFn, listen } from "@tauri-apps/api/event";
-import { useEffect, useRef, useState } from "react";
-import { FeedViewPost } from "../atproto/types/app/bsky/feed/defs";
+import { HomeIcon } from "@heroicons/react/24/outline";
 import Feed from "../components/Feed";
-import {
-  FeedPostEvent,
-  isFeedPostAdd,
-  isFeedPostDelete,
-  isFeedPostUpdate,
-} from "../events";
+import { useFeedViewPosts } from "../hooks/useFeedViewPosts";
 
 const Home = () => {
-  const [timeline, setTimeline] = useState<FeedViewPost[]>([]);
-  const isListening = useRef(false);
-  const unlisten = useRef<UnlistenFn>(() => {});
-  const onPostEvent = (event: Event<FeedPostEvent>) => {
-    const payload = event.payload;
-    console.log(payload);
-    if (isFeedPostAdd(payload)) {
-      setTimeline((prev) =>
-        prev.some((post) => post.post.cid === payload.post.cid)
-          ? prev
-          : [payload, ...prev]
-      );
-    }
-    if (isFeedPostUpdate(payload)) {
-      setTimeline((prev) =>
-        prev.map((post) => {
-          return post.post.cid === payload.post.cid ? payload : post;
-        })
-      );
-    }
-    if (isFeedPostDelete(payload)) {
-      setTimeline((prev) =>
-        prev.filter((post) => post.post.cid !== payload.cid)
-      );
-    }
-  };
-  useEffect(() => {
-    (async () => {
-      if (isListening.current) return;
-      isListening.current = true;
-      unlisten.current = await listen("post", onPostEvent);
-    })();
-    return () => {
-      unlisten.current();
-      (async () => {
-        await invoke("unsubscribe", {});
-      })();
-    };
-  }, []);
-  useEffect(() => {
-    (async () => {
-      try {
-        await invoke("subscribe", {});
-      } catch (err) {
-        console.error(err);
-      }
-    })();
-  }, []);
-  return <Feed posts={timeline} />;
+  const posts = useFeedViewPosts();
+  return (
+    <>
+      <div className="flex items-center p-2 border-b sticky top-0 bg-gray-800">
+        <div className="h-6 w-6">
+          <div className="h-6 flex justify-center items-center">
+            <HomeIcon className="h-6 w-6" />
+          </div>
+        </div>
+        <span className="ml-2 font-semibold">Home</span>
+      </div>
+      <Feed posts={posts} />
+    </>
+  );
 };
 
 export default Home;
