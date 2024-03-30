@@ -63,7 +63,7 @@ const Sidebar: FC<{ onNewPost: () => void; onSettings: () => void }> = ({
       </div>
       <div className="flex-grow overflow-scroll">
         {feedGenerators.map((view) => {
-          const current = view === state ? "" : "opacity-80";
+          const current = view === state ? "brightness-125" : "";
           return (
             <div key={view.cid} className={`p-2 ${current}`}>
               <Link to="/feed_generator" state={view}>

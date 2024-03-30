@@ -1,4 +1,5 @@
 import { listen } from "@tauri-apps/api/event";
+import { getCurrent } from "@tauri-apps/api/window";
 import { message } from "@tauri-apps/plugin-dialog";
 import { check } from "@tauri-apps/plugin-updater";
 import { createContext, useEffect, useRef, useState } from "react";
@@ -11,10 +12,10 @@ import Root from "./routes/root";
 import Signin from "./routes/signin";
 
 export const ThemeContext = createContext<{
-  theme: Theme;
+  theme: Theme | null;
   setTheme: (_: Theme) => void;
 }>({
-  theme: Theme.Dark,
+  theme: null,
   setTheme: (_) => {},
 });
 const router = createBrowserRouter([
@@ -38,7 +39,7 @@ const router = createBrowserRouter([
   },
 ]);
 
-async function useCheckForUpdate() {
+function checkForUpdate() {
   const isChecking = useRef(false);
   useEffect(() => {
     if (isChecking.current) return;
@@ -53,7 +54,7 @@ async function useCheckForUpdate() {
   }, []);
 }
 
-async function useListen() {
+function listenEvents() {
   const isListening = useRef(false);
   const unlisten = useRef(() => {});
   useEffect(() => {
@@ -64,17 +65,22 @@ async function useListen() {
         window.location.reload();
       });
     })();
-    return () => unlisten.current();
+    return unlisten.current;
   }, []);
 }
 
 const App = () => {
-  const [theme, setTheme] = useState<Theme>(Theme.Dark);
-  useCheckForUpdate();
-  useListen();
+  const [theme, setTheme] = useState<Theme | null>(null);
+  checkForUpdate();
+  listenEvents();
+  useEffect(() => {
+    (async () => {
+      setTheme(await getCurrent().theme());
+    })();
+  }, []);
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>
-      <div className={theme}>
+      <div className={theme || ""}>
         <div className="text-foreground bg-background">
           <RouterProvider router={router} />
         </div>

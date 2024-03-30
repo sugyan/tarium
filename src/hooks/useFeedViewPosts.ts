@@ -19,7 +19,6 @@ export function useFeedViewPosts(uri?: string) {
       isListening.current = true;
       unlisten.current = await listen<FeedPostEvent>("post", (event) => {
         const payload = event.payload;
-        console.log(payload);
         if (isFeedPostAdd(payload)) {
           setPosts((prev) =>
             prev.some((post) => post.post.cid === payload.post.cid)
