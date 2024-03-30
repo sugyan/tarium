@@ -64,7 +64,7 @@ const External: FC<{ external: ViewExternal }> = ({ external }) => {
 const Record: FC<{ record: ViewRecord }> = ({ record }) => {
   return (
     <div className="border border-gray-500 rounded-md w-full overflow-hidden mt-2">
-      <div className="flex overflow-hidden break-words m-2">
+      <div className="flex overflow-hidden break-all m-2">
         <div className="w-full">
           <div className="flex justify-between">
             <div className="flex items-center">
