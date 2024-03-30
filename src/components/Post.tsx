@@ -27,7 +27,7 @@ const Post: FC<{ post: PostView; isParent?: boolean }> = ({
             </div>
           )}
         </div>
-        {isParent && <div className="w-0.5 h-full bg-gray-600" />}
+        {isParent && <div className="w-0.5 h-full bg-more-muted" />}
       </div>
       <div className="w-full pb-3">
         <div className="flex justify-between items-center">
@@ -35,17 +35,17 @@ const Post: FC<{ post: PostView; isParent?: boolean }> = ({
             <span className="font-semibold">
               {post.author.displayName || post.author.handle}
             </span>
-            <span className="text-sm font-mono pl-2 text-gray-400">
+            <span className="text-sm font-mono pl-2 text-muted">
               @{post.author.handle}
             </span>
           </div>
-          <div className="text-sm text-gray-400 whitespace-nowrap">
+          <div className="text-sm text-muted whitespace-nowrap">
             <DistanceToNow date={post.indexedAt} />
           </div>
         </div>
         {isRecord(post.record) && <PostText record={post.record} />}
         <PostEmbed embed={post.embed as EmbedView} />
-        <div className="flex text-sm text-gray-500 mt-2">
+        <div className="flex text-sm text-slate-500 mt-2">
           <div className="flex items-center w-20">
             <ChatBubbleBottomCenterIcon className="h-4 w-4 mr-1" />
             {post.replyCount || ""}

@@ -44,12 +44,12 @@ const Images: FC<{ images: ViewImage[] }> = ({ images }) => {
 const External: FC<{ external: ViewExternal }> = ({ external }) => {
   const url = new URL(external.uri);
   return (
-    <div className="border border-gray-500 rounded-md w-full overflow-hidden mt-2">
+    <div className="border border-slate-500 rounded-md w-full overflow-hidden mt-2">
       <a href={external.uri} target="_blank" rel="noreferrer">
         <img src={external.thumb} className="w-full max-h-64 object-cover" />
         <div className="px-3 py-2">
-          <div className="text-gray-500 text-sm">{url.host}</div>
-          <div className="font-semibold mb-2">
+          <div className="text-slate-500 text-sm">{url.host}</div>
+          <div className="font-semibold mb-2 break-all">
             {external.title || url.toString()}
           </div>
           <div className="text-sm line-clamp-2 overflow-hidden break-anywhere">
@@ -63,7 +63,7 @@ const External: FC<{ external: ViewExternal }> = ({ external }) => {
 
 const Record: FC<{ record: ViewRecord }> = ({ record }) => {
   return (
-    <div className="border border-gray-500 rounded-md w-full overflow-hidden mt-2">
+    <div className="border border-slate-500 rounded-md w-full overflow-hidden mt-2">
       <div className="flex overflow-hidden break-all m-2">
         <div className="w-full">
           <div className="flex justify-between">
@@ -80,11 +80,11 @@ const Record: FC<{ record: ViewRecord }> = ({ record }) => {
               <span className="font-semibold">
                 {record.author.displayName || record.author.handle}
               </span>
-              <span className="text-sm font-mono pl-2 text-gray-400">
+              <span className="text-sm font-mono pl-2 text-muted">
                 @{record.author.handle}
               </span>
             </div>
-            <div className="flex items-center text-sm text-gray-400">
+            <div className="flex items-center text-sm text-muted">
               <DistanceToNow date={record.indexedAt} />
             </div>
           </div>

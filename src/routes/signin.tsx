@@ -29,7 +29,7 @@ const Signin = () => {
         >
           <input
             type="text"
-            className="px-4 py-2 border rounded-md text-gray-800"
+            className="px-4 py-2 border text-slate-800 border-muted rounded-md"
             placeholder="Identifier"
             spellCheck={false}
             autoCorrect="off"
@@ -37,7 +37,7 @@ const Signin = () => {
           />
           <input
             type="password"
-            className="px-4 py-2 border rounded-md text-gray-800"
+            className="px-4 py-2 border text-slate-800 border-muted rounded-md"
             placeholder="Password"
             onChange={(e) => setPassword(e.currentTarget.value)}
           />
