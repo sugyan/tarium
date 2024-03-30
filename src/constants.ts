@@ -1,3 +1,4 @@
+export const STORE_SETTING = "settings.json";
 export const EVENT_MENU_RELOAD = "tauri-reload";
 
 export const Theme = {

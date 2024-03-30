@@ -1,10 +1,10 @@
 import { listen } from "@tauri-apps/api/event";
-import { getCurrent } from "@tauri-apps/api/window";
 import { message } from "@tauri-apps/plugin-dialog";
+import { Store } from "@tauri-apps/plugin-store";
 import { check } from "@tauri-apps/plugin-updater";
 import { createContext, useEffect, useRef, useState } from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import { EVENT_MENU_RELOAD, Theme } from "./constants";
+import { EVENT_MENU_RELOAD, STORE_SETTING, Theme } from "./constants";
 import "./index.css";
 import FeedGenerator from "./routes/feed-generator";
 import Home from "./routes/home";
@@ -71,19 +71,29 @@ function listenEvents() {
 
 const App = () => {
   const [theme, setTheme] = useState<Theme | null>(null);
+  const store = new Store(STORE_SETTING);
   checkForUpdate();
   listenEvents();
   useEffect(() => {
     (async () => {
-      setTheme(await getCurrent().theme());
+      setTheme(await store.get("theme"));
     })();
   }, []);
   return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
-      <div className={theme || ""}>
-        <div className="text-foreground bg-background">
-          <RouterProvider router={router} />
-        </div>
+    <ThemeContext.Provider
+      value={{
+        theme,
+        setTheme: (value: Theme | null) => {
+          (async () => {
+            await store.set("theme", value);
+            await store.save();
+          })();
+          setTheme(value);
+        },
+      }}
+    >
+      <div className={`${theme || ""} text-foreground bg-background`}>
+        <RouterProvider router={router} />
       </div>
     </ThemeContext.Provider>
   );
