@@ -79,14 +79,18 @@ const Sidebar: FC<{ onNewPost: () => void }> = ({ onNewPost }) => {
           );
         })}
       </div>
-      <PencilSquareIcon
-        className="h-10 w-10 m-3 text-blue-500 cursor-pointer"
-        onClick={onNewPost}
-      />
-      <UserMinusIcon
-        className="h-10 w-10 m-3 text-red-500 cursor-pointer"
-        onClick={onSignout}
-      />
+      <div>
+        <PencilSquareIcon
+          className="h-10 w-10 m-3 text-blue-500 cursor-pointer"
+          onClick={onNewPost}
+        />
+      </div>
+      <div>
+        <UserMinusIcon
+          className="h-10 w-10 m-3 text-red-500 cursor-pointer"
+          onClick={onSignout}
+        />
+      </div>
     </div>
   );
 };
