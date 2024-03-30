@@ -10,6 +10,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@atproto/lexicon": "^0.4.0",
     "@formkit/auto-animate": "^0.8.1",
     "@heroicons/react": "^2.1.1",
     "@tauri-apps/api": ">=2.0.0-beta.0",
@@ -18,6 +19,7 @@
     "@tauri-apps/plugin-shell": ">=2.0.0-beta.0",
     "@tauri-apps/plugin-updater": "^2.0.0-beta.2",
     "date-fns": "^3.3.1",
+    "multiformats": "^13.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-modal": "^3.16.1",

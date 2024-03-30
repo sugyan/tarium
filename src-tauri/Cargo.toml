@@ -16,7 +16,7 @@ tauri-build = { version = "2.0.0-beta", features = [] }
 
 [dependencies]
 async-trait = "0.1.77"
-atrium-api = "0.19.0"
+atrium-api = "0.20.0"
 atrium-xrpc-client = "0.5.0"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
@@ -25,7 +25,7 @@ tauri-plugin-dialog = "2.0.0-beta.2"
 tauri-plugin-process = "2.0.0-beta.3"
 tauri-plugin-shell = "2.0.0-beta.2"
 thiserror = "1.0.57"
-tokio = { version = "1.36.0", features = ["macros", "time"] }
+tokio = { version = "1.36.0", features = ["macros", "fs", "time"] }
 
 [target."cfg(not(any(target_os = \"android\", target_os = \"ios\")))".dependencies]
 tauri-plugin-updater = "2.0.0-beta.2"

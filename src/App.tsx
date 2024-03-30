@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { EVENT_MENU_RELOAD } from "./constants";
 import "./index.css";
+import FeedGenerator from "./routes/feed-generator";
 import Home from "./routes/home";
 import Root from "./routes/root";
 import Signin from "./routes/signin";
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
       {
         path: "/home",
         element: <Home />,
+      },
+      {
+        path: "/feed_generator",
+        element: <FeedGenerator />,
       },
     ],
   },

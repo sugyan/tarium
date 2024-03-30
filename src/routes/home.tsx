@@ -1,60 +1,22 @@
-import { invoke } from "@tauri-apps/api/core";
-import { UnlistenFn, listen } from "@tauri-apps/api/event";
-import { useEffect, useRef, useState } from "react";
+import { HomeIcon } from "@heroicons/react/24/outline";
 import Feed from "../components/Feed";
-import { FeedViewPost } from "../types/app/bsky/feed/defs";
-import {
-  FeedPostEvent,
-  isFeedPostAdd,
-  isFeedPostDelete,
-  isFeedPostUpdate,
-} from "../types/post";
+import { useFeedViewPosts } from "../hooks/useFeedViewPosts";
 
 const Home = () => {
-  const [timeline, setTimeline] = useState<FeedViewPost[]>([]);
-  const isListening = useRef(false);
-  const unlisten = useRef<UnlistenFn>(() => {});
-  useEffect(() => {
-    (async () => {
-      if (isListening.current) return;
-      isListening.current = true;
-      unlisten.current = await listen<FeedPostEvent>("post", (event) => {
-        const payload = event.payload;
-        console.log(payload);
-        if (isFeedPostAdd(payload)) {
-          setTimeline((prev) => [payload, ...prev]);
-        }
-        if (isFeedPostUpdate(payload)) {
-          setTimeline((prev) =>
-            prev.map((post) => {
-              return post.post.cid === payload.post.cid ? payload : post;
-            })
-          );
-        }
-        if (isFeedPostDelete(payload)) {
-          setTimeline((prev) =>
-            prev.filter((post) => post.post.cid !== payload.cid)
-          );
-        }
-      });
-    })();
-    return () => {
-      unlisten.current();
-      (async () => {
-        await invoke("unsubscribe", {});
-      })();
-    };
-  }, []);
-  useEffect(() => {
-    (async () => {
-      try {
-        await invoke("subscribe", {});
-      } catch (err) {
-        console.error(err);
-      }
-    })();
-  }, []);
-  return <Feed posts={timeline} />;
+  const posts = useFeedViewPosts();
+  return (
+    <>
+      <div className="flex items-center p-2 border-b sticky top-0 bg-gray-800">
+        <div className="h-6 w-6">
+          <div className="h-6 flex justify-center items-center">
+            <HomeIcon className="h-6 w-6" />
+          </div>
+        </div>
+        <span className="ml-2 font-semibold">Home</span>
+      </div>
+      <Feed posts={posts} />
+    </>
+  );
 };
 
 export default Home;
