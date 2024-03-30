@@ -35,8 +35,9 @@ function useFeedGenerators() {
 }
 
 const Sidebar: FC<{ onNewPost: () => void }> = ({ onNewPost }) => {
-  const feedGenerators = useFeedGenerators();
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const feedGenerators = useFeedGenerators();
   const onSignout = async () => {
     const ok = await confirm("Are you sure you want to sign out?", {
       kind: "warning",
@@ -55,28 +56,29 @@ const Sidebar: FC<{ onNewPost: () => void }> = ({ onNewPost }) => {
       <Link to="/home">
         <HomeIcon className="h-10 w-10 m-3" />
       </Link>
-      <BellIcon className="h-10 w-10 m-3 text-gray-500" />
-      {feedGenerators.map((view) => {
-        return (
-          <Link
-            key={view.cid}
-            to="/feed_generator"
-            state={view}
-            className="rounded-lg overflow-hidden m-2"
-          >
-            <div className="h-12 w-12 opacity-80">
-              {view.avatar ? (
-                <img src={view.avatar} />
-              ) : (
-                <div className="h-12 bg-blue-500 flex justify-center items-center">
-                  <RssIcon className="h-10 w-10" />
+      <div>
+        <BellIcon className="h-10 w-10 m-3 text-gray-500" />
+      </div>
+      <div className="flex-grow overflow-scroll">
+        {feedGenerators.map((view) => {
+          const current = view === state ? "" : "opacity-80";
+          return (
+            <div key={view.cid} className={`p-2 ${current}`}>
+              <Link to="/feed_generator" state={view}>
+                <div className="h-12 w-12 rounded-lg overflow-hidden border border-gray-500">
+                  {view.avatar ? (
+                    <img src={view.avatar} />
+                  ) : (
+                    <div className="h-12 bg-blue-500 flex justify-center items-center">
+                      <RssIcon className="h-10 w-10" />
+                    </div>
+                  )}
                 </div>
-              )}
+              </Link>
             </div>
-          </Link>
-        );
-      })}
-      <div className="flex-grow" />
+          );
+        })}
+      </div>
       <PencilSquareIcon
         className="h-10 w-10 m-3 text-blue-500 cursor-pointer"
         onClick={onNewPost}
