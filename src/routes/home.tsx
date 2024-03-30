@@ -6,7 +6,7 @@ const Home = () => {
   const posts = useFeedViewPosts();
   return (
     <>
-      <div className="flex items-center p-2 border-b sticky top-0 bg-gray-800">
+      <div className="flex items-center p-2 border-b border-muted sticky top-0 bg-background">
         <div className="h-6 w-6">
           <div className="h-6 flex justify-center items-center">
             <HomeIcon className="h-6 w-6" />

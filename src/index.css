@@ -14,6 +14,27 @@
   }
 }
 
+@layer base {
+  :root {
+    --foreground: 0 0 0;
+    --background: 255 255 255;
+    --muted: 100 116 139;
+    --more-muted: 203 213 225;
+  }
+  .dark {
+    --foreground: 226 232 240;
+    --background: 30 41 59;
+    --muted: 148 163 184;
+    --more-muted: 71 85 105;
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
 html {
   overscroll-behavior: none;
 }

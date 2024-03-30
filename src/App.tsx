@@ -1,15 +1,22 @@
 import { listen } from "@tauri-apps/api/event";
 import { message } from "@tauri-apps/plugin-dialog";
 import { check } from "@tauri-apps/plugin-updater";
-import { useEffect, useRef } from "react";
+import { createContext, useEffect, useRef, useState } from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import { EVENT_MENU_RELOAD } from "./constants";
+import { EVENT_MENU_RELOAD, Theme } from "./constants";
 import "./index.css";
 import FeedGenerator from "./routes/feed-generator";
 import Home from "./routes/home";
 import Root from "./routes/root";
 import Signin from "./routes/signin";
 
+export const ThemeContext = createContext<{
+  theme: Theme;
+  setTheme: (_: Theme) => void;
+}>({
+  theme: Theme.Dark,
+  setTheme: (_) => {},
+});
 const router = createBrowserRouter([
   {
     path: "/",
@@ -62,14 +69,17 @@ async function useListen() {
 }
 
 const App = () => {
+  const [theme, setTheme] = useState<Theme>(Theme.Dark);
   useCheckForUpdate();
   useListen();
   return (
-    <div className="dark">
-      <div className="dark:text-gray-200 dark:bg-gray-800">
-        <RouterProvider router={router} />
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      <div className={theme}>
+        <div className="text-foreground bg-background">
+          <RouterProvider router={router} />
+        </div>
       </div>
-    </div>
+    </ThemeContext.Provider>
   );
 };
 

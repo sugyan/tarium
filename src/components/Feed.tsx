@@ -16,7 +16,7 @@ const Feed: FC<{ posts: FeedViewPost[] }> = ({ posts }) => {
         return (
           <div
             key={`${post.post.cid}`}
-            className="border-b border-gray-500 px-3 pt-3"
+            className="border-b border-slate-500 px-3 pt-3"
           >
             {post.reply && isPostView(post.reply.parent) && (
               <Post post={post.reply.parent} isParent={true} />
@@ -24,7 +24,7 @@ const Feed: FC<{ posts: FeedViewPost[] }> = ({ posts }) => {
             {post.reason && isReasonRepost(post.reason) && (
               <div className="flex">
                 <div className="flex w-10"></div>
-                <div className="w-full text-gray-400 font-semibold text-sm">
+                <div className="w-full text-muted font-semibold text-sm">
                   <ArrowPathRoundedSquareIcon className="flex w-4 h-4 mr-1" />
                   Reposted by{" "}
                   {post.reason.by.displayName || post.reason.by.handle}

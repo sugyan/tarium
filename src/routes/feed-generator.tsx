@@ -9,7 +9,7 @@ const FeedGenerator = () => {
   const posts = useFeedViewPosts(view.uri);
   return (
     <>
-      <div className="flex items-center p-2 border-b sticky top-0 bg-gray-800">
+      <div className="flex items-center p-2 border-b border-muted sticky top-0 bg-background">
         <div className="h-6 w-6 rounded overflow-hidden">
           {view.avatar ? (
             <img src={view.avatar} />
@@ -20,7 +20,7 @@ const FeedGenerator = () => {
           )}
         </div>
         <span className="ml-2 font-semibold">{view.displayName}</span>
-        <span className="ml-2 text-sm text-gray-400">
+        <span className="ml-2 text-sm text-muted">
           created by {view.creator.displayName}
         </span>
       </div>
