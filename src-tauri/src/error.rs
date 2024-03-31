@@ -27,7 +27,13 @@ pub enum Error {
     #[error(transparent)]
     GetFeedGenerators(#[from] XrpcError<atrium_api::app::bsky::feed::get_feed_generators::Error>),
     #[error(transparent)]
+    GetPosts(#[from] XrpcError<atrium_api::app::bsky::feed::get_posts::Error>),
+    #[error(transparent)]
     GetTimeline(#[from] XrpcError<atrium_api::app::bsky::feed::get_timeline::Error>),
+    #[error(transparent)]
+    ListNotifications(
+        #[from] XrpcError<atrium_api::app::bsky::notification::list_notifications::Error>,
+    ),
 }
 
 impl Serialize for Error {

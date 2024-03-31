@@ -4,6 +4,7 @@ mod error;
 mod event;
 mod session_store;
 mod state;
+mod task;
 
 use crate::session_store::FileStore;
 use crate::state::State;
@@ -69,6 +70,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
             command::login,
@@ -76,6 +78,7 @@ pub fn run() {
             command::get_session,
             command::get_preferences,
             command::get_feed_generators,
+            command::get_posts,
             command::subscribe,
             command::unsubscribe,
             command::create_post,

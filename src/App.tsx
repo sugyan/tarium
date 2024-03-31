@@ -1,15 +1,24 @@
 import { listen } from "@tauri-apps/api/event";
 import { message } from "@tauri-apps/plugin-dialog";
+import { Store } from "@tauri-apps/plugin-store";
 import { check } from "@tauri-apps/plugin-updater";
-import { useEffect, useRef } from "react";
+import { createContext, useEffect, useRef, useState } from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import { EVENT_MENU_RELOAD } from "./constants";
+import { EVENT_MENU_RELOAD, STORE_SETTING, Theme } from "./constants";
 import "./index.css";
 import FeedGenerator from "./routes/feed-generator";
 import Home from "./routes/home";
+import Notifications from "./routes/notifications";
 import Root from "./routes/root";
 import Signin from "./routes/signin";
 
+export const ThemeContext = createContext<{
+  theme: Theme | null;
+  setTheme: (_: Theme) => void;
+}>({
+  theme: null,
+  setTheme: (_) => {},
+});
 const router = createBrowserRouter([
   {
     path: "/",
@@ -18,6 +27,10 @@ const router = createBrowserRouter([
       {
         path: "/home",
         element: <Home />,
+      },
+      {
+        path: "/notifications",
+        element: <Notifications />,
       },
       {
         path: "/feed_generator",
@@ -31,7 +44,7 @@ const router = createBrowserRouter([
   },
 ]);
 
-async function useCheckForUpdate() {
+function checkForUpdate() {
   const isChecking = useRef(false);
   useEffect(() => {
     if (isChecking.current) return;
@@ -46,7 +59,7 @@ async function useCheckForUpdate() {
   }, []);
 }
 
-async function useListen() {
+function listenEvents() {
   const isListening = useRef(false);
   const unlisten = useRef(() => {});
   useEffect(() => {
@@ -57,19 +70,37 @@ async function useListen() {
         window.location.reload();
       });
     })();
-    return () => unlisten.current();
+    return unlisten.current;
   }, []);
 }
 
 const App = () => {
-  useCheckForUpdate();
-  useListen();
+  const [theme, setTheme] = useState<Theme | null>(null);
+  const store = new Store(STORE_SETTING);
+  checkForUpdate();
+  listenEvents();
+  useEffect(() => {
+    (async () => {
+      setTheme(await store.get("theme"));
+    })();
+  }, []);
   return (
-    <div className="dark">
-      <div className="dark:text-gray-200 dark:bg-gray-800">
+    <ThemeContext.Provider
+      value={{
+        theme,
+        setTheme: (value: Theme | null) => {
+          (async () => {
+            await store.set("theme", value);
+            await store.save();
+          })();
+          setTheme(value);
+        },
+      }}
+    >
+      <div className={`${theme || ""} text-foreground bg-background`}>
         <RouterProvider router={router} />
       </div>
-    </div>
+    </ThemeContext.Provider>
   );
 };
 

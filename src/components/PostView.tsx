@@ -2,11 +2,11 @@ import {
   ArrowPathRoundedSquareIcon,
   ChatBubbleBottomCenterIcon,
   HeartIcon,
-  UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import { FC } from "react";
 import { PostView } from "../atproto/types/app/bsky/feed/defs";
 import { isRecord } from "../atproto/types/app/bsky/feed/post";
+import Avatar from "./Avatar";
 import DistanceToNow from "./DistanceToNow";
 import PostEmbed, { EmbedView } from "./PostEmbed";
 import PostText from "./PostText";
@@ -19,15 +19,9 @@ const Post: FC<{ post: PostView; isParent?: boolean }> = ({
     <div className="flex overflow-hidden break-words">
       <div className="flex flex-col items-center mr-2">
         <div className="min-h-12 w-12 rounded-full overflow-hidden">
-          {post.author.avatar ? (
-            <img src={post.author.avatar} />
-          ) : (
-            <div className="bg-blue-500">
-              <UserCircleIcon />
-            </div>
-          )}
+          <Avatar author={post.author} />
         </div>
-        {isParent && <div className="w-0.5 h-full bg-gray-600" />}
+        {isParent && <div className="w-0.5 h-full bg-more-muted" />}
       </div>
       <div className="w-full pb-3">
         <div className="flex justify-between items-center">
@@ -35,17 +29,17 @@ const Post: FC<{ post: PostView; isParent?: boolean }> = ({
             <span className="font-semibold">
               {post.author.displayName || post.author.handle}
             </span>
-            <span className="text-sm font-mono pl-2 text-gray-400">
+            <span className="text-sm font-mono pl-2 text-muted">
               @{post.author.handle}
             </span>
           </div>
-          <div className="text-sm text-gray-400 whitespace-nowrap">
+          <div className="text-sm text-muted whitespace-nowrap">
             <DistanceToNow date={post.indexedAt} />
           </div>
         </div>
         {isRecord(post.record) && <PostText record={post.record} />}
         <PostEmbed embed={post.embed as EmbedView} />
-        <div className="flex text-sm text-gray-500 mt-2">
+        <div className="flex text-sm text-slate-500 mt-2">
           <div className="flex items-center w-20">
             <ChatBubbleBottomCenterIcon className="h-4 w-4 mr-1" />
             {post.replyCount || ""}
