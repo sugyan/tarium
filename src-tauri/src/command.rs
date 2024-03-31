@@ -1,16 +1,14 @@
-use crate::consts::EmitEvent;
 use crate::error::{Error, Result};
-use crate::event::PostEvent;
 use crate::session_store::{FileSessionStore, FileStore};
 use crate::state::State;
+use crate::task::{watch_feed, watch_notifications};
 use atrium_api::agent::store::SessionStore;
 use atrium_api::agent::AtpAgent;
 use atrium_api::records::Record;
 use atrium_api::types::{Collection, Union};
 use atrium_xrpc_client::reqwest::ReqwestClient;
-use std::collections::HashMap;
+use serde::Deserialize;
 use std::sync::Arc;
-use std::time::Duration;
 use tauri::Manager;
 
 #[tauri::command]
@@ -116,97 +114,36 @@ pub async fn get_feed_generators(
         .await?)
 }
 
-async fn background_task(
-    uri: Option<String>,
-    agent: Arc<AtpAgent<FileSessionStore, ReqwestClient>>,
-    mut receiver: tokio::sync::oneshot::Receiver<()>,
-    app_handle: tauri::AppHandle,
-) -> Result<()> {
-    use atrium_api::app::bsky::feed::defs::{FeedViewPost, ReplyRefParentRefs};
-    async fn check_new_post(
-        uri: &Option<String>,
-        app_handle: &tauri::AppHandle,
-        agent: &Arc<AtpAgent<FileSessionStore, ReqwestClient>>,
-        cids: &mut HashMap<String, FeedViewPost>,
-    ) -> Result<()> {
-        println!("checking posts");
-        let posts = if let Some(feed) = uri {
-            agent
-                .api
-                .app
-                .bsky
-                .feed
-                .get_feed(atrium_api::app::bsky::feed::get_feed::Parameters {
-                    cursor: None,
-                    feed: feed.into(),
-                    limit: 30.try_into().ok(),
-                })
-                .await?
-                .feed
-        } else {
-            agent
-                .api
-                .app
-                .bsky
-                .feed
-                .get_timeline(atrium_api::app::bsky::feed::get_timeline::Parameters {
-                    algorithm: None,
-                    cursor: None,
-                    limit: 30.try_into().ok(),
-                })
-                .await?
-                .feed
-        };
-        for post in posts.iter().rev() {
-            let cid = post.post.cid.as_ref().to_string();
-            if let Some(prev) = cids.get(&cid) {
-                if post.reason != prev.reason
-                    || post.post.reply_count != prev.post.reply_count
-                    || post.post.repost_count != prev.post.repost_count
-                    || post.post.like_count != prev.post.like_count
-                {
-                    app_handle
-                        .emit(EmitEvent::Post.as_ref(), PostEvent::Update(post.clone()))
-                        .expect("failed to emit post event");
-                }
-            } else {
-                if let Some(reply) = &post.reply {
-                    if let Union::Refs(ReplyRefParentRefs::PostView(post_view)) = &reply.parent {
-                        if let Some(prev) = cids.get(&post_view.cid.as_ref().to_string()) {
-                            app_handle
-                                .emit(
-                                    EmitEvent::Post.as_ref(),
-                                    PostEvent::Delete(prev.post.clone()),
-                                )
-                                .expect("failed to emit post event");
-                        }
-                    }
-                }
-                app_handle
-                    .emit(EmitEvent::Post.as_ref(), PostEvent::Add(post.clone()))
-                    .expect("failed to emit post event");
-            }
-            cids.insert(cid, post.clone());
-        }
-        Ok(())
-    }
-    let mut cids = HashMap::new();
-    let mut interval = tokio::time::interval(Duration::from_secs(60));
-    loop {
-        tokio::select! {
-            _ = &mut receiver => {
-                println!("cancelling");
-                break;
-            }
-            _ = interval.tick() => check_new_post(&uri, &app_handle, &agent, &mut cids).await?,
-        }
-    }
-    Ok(())
+#[tauri::command]
+pub async fn get_posts(
+    uris: Vec<String>,
+    state: tauri::State<'_, State>,
+) -> Result<atrium_api::app::bsky::feed::get_posts::Output> {
+    Ok(state
+        .agent
+        .lock()
+        .await
+        .as_ref()
+        .ok_or(Error::NoAgent)?
+        .api
+        .app
+        .bsky
+        .feed
+        .get_posts(atrium_api::app::bsky::feed::get_posts::Parameters { uris })
+        .await?)
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Subscription {
+    Feed,
+    Notification,
 }
 
 #[tauri::command]
 pub async fn subscribe(
     uri: Option<String>,
+    subscription: Subscription,
     app_handle: tauri::AppHandle,
     state: tauri::State<'_, State>,
 ) -> Result<()> {
@@ -220,7 +157,14 @@ pub async fn subscribe(
             .as_ref()
             .ok_or(Error::NoAgent)?
             .clone();
-        tauri::async_runtime::spawn(background_task(uri, agent, receiver, app_handle));
+        match subscription {
+            Subscription::Feed => {
+                tauri::async_runtime::spawn(watch_feed(uri, agent, receiver, app_handle));
+            }
+            Subscription::Notification => {
+                tauri::async_runtime::spawn(watch_notifications(agent, receiver, app_handle));
+            }
+        }
     }
     Ok(())
 }

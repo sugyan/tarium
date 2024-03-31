@@ -9,7 +9,7 @@ const FeedGenerator = () => {
   const posts = useFeedViewPosts(view.uri);
   return (
     <>
-      <div className="flex items-center p-2 border-b border-muted sticky top-0 bg-background">
+      <div className="flex items-center p-2 border-b border-muted sticky top-0 bg-background z-10">
         <div className="h-6 w-6 rounded overflow-hidden">
           {view.avatar ? (
             <img src={view.avatar} />
