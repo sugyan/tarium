@@ -1,4 +1,3 @@
-import { UserCircleIcon } from "@heroicons/react/24/outline";
 import { FC } from "react";
 import {
   View as ExternalView,
@@ -21,6 +20,7 @@ import {
   isView as isRecordWithMediaView,
 } from "../atproto/types/app/bsky/embed/recordWithMedia";
 import { isRecord } from "../atproto/types/app/bsky/feed/post";
+import Avatar from "./Avatar";
 import DistanceToNow from "./DistanceToNow";
 
 export type EmbedView =
@@ -34,7 +34,9 @@ const Images: FC<{ images: ViewImage[] }> = ({ images }) => {
     <>
       {images.map((image, index) => (
         <div key={index} className="mt-2 max-h-64 rounded-md overflow-hidden">
-          <img src={image.thumb} className="object-cover w-full" />
+          <a href={image.fullsize} target="_blank" rel="noreferrer">
+            <img src={image.thumb} className="object-cover w-full" />
+          </a>
         </div>
       ))}
     </>
@@ -69,13 +71,7 @@ const Record: FC<{ record: ViewRecord }> = ({ record }) => {
           <div className="flex justify-between">
             <div className="flex items-center">
               <div className="h-4 w-4 rounded-full overflow-hidden mr-1">
-                {record.author.avatar ? (
-                  <img src={record.author.avatar} />
-                ) : (
-                  <div className="bg-blue-500">
-                    <UserCircleIcon />
-                  </div>
-                )}
+                <Avatar author={record.author} />
               </div>
               <span className="font-semibold">
                 {record.author.displayName || record.author.handle}

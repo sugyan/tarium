@@ -8,6 +8,7 @@ import { EVENT_MENU_RELOAD, STORE_SETTING, Theme } from "./constants";
 import "./index.css";
 import FeedGenerator from "./routes/feed-generator";
 import Home from "./routes/home";
+import Notifications from "./routes/notifications";
 import Root from "./routes/root";
 import Signin from "./routes/signin";
 
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
       {
         path: "/home",
         element: <Home />,
+      },
+      {
+        path: "/notifications",
+        element: <Notifications />,
       },
       {
         path: "/feed_generator",

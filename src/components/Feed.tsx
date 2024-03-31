@@ -6,7 +6,7 @@ import {
   isPostView,
   isReasonRepost,
 } from "../atproto/types/app/bsky/feed/defs";
-import Post from "./Post";
+import Post from "./PostView";
 
 const Feed: FC<{ posts: FeedViewPost[] }> = ({ posts }) => {
   const [parent, _] = useAutoAnimate();

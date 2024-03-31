@@ -2,11 +2,11 @@ import {
   ArrowPathRoundedSquareIcon,
   ChatBubbleBottomCenterIcon,
   HeartIcon,
-  UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import { FC } from "react";
 import { PostView } from "../atproto/types/app/bsky/feed/defs";
 import { isRecord } from "../atproto/types/app/bsky/feed/post";
+import Avatar from "./Avatar";
 import DistanceToNow from "./DistanceToNow";
 import PostEmbed, { EmbedView } from "./PostEmbed";
 import PostText from "./PostText";
@@ -19,13 +19,7 @@ const Post: FC<{ post: PostView; isParent?: boolean }> = ({
     <div className="flex overflow-hidden break-words">
       <div className="flex flex-col items-center mr-2">
         <div className="min-h-12 w-12 rounded-full overflow-hidden">
-          {post.author.avatar ? (
-            <img src={post.author.avatar} />
-          ) : (
-            <div className="bg-blue-500">
-              <UserCircleIcon />
-            </div>
-          )}
+          <Avatar author={post.author} />
         </div>
         {isParent && <div className="w-0.5 h-full bg-more-muted" />}
       </div>

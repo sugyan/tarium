@@ -38,7 +38,7 @@ const Sidebar: FC<{ onNewPost: () => void; onSettings: () => void }> = ({
   onSettings,
 }) => {
   const navigate = useNavigate();
-  const { state } = useLocation();
+  const { state, pathname } = useLocation();
   const feedGenerators = useFeedGenerators();
   const onSignout = async () => {
     const ok = await confirm("Are you sure you want to sign out?", {
@@ -55,15 +55,25 @@ const Sidebar: FC<{ onNewPost: () => void; onSettings: () => void }> = ({
   };
   return (
     <div className="w-16 flex flex-col h-full items-center select-none">
-      <Link to="/home">
-        <HomeIcon className="h-10 w-10 m-3" />
+      <Link
+        to="/home"
+        className={`p-2 ${pathname === "/home" && "bg-more-muted"}`}
+      >
+        <div className="flex justify-center items-center h-12 w-12 rounded-lg overflow-hidden border border-slate-500 bg-background">
+          <HomeIcon className="h-10 w-10" />
+        </div>
       </Link>
-      <div>
-        <BellIcon className="h-10 w-10 m-3 text-slate-500" />
-      </div>
+      <Link
+        to="/notifications"
+        className={`p-2 ${pathname === "/notifications" && "bg-more-muted"}`}
+      >
+        <div className="flex justify-center items-center h-12 w-12 rounded-lg overflow-hidden border border-slate-500 bg-background">
+          <BellIcon className="h-10 w-10" />
+        </div>
+      </Link>
       <div className="flex-grow overflow-scroll">
         {feedGenerators.map((view) => {
-          const current = view === state ? "brightness-125" : "";
+          const current = view === state ? "bg-more-muted" : "";
           return (
             <div key={view.cid} className={`p-2 ${current}`}>
               <Link to="/feed_generator" state={view}>

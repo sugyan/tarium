@@ -4,6 +4,7 @@ mod error;
 mod event;
 mod session_store;
 mod state;
+mod task;
 
 use crate::session_store::FileStore;
 use crate::state::State;
@@ -77,6 +78,7 @@ pub fn run() {
             command::get_session,
             command::get_preferences,
             command::get_feed_generators,
+            command::get_posts,
             command::subscribe,
             command::unsubscribe,
             command::create_post,
