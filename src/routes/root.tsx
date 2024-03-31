@@ -38,7 +38,7 @@ const Root = () => {
         ariaHideApp={false}
         onRequestClose={() => setNewPostOpen(false)}
         className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 min-h-64 w-96 rounded shadow-lg shadow-slate-950 outline-none text-foreground bg-background ${theme}`}
-        overlayClassName="fixed inset-0 backdrop-blur-sm backdrop-contrast-75"
+        overlayClassName="fixed inset-0 backdrop-blur-sm backdrop-contrast-75 z-50"
       >
         <NewPostForm onCancel={() => setNewPostOpen(false)} />
       </Modal>
@@ -47,7 +47,7 @@ const Root = () => {
         ariaHideApp={false}
         onRequestClose={() => setSettingsOpen(false)}
         className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 min-h-64 w-auto rounded shadow-lg shadow-slate-950 outline-none text-foreground bg-background ${theme}`}
-        overlayClassName="fixed inset-0 backdrop-blur-sm backdrop-contrast-75"
+        overlayClassName="fixed inset-0 backdrop-blur-sm backdrop-contrast-75 z-50"
       >
         <Settings />
       </Modal>
