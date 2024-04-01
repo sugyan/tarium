@@ -1,5 +1,6 @@
 import { BellIcon } from "@heroicons/react/24/outline";
 import { invoke } from "@tauri-apps/api/core";
+import { differenceInDays } from "date-fns/fp/differenceInDays";
 import { useEffect, useState } from "react";
 import { ProfileView } from "../atproto/types/app/bsky/actor/defs";
 import { OutputSchema } from "../atproto/types/app/bsky/feed/getPosts";
@@ -10,16 +11,19 @@ import { useNotifications } from "../hooks/useNotifications";
 
 interface NotificationGroup {
   key: string;
-  uri: string | undefined;
+  uri?: string;
   reason: NotificationReason;
   indexedAt: string;
   authors: ProfileView[];
 }
 
+// group by reason, subject, and 2-day periods
 function groupNotifications(notifications: Notification[]) {
   const groups: NotificationGroup[] = [];
   const index = new Map();
+  const diff = differenceInDays(new Date());
   notifications.forEach((notification) => {
+    const days2 = Math.floor(-diff(notification.indexedAt) / 2);
     const reason = notification.reason as NotificationReason;
     const uri =
       reason === NotificationReason.Mention ||
@@ -27,7 +31,7 @@ function groupNotifications(notifications: Notification[]) {
       reason === NotificationReason.Reply
         ? notification.uri
         : notification.reasonSubject;
-    const key = [reason, notification.reasonSubject].join(",");
+    const key = `${days2}:${reason},${uri || ""}`;
     const i = index.get(key);
     if (i !== undefined) {
       groups[i].authors.push(notification.author);
