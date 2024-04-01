@@ -47,6 +47,7 @@ function groupNotifications(notifications: Notification[]) {
 
 function useGetPosts(notificationGroups: NotificationGroup[]) {
   const [postViews, setPostViews] = useState(new Map());
+  // extract only unknown uris
   const uris = Array.from(
     notificationGroups.reduce((acc, n) => {
       if (n.uri && !postViews.has(n.uri)) {
@@ -58,7 +59,7 @@ function useGetPosts(notificationGroups: NotificationGroup[]) {
   useEffect(() => {
     if (uris.length === 0) return;
     (async () => {
-      // add keys
+      // just add keys (with value `null`)
       setPostViews((prev) => {
         return new Map(
           Array.from(prev.entries()).concat(uris.map((uri) => [uri, null]))

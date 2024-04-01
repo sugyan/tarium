@@ -12,12 +12,9 @@ import {
 
 export function useFeedViewPosts(uri?: string) {
   const [posts, setPosts] = useState<FeedViewPost[]>([]);
-  const isListening = useRef(false);
   const unlisten = useRef<UnlistenFn>(() => {});
   useEffect(() => {
     (async () => {
-      if (isListening.current) return;
-      isListening.current = true;
       unlisten.current = await listen<FeedPostEvent>(
         EventName.Post,
         (event) => {
@@ -48,7 +45,6 @@ export function useFeedViewPosts(uri?: string) {
       unlisten.current();
       (async () => {
         await invoke("unsubscribe", {});
-        isListening.current = false;
       })();
     };
   }, [uri]);
