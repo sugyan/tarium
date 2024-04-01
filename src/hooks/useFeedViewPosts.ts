@@ -1,14 +1,14 @@
-import { invoke } from "@tauri-apps/api/core";
-import { UnlistenFn, listen } from "@tauri-apps/api/event";
-import { useEffect, useRef, useState } from "react";
-import { FeedViewPost } from "../atproto/types/app/bsky/feed/defs";
-import { EventName } from "../constants";
+import { FeedViewPost } from "@/atproto/types/app/bsky/feed/defs";
+import { EventName } from "@/constants";
 import {
   FeedPostEvent,
   isFeedPostAdd,
   isFeedPostDelete,
   isFeedPostUpdate,
-} from "../events";
+} from "@/events";
+import { invoke } from "@tauri-apps/api/core";
+import { UnlistenFn, listen } from "@tauri-apps/api/event";
+import { useEffect, useRef, useState } from "react";
 
 export function useFeedViewPosts(uri?: string) {
   const [posts, setPosts] = useState<FeedViewPost[]>([]);

@@ -1,13 +1,13 @@
+import { ProfileView } from "@/atproto/types/app/bsky/actor/defs";
+import { OutputSchema } from "@/atproto/types/app/bsky/feed/getPosts";
+import { Notification } from "@/atproto/types/app/bsky/notification/listNotifications";
+import NotificationList from "@/components/NotificatinList";
+import { NotificationReason } from "@/constants";
+import { useNotifications } from "@/hooks/useNotifications";
 import { BellIcon } from "@heroicons/react/24/outline";
 import { invoke } from "@tauri-apps/api/core";
 import { differenceInDays } from "date-fns/fp/differenceInDays";
 import { useEffect, useState } from "react";
-import { ProfileView } from "../atproto/types/app/bsky/actor/defs";
-import { OutputSchema } from "../atproto/types/app/bsky/feed/getPosts";
-import { Notification } from "../atproto/types/app/bsky/notification/listNotifications";
-import NotificationList from "../components/NotificatinList";
-import { NotificationReason } from "../constants";
-import { useNotifications } from "../hooks/useNotifications";
 
 interface NotificationGroup {
   key: string;

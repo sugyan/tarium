@@ -1,6 +1,6 @@
+import { ThemeContext } from "@/App";
+import { Theme } from "@/constants";
 import { useContext } from "react";
-import { ThemeContext } from "../App";
-import { Theme } from "../constants";
 
 const Settings = () => {
   const { theme, setTheme } = useContext(ThemeContext);

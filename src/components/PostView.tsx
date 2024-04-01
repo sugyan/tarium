@@ -1,15 +1,15 @@
+import { PostView } from "@/atproto/types/app/bsky/feed/defs";
+import { isRecord } from "@/atproto/types/app/bsky/feed/post";
+import Avatar from "@/components/Avatar";
+import DistanceToNow from "@/components/DistanceToNow";
+import PostEmbed, { EmbedView } from "@/components/PostEmbed";
+import PostText from "@/components/PostText";
 import {
   ArrowPathRoundedSquareIcon,
   ChatBubbleBottomCenterIcon,
   HeartIcon,
 } from "@heroicons/react/24/outline";
 import { FC } from "react";
-import { PostView } from "../atproto/types/app/bsky/feed/defs";
-import { isRecord } from "../atproto/types/app/bsky/feed/post";
-import Avatar from "./Avatar";
-import DistanceToNow from "./DistanceToNow";
-import PostEmbed, { EmbedView } from "./PostEmbed";
-import PostText from "./PostText";
 
 const Post: FC<{ post: PostView; isParent?: boolean }> = ({
   post,

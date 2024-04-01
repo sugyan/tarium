@@ -1,6 +1,6 @@
+import Feed from "@/components/Feed";
+import { useFeedViewPosts } from "@/hooks/useFeedViewPosts";
 import { HomeIcon } from "@heroicons/react/24/outline";
-import Feed from "../components/Feed";
-import { useFeedViewPosts } from "../hooks/useFeedViewPosts";
 
 const Home = () => {
   const posts = useFeedViewPosts();
