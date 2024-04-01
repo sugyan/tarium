@@ -11,7 +11,7 @@ const REFRESHES = [
 const DistanceToNow: FC<{ date: string }> = ({ date }) => {
   const parsed = parseISO(date);
   const [distance, setDistance] = useState<string>();
-  const timeoutId = useRef<NodeJS.Timeout>();
+  const timeoutId = useRef<number>();
   useEffect(() => {
     const updateDistance = () => {
       setDistance(formatDistanceToNowStrict(parsed));
