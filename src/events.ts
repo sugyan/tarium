@@ -1,5 +1,5 @@
-import { FeedViewPost, PostView } from "./atproto/types/app/bsky/feed/defs";
-import { hasProp, isObj } from "./atproto/util";
+import { FeedViewPost, PostView } from "@/atproto/types/app/bsky/feed/defs";
+import { hasProp, isObj } from "@/atproto/util";
 
 export interface FeedPostAdd extends FeedViewPost {}
 

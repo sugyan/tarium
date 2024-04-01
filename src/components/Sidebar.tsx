@@ -1,3 +1,4 @@
+import { GeneratorView } from "@/atproto/types/app/bsky/feed/defs";
 import {
   BellIcon,
   Cog6ToothIcon,
@@ -10,7 +11,6 @@ import { invoke } from "@tauri-apps/api/core";
 import { confirm } from "@tauri-apps/plugin-dialog";
 import { FC, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { GeneratorView } from "../atproto/types/app/bsky/feed/defs";
 
 function useFeedGenerators() {
   const [feedGenerators, setFeedGenerators] = useState<GeneratorView[]>([]);

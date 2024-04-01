@@ -1,27 +1,27 @@
-import { FC } from "react";
 import {
   View as ExternalView,
   ViewExternal,
   isView as isExternalView,
-} from "../atproto/types/app/bsky/embed/external";
+} from "@/atproto/types/app/bsky/embed/external";
 import {
   View as ImagesView,
   ViewImage,
   isView as isImagesView,
-} from "../atproto/types/app/bsky/embed/images";
+} from "@/atproto/types/app/bsky/embed/images";
 import {
   View as RecordView,
   ViewRecord,
   isView as isRecordView,
   isViewRecord,
-} from "../atproto/types/app/bsky/embed/record";
+} from "@/atproto/types/app/bsky/embed/record";
 import {
   View as RecordWithMediaView,
   isView as isRecordWithMediaView,
-} from "../atproto/types/app/bsky/embed/recordWithMedia";
-import { isRecord } from "../atproto/types/app/bsky/feed/post";
-import Avatar from "./Avatar";
-import DistanceToNow from "./DistanceToNow";
+} from "@/atproto/types/app/bsky/embed/recordWithMedia";
+import { isRecord } from "@/atproto/types/app/bsky/feed/post";
+import Avatar from "@/components/Avatar";
+import DistanceToNow from "@/components/DistanceToNow";
+import { FC } from "react";
 
 export type EmbedView =
   | ExternalView

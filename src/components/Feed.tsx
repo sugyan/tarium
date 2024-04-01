@@ -1,12 +1,12 @@
-import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { ArrowPathRoundedSquareIcon } from "@heroicons/react/24/outline";
-import { FC } from "react";
 import {
   FeedViewPost,
   isPostView,
   isReasonRepost,
-} from "../atproto/types/app/bsky/feed/defs";
-import Post from "./PostView";
+} from "@/atproto/types/app/bsky/feed/defs";
+import Post from "@/components/PostView";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { ArrowPathRoundedSquareIcon } from "@heroicons/react/24/outline";
+import { FC } from "react";
 
 const Feed: FC<{ posts: FeedViewPost[] }> = ({ posts }) => {
   const [parent, _] = useAutoAnimate();

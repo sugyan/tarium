@@ -1,8 +1,8 @@
+import { Notification } from "@/atproto/types/app/bsky/notification/listNotifications";
+import { EventName } from "@/constants";
 import { invoke } from "@tauri-apps/api/core";
 import { UnlistenFn, listen } from "@tauri-apps/api/event";
 import { useEffect, useRef, useState } from "react";
-import { Notification } from "../atproto/types/app/bsky/notification/listNotifications";
-import { EventName } from "../constants";
 
 export function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);

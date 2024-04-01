@@ -1,8 +1,8 @@
+import { GeneratorView } from "@/atproto/types/app/bsky/feed/defs";
+import Feed from "@/components/Feed";
+import { useFeedViewPosts } from "@/hooks/useFeedViewPosts";
 import { RssIcon } from "@heroicons/react/24/solid";
 import { useLocation } from "react-router-dom";
-import { GeneratorView } from "../atproto/types/app/bsky/feed/defs";
-import Feed from "../components/Feed";
-import { useFeedViewPosts } from "../hooks/useFeedViewPosts";
 
 const FeedGenerator = () => {
   const { state: view }: { state: GeneratorView } = useLocation();

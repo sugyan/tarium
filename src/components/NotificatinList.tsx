@@ -1,3 +1,12 @@
+import { ProfileView } from "@/atproto/types/app/bsky/actor/defs";
+import { isView } from "@/atproto/types/app/bsky/embed/images";
+import { PostView } from "@/atproto/types/app/bsky/feed/defs";
+import { isRecord } from "@/atproto/types/app/bsky/feed/post";
+import Avatar from "@/components/Avatar";
+import DistanceToNow from "@/components/DistanceToNow";
+import PostEmbed from "@/components/PostEmbed";
+import Post from "@/components/PostView";
+import { NotificationReason } from "@/constants";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import {
   ArrowPathRoundedSquareIcon,
@@ -5,15 +14,6 @@ import {
   UserPlusIcon,
 } from "@heroicons/react/24/solid";
 import { FC, PropsWithChildren } from "react";
-import { ProfileView } from "../atproto/types/app/bsky/actor/defs";
-import { isView } from "../atproto/types/app/bsky/embed/images";
-import { PostView } from "../atproto/types/app/bsky/feed/defs";
-import { isRecord } from "../atproto/types/app/bsky/feed/post";
-import { NotificationReason } from "../constants";
-import Avatar from "./Avatar";
-import DistanceToNow from "./DistanceToNow";
-import PostEmbed from "./PostEmbed";
-import Post from "./PostView";
 
 export interface NotificationGroup {
   key: string;

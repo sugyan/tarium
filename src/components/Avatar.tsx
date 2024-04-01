@@ -1,6 +1,6 @@
+import { ProfileView } from "@/atproto/types/app/bsky/actor/defs";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
 import { FC } from "react";
-import { ProfileView } from "../atproto/types/app/bsky/actor/defs";
 
 const Avatar: FC<{ author: ProfileView }> = ({ author }) => {
   return author.avatar ? (
