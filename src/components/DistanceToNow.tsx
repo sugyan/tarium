@@ -23,7 +23,7 @@ const DistanceToNow: FC<{ date: string }> = ({ date }) => {
     };
     updateDistance();
     return () => clearTimeout(timeoutId.current);
-  }, []);
+  }, [date]);
   return <>{distance}</>;
 };
 
