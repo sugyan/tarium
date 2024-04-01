@@ -67,7 +67,7 @@ function listenEvents() {
     isListening.current = true;
     (async () => {
       unlisten.current = await listen<null>(EVENT_MENU_RELOAD, () => {
-        window.location.reload();
+        console.log("Reload!");
       });
     })();
     return unlisten.current;

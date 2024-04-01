@@ -119,6 +119,7 @@ pub async fn get_posts(
     uris: Vec<String>,
     state: tauri::State<'_, State>,
 ) -> Result<atrium_api::app::bsky::feed::get_posts::Output> {
+    println!("get_posts: {uris:?}");
     Ok(state
         .agent
         .lock()
@@ -148,6 +149,7 @@ pub async fn subscribe(
     state: tauri::State<'_, State>,
 ) -> Result<()> {
     if state.sender.lock().await.is_none() {
+        println!("start subscription");
         let (sender, receiver) = tokio::sync::oneshot::channel();
         state.sender.lock().await.replace(sender);
         let agent = state
@@ -165,6 +167,8 @@ pub async fn subscribe(
                 tauri::async_runtime::spawn(watch_notifications(agent, receiver, app_handle));
             }
         }
+    } else {
+        println!("already subscribing")
     }
     Ok(())
 }
@@ -172,6 +176,7 @@ pub async fn subscribe(
 #[tauri::command]
 pub async fn unsubscribe(state: tauri::State<'_, State>) -> Result<()> {
     if let Some(sender) = state.sender.lock().await.take() {
+        println!("cancel subscription");
         sender.send(()).expect("failed to send");
     }
     Ok(())

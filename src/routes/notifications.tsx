@@ -1,6 +1,6 @@
 import { BellIcon } from "@heroicons/react/24/outline";
 import { invoke } from "@tauri-apps/api/core";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { ProfileView } from "../atproto/types/app/bsky/actor/defs";
 import { OutputSchema } from "../atproto/types/app/bsky/feed/getPosts";
 import { Notification } from "../atproto/types/app/bsky/notification/listNotifications";
@@ -47,25 +47,31 @@ function groupNotifications(notifications: Notification[]) {
 
 function useGetPosts(notificationGroups: NotificationGroup[]) {
   const [postViews, setPostViews] = useState(new Map());
-  const uris = useMemo(() => {
-    return Array.from(
-      notificationGroups.reduce((acc: Set<string>, n: NotificationGroup) => {
-        if (n.uri && !postViews.has(n.uri)) {
-          acc.add(n.uri);
-        }
-        return acc;
-      }, new Set())
-    );
-  }, [notificationGroups, postViews]);
+  const uris = Array.from(
+    notificationGroups.reduce((acc, n) => {
+      if (n.uri && !postViews.has(n.uri)) {
+        acc.add(n.uri);
+      }
+      return acc;
+    }, new Set())
+  );
   useEffect(() => {
     if (uris.length === 0) return;
     (async () => {
+      // add keys
+      setPostViews((prev) => {
+        return new Map(
+          Array.from(prev.entries()).concat(uris.map((uri) => [uri, null]))
+        );
+      });
       const output = await invoke<OutputSchema>("get_posts", {
         uris,
       });
+      // set values
       setPostViews((prev) => {
-        output.posts.forEach((postView) => prev.set(postView.uri, postView));
-        return new Map(prev);
+        return new Map(
+          Array.from(prev.entries()).concat(output.posts.map((p) => [p.uri, p]))
+        );
       });
     })();
   }, [uris]);
