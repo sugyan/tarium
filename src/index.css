@@ -22,8 +22,8 @@
     --more-muted: 203 213 225; /* slate-300 */
   }
   .dark {
-    --foreground: 226 232 240; /* slate-200 */
-    --background: 30 41 59; /* slate-800 */
+    --foreground: 241 245 249; /* slate-100 */
+    --background: 15 23 42; /* slate-900 */
     --muted: 148 163 184; /* slate-400 */
     --more-muted: 71 85 105; /* slate-600 */
   }
