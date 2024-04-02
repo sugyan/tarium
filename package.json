@@ -12,6 +12,7 @@
   "dependencies": {
     "@atproto/lexicon": "^0.4.0",
     "@formkit/auto-animate": "^0.8.1",
+    "@headlessui/react": "^1.7.18",
     "@heroicons/react": "^2.1.1",
     "@tauri-apps/api": ">=2.0.0-beta.0",
     "@tauri-apps/plugin-dialog": "^2.0.0-beta.2",
@@ -20,6 +21,7 @@
     "@tauri-apps/plugin-store": "^2.0.0-beta.2",
     "@tauri-apps/plugin-updater": "^2.0.0-beta.2",
     "date-fns": "^3.3.1",
+    "lodash": "^4.17.21",
     "multiformats": "^13.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -28,6 +30,7 @@
   },
   "devDependencies": {
     "@tauri-apps/cli": ">=2.0.0-beta.0",
+    "@types/lodash": "^4.17.0",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@types/react-modal": "^3.16.3",
