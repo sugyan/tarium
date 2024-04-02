@@ -1,6 +1,7 @@
 import { ProfileView } from "@/atproto/types/app/bsky/actor/defs";
 import { OutputSchema } from "@/atproto/types/app/bsky/feed/getPosts";
 import { Notification } from "@/atproto/types/app/bsky/notification/listNotifications";
+import Column from "@/components/Column";
 import NotificationList from "@/components/NotificatinList";
 import { NotificationReason } from "@/constants";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -87,18 +88,20 @@ const Notifications = () => {
   const notifications = useNotifications();
   const groups = groupNotifications(notifications);
   const posts = useGetPosts(groups);
-  return (
+  const headerContent = (
     <>
-      <div className="flex items-center p-2 border-b border-muted sticky top-0 bg-background z-10">
-        <div className="h-6 w-6">
-          <div className="h-6 flex justify-center items-center">
-            <BellIcon className="h-6 w-6" />
-          </div>
+      <div className="h-6 w-6">
+        <div className="h-6 flex justify-center items-center">
+          <BellIcon className="h-6 w-6" />
         </div>
-        <span className="ml-2 font-semibold">Notifications</span>
       </div>
-      <NotificationList groups={groups} posts={posts} />
+      <span className="ml-2 font-semibold">Notifications</span>
     </>
+  );
+  return (
+    <Column headerContent={headerContent}>
+      <NotificationList groups={groups} posts={posts} />
+    </Column>
   );
 };
 
