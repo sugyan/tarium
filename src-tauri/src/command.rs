@@ -1,7 +1,7 @@
 use crate::error::{Error, Result};
 use crate::session_store::{FileSessionStore, FileStore};
 use crate::state::State;
-use crate::task::{watch_feed, watch_notifications};
+use crate::task::{poll_feed, poll_notifications};
 use atrium_api::agent::store::SessionStore;
 use atrium_api::agent::AtpAgent;
 use atrium_api::records::Record;
