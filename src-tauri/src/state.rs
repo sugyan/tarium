@@ -5,9 +5,8 @@ use atrium_xrpc_client::reqwest::ReqwestClient;
 use std::sync::Arc;
 use tauri::{async_runtime::Mutex, Runtime};
 
-#[derive(Default)]
 pub struct State<R: Runtime> {
-    pub agent: Mutex<Option<Arc<AtpAgent<TauriPluginStore<R>, ReqwestClient>>>>,
+    pub agent: Mutex<Arc<AtpAgent<TauriPluginStore<R>, ReqwestClient>>>,
     pub subscription_sender: Mutex<Option<tokio::sync::oneshot::Sender<()>>>,
     pub notification_sender: Mutex<Option<tokio::sync::oneshot::Sender<()>>>,
 }

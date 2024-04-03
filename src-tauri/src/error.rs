@@ -6,8 +6,6 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug, Error)]
 pub enum Error {
-    #[error("no agent")]
-    NoAgent,
     #[error("no session")]
     NoSession,
     #[error(transparent)]

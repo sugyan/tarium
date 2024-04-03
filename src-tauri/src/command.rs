@@ -25,20 +25,16 @@ pub async fn login<R: Runtime>(
         TauriPluginStore::new(app.clone()),
     );
     let result = agent.login(identifier, password).await?;
-    state.agent.lock().await.replace(Arc::new(agent));
+    *state.agent.lock().await = Arc::new(agent);
     Ok(result)
 }
 
 #[tauri::command]
-pub async fn logout<R: Runtime>(
-    app: AppHandle<R>,
-    state: tauri::State<'_, State<R>>,
-) -> Result<()> {
+pub async fn logout<R: Runtime>(app: AppHandle<R>) -> Result<()> {
     with_store(app.clone(), app.state(), STORE_APPDATA_PATH, |store| {
         store.delete(CURRENT)?;
         store.save()
     })?;
-    *state.agent.lock().await = None;
     Ok(())
 }
 
@@ -51,8 +47,6 @@ pub async fn get_session<R: Runtime>(
         .agent
         .lock()
         .await
-        .as_ref()
-        .ok_or(Error::NoAgent)?
         .api
         .com
         .atproto
@@ -70,8 +64,6 @@ pub async fn get_preferences<R: Runtime>(
         .agent
         .lock()
         .await
-        .as_ref()
-        .ok_or(Error::NoAgent)?
         .api
         .app
         .bsky
@@ -85,13 +77,7 @@ pub async fn get_feed_generators<R: Runtime>(
     app: AppHandle<R>,
     state: tauri::State<'_, State<R>>,
 ) -> Result<atrium_api::app::bsky::feed::get_feed_generators::Output> {
-    let agent = state
-        .agent
-        .lock()
-        .await
-        .as_ref()
-        .ok_or(Error::NoAgent)?
-        .clone();
+    let agent = state.agent.lock().await.clone();
     let preferences = get_preferences(app, state).await?;
     let feeds = preferences
         .preferences
@@ -127,8 +113,6 @@ pub async fn get_posts<R: Runtime>(
         .agent
         .lock()
         .await
-        .as_ref()
-        .ok_or(Error::NoAgent)?
         .api
         .app
         .bsky
@@ -153,13 +137,7 @@ pub async fn subscribe<R: Runtime>(
 ) -> Result<()> {
     if state.subscription_sender.lock().await.is_none() {
         log::info!("start subscription: {subscription:?}");
-        let agent = state
-            .agent
-            .lock()
-            .await
-            .as_ref()
-            .ok_or(Error::NoAgent)?
-            .clone();
+        let agent = state.agent.lock().await.clone();
         let (sender, receiver) = tokio::sync::oneshot::channel();
         state.subscription_sender.lock().await.replace(sender);
         match subscription {
@@ -183,13 +161,7 @@ pub async fn subscribe_notification<R: Runtime>(
 ) -> Result<()> {
     if state.notification_sender.lock().await.is_none() {
         log::info!("start subscribe notification");
-        let agent = state
-            .agent
-            .lock()
-            .await
-            .as_ref()
-            .ok_or(Error::NoAgent)?
-            .clone();
+        let agent = state.agent.lock().await.clone();
         let (sender, receiver) = tokio::sync::oneshot::channel();
         state.notification_sender.lock().await.replace(sender);
         tauri::async_runtime::spawn(poll_unread_notifications(agent, receiver, app));
@@ -241,8 +213,6 @@ pub async fn create_post<R: Runtime>(
         .agent
         .lock()
         .await
-        .as_ref()
-        .ok_or(Error::NoAgent)?
         .api
         .com
         .atproto
