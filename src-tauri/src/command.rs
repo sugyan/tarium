@@ -163,7 +163,7 @@ pub async fn subscribe(
                 tauri::async_runtime::spawn(poll_feed(uri, agent, receiver, app_handle));
             }
             Subscription::Notification => {
-                tauri::async_runtime::spawn(watch_notifications(agent, receiver, app_handle));
+                tauri::async_runtime::spawn(poll_notifications(agent, receiver, app_handle));
             }
         }
     } else {
