@@ -1,7 +1,7 @@
 use crate::error::{Error, Result};
 use crate::session_store::{FileSessionStore, FileStore};
 use crate::state::State;
-use crate::task::{watch_feed, watch_notifications};
+use crate::task::{poll_feed, poll_notifications};
 use atrium_api::agent::store::SessionStore;
 use atrium_api::agent::AtpAgent;
 use atrium_api::records::Record;
@@ -137,13 +137,12 @@ pub async fn get_posts(
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Subscription {
-    Feed,
+    Feed { uri: Option<String> },
     Notification,
 }
 
 #[tauri::command]
 pub async fn subscribe(
-    uri: Option<String>,
     subscription: Subscription,
     app_handle: tauri::AppHandle,
     state: tauri::State<'_, State>,
@@ -160,11 +159,11 @@ pub async fn subscribe(
             .ok_or(Error::NoAgent)?
             .clone();
         match subscription {
-            Subscription::Feed => {
-                tauri::async_runtime::spawn(watch_feed(uri, agent, receiver, app_handle));
+            Subscription::Feed { uri } => {
+                tauri::async_runtime::spawn(poll_feed(uri, agent, receiver, app_handle));
             }
             Subscription::Notification => {
-                tauri::async_runtime::spawn(watch_notifications(agent, receiver, app_handle));
+                tauri::async_runtime::spawn(poll_notifications(agent, receiver, app_handle));
             }
         }
     } else {

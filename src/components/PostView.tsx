@@ -9,6 +9,10 @@ import {
   ChatBubbleBottomCenterIcon,
   HeartIcon,
 } from "@heroicons/react/24/outline";
+import {
+  ArrowPathRoundedSquareIcon as ArrowPathRoundedSquareIconSolid,
+  HeartIcon as HeartIconSolid,
+} from "@heroicons/react/24/solid";
 import { FC } from "react";
 
 const Post: FC<{ post: PostView; isParent?: boolean }> = ({
@@ -45,12 +49,30 @@ const Post: FC<{ post: PostView; isParent?: boolean }> = ({
             {post.replyCount || ""}
           </div>
           <div className="flex items-center w-20">
-            <ArrowPathRoundedSquareIcon className="h-4 w-4 mr-1" />
-            {post.repostCount || ""}
+            {post.viewer?.repost ? (
+              <div className="text-green-500 inline-flex items-center">
+                <ArrowPathRoundedSquareIconSolid className="h-4 w-4 mr-1" />
+                <span className="font-semibold">{post.repostCount}</span>
+              </div>
+            ) : (
+              <>
+                <ArrowPathRoundedSquareIcon className="h-4 w-4 mr-1" />
+                {post.repostCount || ""}
+              </>
+            )}
           </div>
           <div className="flex items-center w-20">
-            <HeartIcon className="h-4 w-4 mr-1" />
-            {post.likeCount || ""}
+            {post.viewer?.like ? (
+              <div className="text-pink-500 inline-flex items-center">
+                <HeartIconSolid className="h-4 w-4 mr-1" />
+                <span className="font-semibold">{post.likeCount}</span>
+              </div>
+            ) : (
+              <>
+                <HeartIcon className="h-4 w-4 mr-1" />
+                {post.likeCount || ""}
+              </>
+            )}
           </div>
         </div>
       </div>

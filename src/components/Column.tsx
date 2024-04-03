@@ -6,6 +6,7 @@ import {
   ReactNode,
   SyntheticEvent,
   useCallback,
+  useEffect,
   useRef,
   useState,
 } from "react";
@@ -15,6 +16,7 @@ const Column: FC<PropsWithChildren<{ headerContent: ReactNode }>> = ({
   children,
 }) => {
   const [isShowing, setShowing] = useState(true);
+  const ref = useRef<HTMLDivElement>(null);
   const scrollTop = useRef(0);
   const onScroll = useCallback(
     throttle((event: SyntheticEvent<HTMLDivElement>) => {
@@ -30,8 +32,16 @@ const Column: FC<PropsWithChildren<{ headerContent: ReactNode }>> = ({
     }, 50),
     []
   );
+  useEffect(() => {
+    ref.current?.focus();
+  }, []);
   return (
-    <div onScroll={onScroll} className="overflow-y-scroll h-screen">
+    <div
+      onScroll={onScroll}
+      className="overflow-y-scroll h-screen focus:outline-none"
+      tabIndex={-1}
+      ref={ref}
+    >
       <Transition
         show={isShowing}
         enter="transition ease-in-out duration-500 transform"

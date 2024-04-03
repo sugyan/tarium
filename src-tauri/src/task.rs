@@ -10,7 +10,7 @@ use std::sync::Arc;
 use std::time::Duration;
 use tauri::Manager;
 
-pub async fn watch_feed(
+pub async fn poll_feed(
     uri: Option<String>,
     agent: Arc<AtpAgent<FileSessionStore, ReqwestClient>>,
     mut receiver: tokio::sync::oneshot::Receiver<()>,
@@ -97,7 +97,7 @@ pub async fn watch_feed(
     Ok(())
 }
 
-pub async fn watch_notifications(
+pub async fn poll_notifications(
     agent: Arc<AtpAgent<FileSessionStore, ReqwestClient>>,
     mut receiver: tokio::sync::oneshot::Receiver<()>,
     app_handle: tauri::AppHandle,

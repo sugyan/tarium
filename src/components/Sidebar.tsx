@@ -19,15 +19,10 @@ function useFeedGenerators() {
     if (isLoading.current) return;
     isLoading.current = true;
     (async () => {
-      try {
-        const result = await invoke<{ feeds: GeneratorView[] }>(
-          "get_feed_generators",
-          {}
-        );
-        setFeedGenerators(result.feeds);
-      } catch (e) {
-        console.error(e);
-      }
+      const result = await invoke<{ feeds: GeneratorView[] }>(
+        "get_feed_generators"
+      );
+      setFeedGenerators(result.feeds);
     })();
   }, []);
   return feedGenerators;
@@ -45,11 +40,7 @@ const Sidebar: FC<{ onNewPost: () => void; onSettings: () => void }> = ({
       kind: "warning",
     });
     if (ok) {
-      try {
-        await invoke("logout", {});
-      } catch (e) {
-        console.error(e);
-      }
+      await invoke("logout");
       navigate("/signin");
     }
   };

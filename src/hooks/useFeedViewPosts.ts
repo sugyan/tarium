@@ -51,11 +51,7 @@ export function useFeedViewPosts(uri?: string) {
   useEffect(() => {
     setPosts([]);
     (async () => {
-      try {
-        await invoke("subscribe", { subscription: "feed", uri });
-      } catch (err) {
-        console.error(err);
-      }
+      await invoke("subscribe", { subscription: { feed: { uri } } });
     })();
   }, [uri]);
   return posts;

@@ -29,11 +29,7 @@ export function useNotifications() {
   useEffect(() => {
     setNotifications([]);
     (async () => {
-      try {
-        await invoke("subscribe", { subscription: "notification" });
-      } catch (err) {
-        console.error(err);
-      }
+      await invoke("subscribe", { subscription: "notification" });
     })();
   }, []);
   return notifications;
