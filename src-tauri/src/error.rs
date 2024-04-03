@@ -8,10 +8,12 @@ pub type Result<T> = std::result::Result<T, Error>;
 pub enum Error {
     #[error("no agent")]
     NoAgent,
-    #[error("no store")]
-    NoStore,
     #[error("no session")]
     NoSession,
+    #[error(transparent)]
+    Serde(#[from] serde_json::Error),
+    #[error(transparent)]
+    TauriPluginStore(#[from] tauri_plugin_store::Error),
     #[error(transparent)]
     CreateRecord(#[from] XrpcError<atrium_api::com::atproto::repo::create_record::Error>),
     #[error(transparent)]

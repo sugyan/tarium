@@ -6,38 +6,45 @@ mod session_store;
 mod state;
 mod task;
 
-use crate::session_store::FileStore;
 use crate::state::State;
 use atrium_api::agent::AtpAgent;
 use atrium_xrpc_client::reqwest::ReqwestClient;
-use session_store::FileSessionStore;
-use std::fs::create_dir_all;
+use log::LevelFilter;
+use session_store::TauriPluginStore;
 use std::sync::Arc;
 use tauri::async_runtime::Mutex;
 use tauri::menu::{Menu, MenuItemBuilder, MenuItemKind};
 use tauri::{Manager, Wry};
+use tauri_plugin_store::StoreBuilder;
+
+pub const STORE_APPDATA_PATH: &str = "appdata.json";
+pub const STORE_SESSION_PATH: &str = "session.json";
+pub const STORE_SETTING_PATH: &str = "setting.json";
 
 fn setup(app: &mut tauri::App<Wry>) -> Result<(), Box<dyn std::error::Error>> {
-    let data_dir = app.path().app_data_dir()?;
-    create_dir_all(&data_dir)?;
     // TODO: how switch to different account?
-    let session_path = data_dir.join("session.json");
-    let mut store = Mutex::new(None);
-    let agent = Mutex::new(if session_path.exists() {
-        let file_store = Arc::new(FileStore::new(session_path));
-        store = Mutex::new(Some(file_store.clone()));
-        Some(Arc::new(AtpAgent::new(
-            ReqwestClient::new("https://bsky.social"),
-            FileSessionStore { store: file_store },
-        )))
-    } else {
-        None
-    });
+    let agent = Mutex::new(Some(Arc::new(AtpAgent::new(
+        ReqwestClient::new("https://bsky.social"),
+        TauriPluginStore::new(app.handle().clone()),
+    ))));
     app.manage(State {
         agent,
-        store,
-        ..Default::default()
+        subscription_sender: Mutex::new(None),
+        notification_sender: Mutex::new(None),
     });
+
+    app.handle()
+        .plugin(
+            tauri_plugin_store::Builder::new()
+                .stores([
+                    StoreBuilder::new(STORE_APPDATA_PATH).build(app.handle().clone()),
+                    StoreBuilder::new(STORE_SESSION_PATH).build(app.handle().clone()),
+                    StoreBuilder::new(STORE_SETTING_PATH).build(app.handle().clone()),
+                ])
+                .freeze()
+                .build(),
+        )
+        .expect("failed to add plugin");
     Ok(())
 }
 
@@ -68,9 +75,15 @@ pub fn run() {
         })
         .setup(setup)
         .plugin(tauri_plugin_dialog::init())
+        .plugin(
+            tauri_plugin_log::Builder::new()
+                .level(LevelFilter::Info)
+                .with_colors(Default::default())
+                .build(),
+        )
+        .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_shell::init())
-        .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
             command::login,
@@ -80,7 +93,9 @@ pub fn run() {
             command::get_feed_generators,
             command::get_posts,
             command::subscribe,
+            command::subscribe_notification,
             command::unsubscribe,
+            command::unsubscribe_notification,
             command::create_post,
         ])
         .run(tauri::generate_context!())

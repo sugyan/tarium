@@ -1,55 +1,89 @@
-use async_trait::async_trait;
+use crate::{STORE_APPDATA_PATH, STORE_SESSION_PATH};
 use atrium_api::agent::{store::SessionStore, Session};
-use std::path::{Path, PathBuf};
-use std::sync::Arc;
-use tokio::fs;
-use tokio::io::{AsyncReadExt, AsyncWriteExt};
+use serde_json::{from_value, to_value, Value};
+use tauri::{AppHandle, Manager, Runtime};
+use tauri_plugin_store::with_store;
 
-pub struct FileSessionStore {
-    pub store: Arc<FileStore>,
+pub const CURRENT: &str = "current";
+
+pub struct TauriPluginStore<R: Runtime> {
+    pub app: AppHandle<R>,
 }
 
-#[async_trait]
-impl SessionStore for FileSessionStore {
-    async fn get_session(&self) -> Option<Session> {
-        self.store.get_session().await
+impl<R: Runtime> TauriPluginStore<R> {
+    pub fn new(app: AppHandle<R>) -> Self {
+        Self { app }
     }
-    async fn set_session(&self, session: Session) {
-        self.store.set_session(session).await
-    }
-    async fn clear_session(&self) {
-        self.store.clear_session().await
-    }
-}
-
-pub struct FileStore {
-    path: PathBuf,
-}
-
-impl FileStore {
-    pub fn new(path: impl AsRef<Path>) -> Self {
-        Self {
-            path: path.as_ref().into(),
+    fn current_did(&self) -> Option<String> {
+        let value = with_store(
+            self.app.clone(),
+            self.app.state(),
+            STORE_APPDATA_PATH,
+            |store| Ok(store.get(CURRENT).cloned()),
+        )
+        .expect("failed to get current session");
+        if let Some(Value::String(did)) = value {
+            Some(did)
+        } else {
+            None
         }
     }
+    fn set_current(&self, did: String) {
+        with_store(
+            self.app.clone(),
+            self.app.state(),
+            STORE_APPDATA_PATH,
+            |store| {
+                store.insert(CURRENT.into(), to_value(did)?)?;
+                store.save()
+            },
+        )
+        .expect("failed to set current session");
+    }
 }
 
-#[async_trait]
-impl SessionStore for FileStore {
+#[async_trait::async_trait]
+impl<R: Runtime> SessionStore for TauriPluginStore<R> {
     async fn get_session(&self) -> Option<Session> {
-        let mut file = fs::File::open(&self.path).await.ok()?;
-        let mut buf = Vec::new();
-        file.read_to_end(&mut buf).await.ok()?;
-        serde_json::from_slice(&buf).ok()
-    }
-    async fn set_session(&self, session: Session) {
-        if let Ok(mut file) = fs::File::create(&self.path).await {
-            if let Ok(data) = serde_json::to_vec(&session) {
-                file.write_all(&data).await.ok();
-            }
+        if let Some(key) = self.current_did() {
+            let value = with_store(
+                self.app.clone(),
+                self.app.state(),
+                STORE_SESSION_PATH,
+                |store| Ok(store.get(key).cloned()),
+            )
+            .expect("failed to get session data");
+            value.map(|v| from_value(v).expect("failed to deserialize"))
+        } else {
+            None
         }
     }
+    async fn set_session(&self, session: Session) {
+        let did = session.did.to_string();
+        with_store(
+            self.app.clone(),
+            self.app.state(),
+            STORE_SESSION_PATH,
+            |store| {
+                store.insert(did.clone(), to_value(session)?)?;
+                store.save()
+            },
+        )
+        .expect("failed to set session data");
+        self.set_current(did);
+    }
     async fn clear_session(&self) {
-        fs::remove_file(&self.path).await.ok();
+        if let Some(key) = self.current_did() {
+            with_store(
+                self.app.clone(),
+                self.app.state(),
+                STORE_SESSION_PATH,
+                |store| {
+                    store.delete(key)?;
+                    store.save()
+                },
+            )
+            .expect("failed to delete session data");
+        }
     }
 }
