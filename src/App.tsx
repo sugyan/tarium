@@ -1,4 +1,9 @@
-import { EVENT_MENU_RELOAD, STORE_SETTING, Theme } from "@/constants";
+import {
+  EVENT_MENU_RELOAD,
+  STORE_SETTING,
+  SettingKey,
+  Theme,
+} from "@/constants";
 import FeedGenerator from "@/routes/feed-generator";
 import Home from "@/routes/home";
 import Notifications from "@/routes/notifications";
@@ -81,7 +86,7 @@ const App = () => {
   listenEvents();
   useEffect(() => {
     (async () => {
-      setTheme(await store.get("theme"));
+      setTheme(await store.get(SettingKey.Theme));
     })();
   }, []);
   return (
@@ -90,7 +95,7 @@ const App = () => {
         theme,
         setTheme: (value: Theme | null) => {
           (async () => {
-            await store.set("theme", value);
+            await store.set(SettingKey.Theme, value);
             await store.save();
           })();
           setTheme(value);

@@ -1,8 +1,8 @@
-use crate::appdata;
-use crate::consts::EmitEvent;
+use crate::consts::{EmitEvent, SETTING_NOTIFICATION};
 use crate::error::Result;
 use crate::event::{NotificationEvent, PostEvent};
 use crate::session_store::TauriPluginStore;
+use crate::{appdata, STORE_SETTING_PATH};
 use atrium_api::agent::AtpAgent;
 use atrium_api::records::{KnownRecord, Record};
 use atrium_api::types::Union;
@@ -13,6 +13,7 @@ use std::sync::Arc;
 use std::time::Duration;
 use tauri::{Manager, Runtime};
 use tauri_plugin_notification::NotificationExt;
+use tauri_plugin_store::with_store;
 
 const NOTIFIED_AT: &str = "notified_at";
 
@@ -214,6 +215,15 @@ async fn notify<R: Runtime>(
     notification: atrium_api::app::bsky::notification::list_notifications::Notification,
     app: tauri::AppHandle<R>,
 ) -> Result<()> {
+    if !with_store(app.clone(), app.state(), STORE_SETTING_PATH, |store| {
+        Ok(store.get(SETTING_NOTIFICATION).cloned())
+    })?
+    .and_then(|v| from_value::<bool>(v.clone()).ok())
+    .unwrap_or(true)
+    {
+        log::info!("skip notifying");
+        return Ok(());
+    }
     let author = notification.author.clone();
     let author_name = author
         .display_name

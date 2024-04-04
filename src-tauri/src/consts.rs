@@ -1,5 +1,7 @@
 pub const MENU_ID_RELOAD: &str = "tauri-reload";
 
+pub const SETTING_NOTIFICATION: &str = "notification";
+
 pub enum EmitEvent {
     Post,
     Notification,
