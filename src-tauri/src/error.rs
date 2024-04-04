@@ -6,12 +6,16 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug, Error)]
 pub enum Error {
-    #[error("no agent")]
-    NoAgent,
-    #[error("no store")]
-    NoStore,
     #[error("no session")]
     NoSession,
+    #[error(transparent)]
+    Serde(#[from] serde_json::Error),
+    #[error(transparent)]
+    Tauri(#[from] tauri::Error),
+    #[error(transparent)]
+    TauriPluginNotification(#[from] tauri_plugin_notification::Error),
+    #[error(transparent)]
+    TauriPluginStore(#[from] tauri_plugin_store::Error),
     #[error(transparent)]
     CreateRecord(#[from] XrpcError<atrium_api::com::atproto::repo::create_record::Error>),
     #[error(transparent)]
@@ -34,6 +38,8 @@ pub enum Error {
     ListNotifications(
         #[from] XrpcError<atrium_api::app::bsky::notification::list_notifications::Error>,
     ),
+    #[error(transparent)]
+    UpdateSeen(#[from] XrpcError<atrium_api::app::bsky::notification::update_seen::Error>),
 }
 
 impl Serialize for Error {

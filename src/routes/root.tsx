@@ -1,11 +1,11 @@
+import { ThemeContext } from "@/App";
+import NewPostForm from "@/components/NewPostForm";
+import Settings from "@/components/Settings";
+import Sidebar from "@/components/Sidebar";
 import { invoke } from "@tauri-apps/api/core";
 import { useContext, useEffect, useState } from "react";
 import Modal from "react-modal";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { ThemeContext } from "../App";
-import NewPostForm from "../components/NewPostForm";
-import Settings from "../components/Settings";
-import Sidebar from "../components/Sidebar";
 
 const Root = () => {
   const { theme } = useContext(ThemeContext);

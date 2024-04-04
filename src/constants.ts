@@ -1,9 +1,16 @@
-export const STORE_SETTING = "settings.json";
+export const STORE_SETTING = "setting.json";
 export const EVENT_MENU_RELOAD = "tauri-reload";
+
+export const SettingKey = {
+  Theme: "theme",
+  Notification: "notification",
+} as const;
+export type SettingKey = (typeof SettingKey)[keyof typeof SettingKey];
 
 export const EventName = {
   Post: "post",
   Notification: "notification",
+  UnreadCount: "unread_count",
 } as const;
 export type EventName = (typeof EventName)[keyof typeof EventName];
 

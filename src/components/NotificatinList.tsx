@@ -1,3 +1,12 @@
+import { ProfileView } from "@/atproto/types/app/bsky/actor/defs";
+import { isView } from "@/atproto/types/app/bsky/embed/images";
+import { PostView } from "@/atproto/types/app/bsky/feed/defs";
+import { isRecord } from "@/atproto/types/app/bsky/feed/post";
+import Avatar from "@/components/Avatar";
+import DistanceToNow from "@/components/DistanceToNow";
+import PostEmbed from "@/components/PostEmbed";
+import Post from "@/components/PostView";
+import { NotificationReason } from "@/constants";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import {
   ArrowPathRoundedSquareIcon,
@@ -5,19 +14,10 @@ import {
   UserPlusIcon,
 } from "@heroicons/react/24/solid";
 import { FC, PropsWithChildren } from "react";
-import { ProfileView } from "../atproto/types/app/bsky/actor/defs";
-import { isView } from "../atproto/types/app/bsky/embed/images";
-import { PostView } from "../atproto/types/app/bsky/feed/defs";
-import { isRecord } from "../atproto/types/app/bsky/feed/post";
-import { NotificationReason } from "../constants";
-import Avatar from "./Avatar";
-import DistanceToNow from "./DistanceToNow";
-import PostEmbed from "./PostEmbed";
-import Post from "./PostView";
 
 export interface NotificationGroup {
   key: string;
-  uri: string | undefined;
+  uri?: string;
   reason: NotificationReason;
   indexedAt: string;
   authors: ProfileView[];
@@ -26,7 +26,7 @@ export interface NotificationGroup {
 const NotificationView: FC<
   PropsWithChildren<{
     group: NotificationGroup;
-    post?: PostView;
+    post?: PostView | null;
   }>
 > = ({ group, post, children }) => {
   const { reason, indexedAt, authors } = group;
@@ -103,9 +103,10 @@ const NotificationView: FC<
     </div>
   );
 };
+
 const NotificationItem: FC<{
   group: NotificationGroup;
-  post?: PostView;
+  post?: PostView | null;
 }> = ({ group, post }) => {
   switch (group.reason) {
     case NotificationReason.Like:
@@ -129,14 +130,17 @@ const NotificationItem: FC<{
 
 const NotificationList: FC<{
   groups: NotificationGroup[];
-  posts: Map<string | undefined, PostView>;
+  posts: Map<string, PostView | null>;
 }> = ({ groups, posts }) => {
   const [parent, _] = useAutoAnimate();
   return (
     <div ref={parent}>
       {groups.map((group) => (
         <div key={group.key} className="border-b border-slate-500 px-3 pt-3">
-          <NotificationItem group={group} post={posts.get(group.uri)} />
+          <NotificationItem
+            group={group}
+            post={group.uri ? posts.get(group.uri) : undefined}
+          />
         </div>
       ))}
     </div>

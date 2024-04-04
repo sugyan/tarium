@@ -1,58 +1,50 @@
+use crate::appdata;
+use crate::consts::EmitEvent;
 use crate::error::{Error, Result};
-use crate::session_store::{FileSessionStore, FileStore};
+use crate::event::NotificationEvent;
+use crate::session_store::{TauriPluginStore, CURRENT};
 use crate::state::State;
-use crate::task::{watch_feed, watch_notifications};
-use atrium_api::agent::store::SessionStore;
+use crate::task::{poll_feed, poll_notifications, poll_unread_notifications};
 use atrium_api::agent::AtpAgent;
 use atrium_api::records::Record;
+use atrium_api::types::string::Datetime;
 use atrium_api::types::{Collection, Union};
 use atrium_xrpc_client::reqwest::ReqwestClient;
 use serde::Deserialize;
+use serde_json::from_value;
 use std::sync::Arc;
-use tauri::Manager;
+use tauri::{AppHandle, Manager, Runtime};
 
 #[tauri::command]
-pub async fn login(
+pub async fn login<R: Runtime>(
     identifier: &str,
     password: &str,
-    app_handle: tauri::AppHandle,
-    state: tauri::State<'_, State>,
+    app: tauri::AppHandle<R>,
 ) -> Result<atrium_api::com::atproto::server::create_session::Output> {
-    let session_path = app_handle
-        .path()
-        .app_data_dir()
-        .expect("failed to get app data dir")
-        .join("session.json");
-    let store = Arc::new(FileStore::new(session_path));
     let agent = AtpAgent::new(
         ReqwestClient::new("https://bsky.social"),
-        FileSessionStore {
-            store: store.clone(),
-        },
+        TauriPluginStore::new(app.clone()),
     );
     let result = agent.login(identifier, password).await?;
-    state.agent.lock().await.replace(Arc::new(agent));
-    state.store.lock().await.replace(store);
+    *app.state::<State<R>>().agent.lock().await = Arc::new(agent);
     Ok(result)
 }
 
 #[tauri::command]
-pub async fn logout(state: tauri::State<'_, State>) -> Result<()> {
-    *state.agent.lock().await = None;
-    *state.store.lock().await = None;
-    Ok(())
+pub async fn logout<R: Runtime>(app: AppHandle<R>) -> Result<()> {
+    Ok(appdata::delete(app, CURRENT)?)
 }
 
 #[tauri::command]
-pub async fn get_session(
-    state: tauri::State<'_, State>,
+pub async fn get_session<R: Runtime>(
+    app: AppHandle<R>,
 ) -> Result<atrium_api::com::atproto::server::get_session::Output> {
-    Ok(state
+    log::info!("get_session");
+    Ok(app
+        .state::<State<R>>()
         .agent
         .lock()
         .await
-        .as_ref()
-        .ok_or(Error::NoAgent)?
         .api
         .com
         .atproto
@@ -62,15 +54,15 @@ pub async fn get_session(
 }
 
 #[tauri::command]
-pub async fn get_preferences(
-    state: tauri::State<'_, State>,
+pub async fn get_preferences<R: Runtime>(
+    app: AppHandle<R>,
 ) -> Result<atrium_api::app::bsky::actor::get_preferences::Output> {
-    Ok(state
+    log::info!("get_preferences");
+    Ok(app
+        .state::<State<R>>()
         .agent
         .lock()
         .await
-        .as_ref()
-        .ok_or(Error::NoAgent)?
         .api
         .app
         .bsky
@@ -80,17 +72,12 @@ pub async fn get_preferences(
 }
 
 #[tauri::command]
-pub async fn get_feed_generators(
-    state: tauri::State<'_, State>,
+pub async fn get_feed_generators<R: Runtime>(
+    app: AppHandle<R>,
 ) -> Result<atrium_api::app::bsky::feed::get_feed_generators::Output> {
-    let agent = state
-        .agent
-        .lock()
-        .await
-        .as_ref()
-        .ok_or(Error::NoAgent)?
-        .clone();
-    let preferences = get_preferences(state).await?;
+    log::info!("get_feed_generators");
+    let agent = app.state::<State<R>>().agent.lock().await.clone();
+    let preferences = get_preferences(app).await?;
     let feeds = preferences
         .preferences
         .iter()
@@ -115,16 +102,16 @@ pub async fn get_feed_generators(
 }
 
 #[tauri::command]
-pub async fn get_posts(
+pub async fn get_posts<R: Runtime>(
     uris: Vec<String>,
-    state: tauri::State<'_, State>,
+    app: AppHandle<R>,
 ) -> Result<atrium_api::app::bsky::feed::get_posts::Output> {
-    Ok(state
+    log::info!("get_posts: {uris:?}");
+    Ok(app
+        .state::<State<R>>()
         .agent
         .lock()
         .await
-        .as_ref()
-        .ok_or(Error::NoAgent)?
         .api
         .app
         .bsky
@@ -136,67 +123,114 @@ pub async fn get_posts(
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Subscription {
-    Feed,
+    Feed { uri: Option<String> },
     Notification,
 }
 
 #[tauri::command]
-pub async fn subscribe(
-    uri: Option<String>,
+pub async fn subscribe<R: Runtime>(
     subscription: Subscription,
-    app_handle: tauri::AppHandle,
-    state: tauri::State<'_, State>,
+    app: tauri::AppHandle<R>,
 ) -> Result<()> {
-    if state.sender.lock().await.is_none() {
+    let state = app.state::<State<R>>();
+    if state.subscription_sender.lock().await.is_none() {
+        log::info!("start subscription: {subscription:?}");
+        let agent = state.agent.lock().await.clone();
         let (sender, receiver) = tokio::sync::oneshot::channel();
-        state.sender.lock().await.replace(sender);
-        let agent = state
-            .agent
-            .lock()
-            .await
-            .as_ref()
-            .ok_or(Error::NoAgent)?
-            .clone();
+        state.subscription_sender.lock().await.replace(sender);
         match subscription {
-            Subscription::Feed => {
-                tauri::async_runtime::spawn(watch_feed(uri, agent, receiver, app_handle));
+            Subscription::Feed { uri } => {
+                tauri::async_runtime::spawn(poll_feed(uri, agent, receiver, app));
             }
             Subscription::Notification => {
-                tauri::async_runtime::spawn(watch_notifications(agent, receiver, app_handle));
+                tauri::async_runtime::spawn(poll_notifications(agent, receiver, app));
             }
         }
+    } else {
+        log::info!("already subscribing");
     }
     Ok(())
 }
 
 #[tauri::command]
-pub async fn unsubscribe(state: tauri::State<'_, State>) -> Result<()> {
-    if let Some(sender) = state.sender.lock().await.take() {
+pub async fn subscribe_notification<R: Runtime>(app: tauri::AppHandle<R>) -> Result<()> {
+    let state = app.state::<State<R>>();
+    if state.notification_sender.lock().await.is_none() {
+        log::info!("start subscribe notification");
+        let agent = state.agent.lock().await.clone();
+        let (sender, receiver) = tokio::sync::oneshot::channel();
+        state.notification_sender.lock().await.replace(sender);
+        tauri::async_runtime::spawn(poll_unread_notifications(agent, receiver, app));
+    } else {
+        log::info!("already subscribing");
+    }
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn unsubscribe<R: Runtime>(app: AppHandle<R>) -> Result<()> {
+    if let Some(sender) = app
+        .state::<State<R>>()
+        .subscription_sender
+        .lock()
+        .await
+        .take()
+    {
+        log::info!("cancel subscription");
         sender.send(()).expect("failed to send");
     }
     Ok(())
 }
 
 #[tauri::command]
-pub async fn create_post(
-    text: String,
-    state: tauri::State<'_, State>,
-) -> Result<atrium_api::com::atproto::repo::create_record::Output> {
-    let session = state
-        .store
+pub async fn unsubscribe_notification<R: Runtime>(app: AppHandle<R>) -> Result<()> {
+    if let Some(sender) = app
+        .state::<State<R>>()
+        .notification_sender
         .lock()
         .await
-        .as_ref()
-        .ok_or(Error::NoStore)?
-        .get_session()
-        .await
-        .ok_or(Error::NoSession)?;
-    Ok(state
+        .take()
+    {
+        log::info!("cancel subscribe notification");
+        sender.send(()).expect("failed to send");
+    }
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn update_seen<R: Runtime>(app: tauri::AppHandle<R>) -> Result<()> {
+    let seen_at = Datetime::now();
+    log::info!("update_seen: {}", seen_at.as_ref());
+    app.state::<State<R>>()
         .agent
         .lock()
         .await
-        .as_ref()
-        .ok_or(Error::NoAgent)?
+        .api
+        .app
+        .bsky
+        .notification
+        .update_seen(atrium_api::app::bsky::notification::update_seen::Input { seen_at })
+        .await?;
+    Ok(app.emit(
+        EmitEvent::UnreadCount.as_ref(),
+        NotificationEvent::Unread { count: 0 },
+    )?)
+}
+
+#[tauri::command]
+pub async fn create_post<R: Runtime>(
+    text: String,
+    app: tauri::AppHandle<R>,
+) -> Result<atrium_api::com::atproto::repo::create_record::Output> {
+    log::info!("create_post");
+    let did = from_value::<String>(appdata::get(app.clone(), CURRENT)?.ok_or(Error::NoSession)?)?
+        .parse()
+        .expect("failed to parse DID");
+    Ok(app
+        .state::<State<R>>()
+        .agent
+        .lock()
+        .await
         .api
         .com
         .atproto
@@ -218,7 +252,7 @@ pub async fn create_post(
                     text,
                 },
             ))),
-            repo: atrium_api::types::string::AtIdentifier::Did(session.did),
+            repo: did,
             rkey: None,
             swap_commit: None,
             validate: None,

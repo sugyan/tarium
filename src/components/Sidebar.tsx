@@ -1,3 +1,6 @@
+import { GeneratorView } from "@/atproto/types/app/bsky/feed/defs";
+import { EventName } from "@/constants";
+import { UnreadNotification } from "@/events";
 import {
   BellIcon,
   Cog6ToothIcon,
@@ -7,10 +10,10 @@ import {
 } from "@heroicons/react/24/outline";
 import { RssIcon } from "@heroicons/react/24/solid";
 import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 import { confirm } from "@tauri-apps/plugin-dialog";
 import { FC, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { GeneratorView } from "../atproto/types/app/bsky/feed/defs";
 
 function useFeedGenerators() {
   const [feedGenerators, setFeedGenerators] = useState<GeneratorView[]>([]);
@@ -19,18 +22,38 @@ function useFeedGenerators() {
     if (isLoading.current) return;
     isLoading.current = true;
     (async () => {
-      try {
-        const result = await invoke<{ feeds: GeneratorView[] }>(
-          "get_feed_generators",
-          {}
-        );
-        setFeedGenerators(result.feeds);
-      } catch (e) {
-        console.error(e);
-      }
+      const result = await invoke<{ feeds: GeneratorView[] }>(
+        "get_feed_generators"
+      );
+      setFeedGenerators(result.feeds);
     })();
   }, []);
   return feedGenerators;
+}
+
+function useUnreadCount() {
+  const [count, setCount] = useState(0);
+  const isListening = useRef(false);
+  const unlisten = useRef(() => {});
+  useEffect(() => {
+    if (isListening.current) return;
+    isListening.current = true;
+    (async () => {
+      unlisten.current = await listen<UnreadNotification>(
+        EventName.UnreadCount,
+        (event) => {
+          setCount(event.payload.count);
+        }
+      );
+    })();
+    return unlisten.current;
+  }, []);
+  useEffect(() => {
+    (async () => {
+      await invoke("subscribe_notification");
+    })();
+  }, []);
+  return count;
 }
 
 const Sidebar: FC<{ onNewPost: () => void; onSettings: () => void }> = ({
@@ -40,37 +63,42 @@ const Sidebar: FC<{ onNewPost: () => void; onSettings: () => void }> = ({
   const navigate = useNavigate();
   const { state, pathname } = useLocation();
   const feedGenerators = useFeedGenerators();
+  const unread = useUnreadCount();
   const onSignout = async () => {
     const ok = await confirm("Are you sure you want to sign out?", {
       kind: "warning",
     });
     if (ok) {
-      try {
-        await invoke("logout", {});
-      } catch (e) {
-        console.error(e);
-      }
+      await invoke("logout");
       navigate("/signin");
     }
   };
   return (
     <div className="w-16 flex flex-col h-full items-center select-none">
-      <Link
-        to="/home"
-        className={`p-2 ${pathname === "/home" && "bg-more-muted"}`}
+      <div className={`p-2 ${pathname === "/home" && "bg-more-muted"}`}>
+        <Link to="/home">
+          <div className="flex justify-center items-center h-12 w-12 rounded-lg overflow-hidden border border-slate-500 bg-background">
+            <HomeIcon className="h-10 w-10" />
+          </div>
+        </Link>
+      </div>
+      <div
+        className={`p-2 relative ${
+          pathname === "/notifications" && "bg-more-muted"
+        }`}
       >
-        <div className="flex justify-center items-center h-12 w-12 rounded-lg overflow-hidden border border-slate-500 bg-background">
-          <HomeIcon className="h-10 w-10" />
-        </div>
-      </Link>
-      <Link
-        to="/notifications"
-        className={`p-2 ${pathname === "/notifications" && "bg-more-muted"}`}
-      >
-        <div className="flex justify-center items-center h-12 w-12 rounded-lg overflow-hidden border border-slate-500 bg-background">
-          <BellIcon className="h-10 w-10" />
-        </div>
-      </Link>
+        <Link to="/notifications">
+          <div className="flex justify-center items-center h-12 w-12 rounded-lg overflow-hidden border border-slate-500 bg-background">
+            <BellIcon className="h-10 w-10" />
+            {unread ? (
+              <div className="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-semibold text-white bg-blue-500 border-2 border-more-muted rounded-full top-0.5 right-0.5">
+                {unread}
+                {unread > 30 && <span className="font-light">+</span>}
+              </div>
+            ) : null}
+          </div>
+        </Link>
+      </div>
       <div className="flex-grow overflow-scroll">
         {feedGenerators.map((view) => {
           const current = view === state ? "bg-more-muted" : "";

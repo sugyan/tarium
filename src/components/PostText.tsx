@@ -1,6 +1,6 @@
+import { Record } from "@/atproto/types/app/bsky/feed/post";
+import { Main, isLink } from "@/atproto/types/app/bsky/richtext/facet";
 import { FC, Fragment } from "react";
-import { Record } from "../atproto/types/app/bsky/feed/post";
-import { Main, isLink } from "../atproto/types/app/bsky/richtext/facet";
 
 const ranges = (facets: Main[], length: number): [number, number][] => {
   // TODO: intersection?

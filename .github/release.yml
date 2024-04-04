@@ -1,4 +1,7 @@
 changelog:
+  exclude:
+    authors:
+      - github-actions
   categories:
     - title: Added
       labels:

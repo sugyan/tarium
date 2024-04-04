@@ -1,23 +1,20 @@
-import { invoke } from "@tauri-apps/api/core";
-import { UnlistenFn, listen } from "@tauri-apps/api/event";
-import { useEffect, useRef, useState } from "react";
-import { FeedViewPost } from "../atproto/types/app/bsky/feed/defs";
-import { EventName } from "../constants";
+import { FeedViewPost } from "@/atproto/types/app/bsky/feed/defs";
+import { EventName } from "@/constants";
 import {
   FeedPostEvent,
   isFeedPostAdd,
   isFeedPostDelete,
   isFeedPostUpdate,
-} from "../events";
+} from "@/events";
+import { invoke } from "@tauri-apps/api/core";
+import { UnlistenFn, listen } from "@tauri-apps/api/event";
+import { useEffect, useRef, useState } from "react";
 
 export function useFeedViewPosts(uri?: string) {
   const [posts, setPosts] = useState<FeedViewPost[]>([]);
-  const isListening = useRef(false);
   const unlisten = useRef<UnlistenFn>(() => {});
   useEffect(() => {
     (async () => {
-      if (isListening.current) return;
-      isListening.current = true;
       unlisten.current = await listen<FeedPostEvent>(
         EventName.Post,
         (event) => {
@@ -48,18 +45,13 @@ export function useFeedViewPosts(uri?: string) {
       unlisten.current();
       (async () => {
         await invoke("unsubscribe", {});
-        isListening.current = false;
       })();
     };
   }, [uri]);
   useEffect(() => {
     setPosts([]);
     (async () => {
-      try {
-        await invoke("subscribe", { subscription: "feed", uri });
-      } catch (err) {
-        console.error(err);
-      }
+      await invoke("subscribe", { subscription: { feed: { uri } } });
     })();
   }, [uri]);
   return posts;
