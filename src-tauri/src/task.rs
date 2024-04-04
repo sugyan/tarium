@@ -1,14 +1,20 @@
+use crate::appdata;
 use crate::consts::EmitEvent;
 use crate::error::Result;
-use crate::event::PostEvent;
+use crate::event::{NotificationEvent, PostEvent};
 use crate::session_store::TauriPluginStore;
 use atrium_api::agent::AtpAgent;
+use atrium_api::records::{KnownRecord, Record};
 use atrium_api::types::Union;
 use atrium_xrpc_client::reqwest::ReqwestClient;
+use serde_json::{from_value, to_value};
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 use std::time::Duration;
 use tauri::{Manager, Runtime};
+use tauri_plugin_notification::NotificationExt;
+
+const NOTIFIED_AT: &str = "notified_at";
 
 pub async fn poll_feed<R: Runtime>(
     uri: Option<String>,
@@ -59,8 +65,7 @@ pub async fn poll_feed<R: Runtime>(
                     || post.post.repost_count != prev.post.repost_count
                     || post.post.like_count != prev.post.like_count
                 {
-                    app.emit(EmitEvent::Post.as_ref(), PostEvent::Update(post.clone()))
-                        .expect("failed to emit post event");
+                    app.emit(EmitEvent::Post.as_ref(), PostEvent::Update(post.clone()))?;
                 }
             } else {
                 if let Some(reply) = &post.reply {
@@ -69,13 +74,11 @@ pub async fn poll_feed<R: Runtime>(
                             app.emit(
                                 EmitEvent::Post.as_ref(),
                                 PostEvent::Delete(prev.post.clone()),
-                            )
-                            .expect("failed to emit post event");
+                            )?;
                         }
                     }
                 }
-                app.emit(EmitEvent::Post.as_ref(), PostEvent::Add(post.clone()))
-                    .expect("failed to emit post event");
+                app.emit(EmitEvent::Post.as_ref(), PostEvent::Add(post.clone()))?;
             }
             cids.insert(cid, post.clone());
         }
@@ -123,8 +126,7 @@ pub async fn poll_notifications<R: Runtime>(
                 continue;
             }
             cids.insert(cid);
-            app.emit(EmitEvent::Notification.as_ref(), notification)
-                .expect("failed to emit post event");
+            app.emit(EmitEvent::Notification.as_ref(), notification)?;
         }
         Ok(())
     }
@@ -149,7 +151,7 @@ pub async fn poll_unread_notifications<R: Runtime>(
     use atrium_api::app::bsky::notification::list_notifications::Parameters;
     async fn fetch_notifications<R: Runtime>(
         agent: &Arc<AtpAgent<TauriPluginStore<R>, ReqwestClient>>,
-        _: &tauri::AppHandle<R>,
+        app: &tauri::AppHandle<R>,
     ) -> Result<()> {
         log::info!("fetch notifications");
         let output = agent
@@ -164,13 +166,34 @@ pub async fn poll_unread_notifications<R: Runtime>(
             })
             .await?;
         if let Some(seen_at) = output.seen_at {
+            let notified = appdata::get(app.clone(), NOTIFIED_AT)?
+                .and_then(|value| from_value::<String>(value).ok())
+                .and_then(|v| v.parse().ok())
+                .unwrap_or(seen_at.clone());
+            let mut count = 0;
             for notification in output.notifications.iter().rev() {
                 if notification.indexed_at > seen_at {
                     // TODO: more filtering
-                    log::info!("new notification: {notification:?}");
-                    // notify(app, notification).expect("failed to notify");
+                    count += 1;
+                    log::info!("new notification: {}", notification.cid.as_ref());
+                    if notification.indexed_at > notified {
+                        tauri::async_runtime::spawn(notify(
+                            agent.clone(),
+                            notification.clone(),
+                            app.clone(),
+                        ));
+                        appdata::set(
+                            app.clone(),
+                            NOTIFIED_AT,
+                            &to_value(&notification.indexed_at)?,
+                        )?;
+                    }
                 }
             }
+            app.emit(
+                EmitEvent::UnreadCount.as_ref(),
+                NotificationEvent::Unread { count },
+            )?;
         }
         Ok(())
     }
@@ -186,28 +209,55 @@ pub async fn poll_unread_notifications<R: Runtime>(
     Ok(())
 }
 
-// WIP
-// fn notify<R: Runtime>(
-//     app: &tauri::AppHandle<R>,
-//     notification: &atrium_api::app::bsky::notification::list_notifications::Notification,
-// ) -> std::result::Result<(), tauri_plugin_notification::Error> {
-//     let author = notification.author.clone();
-//     log::info!("handle: {:?}", author.handle.to_string());
-
-//     let author_name = author
-//         .display_name
-//         .filter(|s| !s.is_empty())
-//         .unwrap_or(author.handle.to_string());
-//     log::info!("author name: {author_name}");
-//     let title = match notification.reason.as_str() {
-//         "like" => format!("{author_name} liked your post"),
-//         "repost" => format!("{author_name} reposted your post"),
-//         "follow" => format!("{author_name} followed your"),
-//         "mention" => String::new(),
-//         "reply" => String::new(),
-//         "quote" => String::new(),
-//         _ => unreachable!(),
-//     };
-//     let body = "test";
-//     app.notification().builder().title(title).body(body).show()
-// }
+async fn notify<R: Runtime>(
+    agent: Arc<AtpAgent<TauriPluginStore<R>, ReqwestClient>>,
+    notification: atrium_api::app::bsky::notification::list_notifications::Notification,
+    app: tauri::AppHandle<R>,
+) -> Result<()> {
+    let author = notification.author.clone();
+    let author_name = author
+        .display_name
+        .filter(|s| !s.is_empty())
+        .unwrap_or(author.handle.to_string());
+    let (title, uri) = match notification.reason.as_str() {
+        "like" => (
+            format!("{author_name} liked your post"),
+            notification.reason_subject,
+        ),
+        "repost" => (
+            format!("{author_name} reposted your post"),
+            notification.reason_subject,
+        ),
+        "follow" => (
+            format!("{author_name} followed you"),
+            notification.reason_subject,
+        ),
+        "mention" => (
+            format!("{author_name} mentioned you"),
+            Some(notification.uri),
+        ),
+        "reply" => (
+            format!("{author_name} replied to you"),
+            Some(notification.uri),
+        ),
+        "quote" => (
+            format!("{author_name} quoted your post"),
+            Some(notification.uri),
+        ),
+        _ => unreachable!(),
+    };
+    let mut builder = app.notification().builder().title(title);
+    if let Some(uri) = uri {
+        let output = agent
+            .api
+            .app
+            .bsky
+            .feed
+            .get_posts(atrium_api::app::bsky::feed::get_posts::Parameters { uris: vec![uri] })
+            .await?;
+        if let Record::Known(KnownRecord::AppBskyFeedPost(record)) = &output.posts[0].record {
+            builder = builder.body(record.text.clone())
+        }
+    }
+    Ok(builder.show()?)
+}

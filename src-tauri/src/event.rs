@@ -8,3 +8,9 @@ pub enum PostEvent {
     Update(FeedViewPost),
     Delete(PostView),
 }
+
+#[derive(Serialize, Clone)]
+#[serde(tag = "$type", rename_all = "lowercase")]
+pub enum NotificationEvent {
+    Unread { count: usize },
+}

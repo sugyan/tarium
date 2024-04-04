@@ -18,6 +18,7 @@ export const ThemeContext = createContext<{
   theme: null,
   setTheme: (_) => {},
 });
+
 const router = createBrowserRouter([
   {
     path: "/",
