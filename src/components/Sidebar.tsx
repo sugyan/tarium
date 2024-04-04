@@ -75,30 +75,30 @@ const Sidebar: FC<{ onNewPost: () => void; onSettings: () => void }> = ({
   };
   return (
     <div className="w-16 flex flex-col h-full items-center select-none">
-      <Link
-        to="/home"
-        className={`p-2 ${pathname === "/home" && "bg-more-muted"}`}
-      >
-        <div className="flex justify-center items-center h-12 w-12 rounded-lg overflow-hidden border border-slate-500 bg-background">
-          <HomeIcon className="h-10 w-10" />
-        </div>
-      </Link>
-      <Link
-        to="/notifications"
+      <div className={`p-2 ${pathname === "/home" && "bg-more-muted"}`}>
+        <Link to="/home">
+          <div className="flex justify-center items-center h-12 w-12 rounded-lg overflow-hidden border border-slate-500 bg-background">
+            <HomeIcon className="h-10 w-10" />
+          </div>
+        </Link>
+      </div>
+      <div
         className={`p-2 relative ${
           pathname === "/notifications" && "bg-more-muted"
         }`}
       >
-        <div className="flex justify-center items-center h-12 w-12 rounded-lg overflow-hidden border border-slate-500 bg-background">
-          <BellIcon className="h-10 w-10" />
-          {unread ? (
-            <div className="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-semibold text-white bg-blue-500 border-2 border-more-muted rounded-full top-0.5 right-0.5">
-              {unread}
-              {unread > 30 && <span className="font-light">+</span>}
-            </div>
-          ) : null}
-        </div>
-      </Link>
+        <Link to="/notifications">
+          <div className="flex justify-center items-center h-12 w-12 rounded-lg overflow-hidden border border-slate-500 bg-background">
+            <BellIcon className="h-10 w-10" />
+            {unread ? (
+              <div className="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-semibold text-white bg-blue-500 border-2 border-more-muted rounded-full top-0.5 right-0.5">
+                {unread}
+                {unread > 30 && <span className="font-light">+</span>}
+              </div>
+            ) : null}
+          </div>
+        </Link>
+      </div>
       <div className="flex-grow overflow-scroll">
         {feedGenerators.map((view) => {
           const current = view === state ? "bg-more-muted" : "";
