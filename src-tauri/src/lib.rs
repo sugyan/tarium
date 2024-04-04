@@ -1,3 +1,4 @@
+mod appdata;
 mod command;
 mod consts;
 mod error;
@@ -96,6 +97,7 @@ pub fn run() {
             command::subscribe_notification,
             command::unsubscribe,
             command::unsubscribe_notification,
+            command::update_seen,
             command::create_post,
         ])
         .run(tauri::generate_context!())

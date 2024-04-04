@@ -20,3 +20,11 @@ export function isFeedPostDelete(v: unknown): v is FeedPostDelete {
 }
 
 export type FeedPostEvent = FeedPostAdd | FeedPostUpdate | FeedPostDelete;
+
+export interface UnreadNotification {
+  count: number;
+}
+
+export function isUnreadNotification(v: unknown): v is UnreadNotification {
+  return isObj(v) && hasProp(v, "$type") && v.$type === "unread";
+}

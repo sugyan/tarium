@@ -28,8 +28,8 @@ function groupNotifications(notifications: Notification[]) {
     const reason = notification.reason as NotificationReason;
     const uri =
       reason === NotificationReason.Mention ||
-      reason === NotificationReason.Quote ||
-      reason === NotificationReason.Reply
+      reason === NotificationReason.Reply ||
+      reason === NotificationReason.Quote
         ? notification.uri
         : notification.reasonSubject;
     const key = `${days2}:${reason},${uri || ""}`;
@@ -88,6 +88,14 @@ const Notifications = () => {
   const notifications = useNotifications();
   const groups = groupNotifications(notifications);
   const posts = useGetPosts(groups);
+  useEffect(() => {
+    const latest = notifications[0];
+    if (latest) {
+      (async () => {
+        await invoke("update_seen");
+      })();
+    }
+  }, [notifications]);
   const headerContent = (
     <>
       <div className="h-6 w-6">

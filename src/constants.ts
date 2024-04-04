@@ -4,6 +4,7 @@ export const EVENT_MENU_RELOAD = "tauri-reload";
 export const EventName = {
   Post: "post",
   Notification: "notification",
+  UnreadCount: "unread_count",
 } as const;
 export type EventName = (typeof EventName)[keyof typeof EventName];
 
