@@ -1,5 +1,11 @@
 export const STORE_SETTING = "setting.json";
+export const STORE_APPDATA = "appdata.json";
 export const EVENT_MENU_RELOAD = "tauri-reload";
+
+export const AppdataKey = {
+  Lang: "langs",
+} as const;
+export type AppdataKey = (typeof AppdataKey)[keyof typeof AppdataKey];
 
 export const SettingKey = {
   Theme: "theme",
