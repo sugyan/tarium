@@ -7,7 +7,7 @@ use crate::state::State;
 use crate::task::{poll_feed, poll_notifications, poll_unread_notifications};
 use atrium_api::agent::AtpAgent;
 use atrium_api::records::Record;
-use atrium_api::types::string::Datetime;
+use atrium_api::types::string::{Datetime, Language};
 use atrium_api::types::{Collection, Union};
 use atrium_xrpc_client::reqwest::ReqwestClient;
 use serde::Deserialize;
@@ -220,6 +220,7 @@ pub async fn update_seen<R: Runtime>(app: tauri::AppHandle<R>) -> Result<()> {
 #[tauri::command]
 pub async fn create_post<R: Runtime>(
     text: String,
+    langs: Option<Vec<Language>>,
     app: tauri::AppHandle<R>,
 ) -> Result<atrium_api::com::atproto::repo::create_record::Output> {
     log::info!("create_post");
@@ -246,7 +247,7 @@ pub async fn create_post<R: Runtime>(
                     entities: None,
                     facets: None,
                     labels: None,
-                    langs: None,
+                    langs,
                     reply: None,
                     tags: None,
                     text,
