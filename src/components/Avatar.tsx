@@ -6,7 +6,7 @@ const Avatar: FC<{ author: ProfileView }> = ({ author }) => {
   return author.avatar ? (
     <img src={author.avatar} />
   ) : (
-    <div className="bg-blue-500">
+    <div className="bg-blue-500 text-white">
       <UserCircleIcon />
     </div>
   );

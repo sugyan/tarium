@@ -4,6 +4,9 @@ export default {
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        mono: 'monospace'
+      },
       colors: {
         foreground: "rgb(var(--foreground))",
         background: "rgb(var(--background))",
