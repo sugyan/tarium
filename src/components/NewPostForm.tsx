@@ -28,7 +28,7 @@ const Languages: FC<{
         leaveTo="transform scale-95 opacity-0"
       >
         <Popover.Panel className="absolute top-10 right-0">
-          <div className="bg-more-muted text-foreground h-64 w-64 rounded">
+          <div className="text-muted bg-background border border-more-muted h-64 w-64 rounded-lg">
             <div className="p-2 h-full flex flex-col">
               Language
               <div className="mt-3 h-full overflow-y-auto">
@@ -45,7 +45,7 @@ const Languages: FC<{
                         />
                         <label
                           htmlFor={v.code}
-                          className="ms-2 text-sm font-medium text-foreground line-clamp-1 cursor-pointer"
+                          className="ms-2 text-sm font-medium text-muted line-clamp-1 cursor-pointer"
                         >
                           {v.name}
                         </label>
