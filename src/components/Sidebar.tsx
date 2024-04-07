@@ -60,7 +60,7 @@ const Sidebar: FC<{
   did: string;
   onNewPost: () => void;
   onSettings: () => void;
-}> = ({ did, onNewPost, onSettings }) => {
+}> = ({ onNewPost, onSettings }) => {
   const navigate = useNavigate();
   const { state, pathname } = useLocation();
   const feedGenerators = useFeedGenerators();
@@ -74,8 +74,6 @@ const Sidebar: FC<{
       navigate("/signin");
     }
   };
-  console.log(did);
-
   return (
     <div className="w-16 flex flex-col h-full items-center select-none">
       <div className={`p-2 ${pathname === "/" && "bg-more-muted"}`}>
