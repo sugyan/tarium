@@ -5,9 +5,10 @@ use crate::event::NotificationEvent;
 use crate::session_store::{TauriPluginStore, CURRENT};
 use crate::state::State;
 use crate::task::{poll_feed, poll_notifications, poll_unread_notifications};
+use atrium_api::agent::store::SessionStore;
 use atrium_api::agent::AtpAgent;
 use atrium_api::records::Record;
-use atrium_api::types::string::{Datetime, Language};
+use atrium_api::types::string::{Datetime, Did, Language};
 use atrium_api::types::{Collection, Union};
 use atrium_xrpc_client::reqwest::ReqwestClient;
 use serde::Deserialize;
@@ -36,21 +37,16 @@ pub async fn logout<R: Runtime>(app: AppHandle<R>) -> Result<()> {
 }
 
 #[tauri::command]
-pub async fn get_session<R: Runtime>(
-    app: AppHandle<R>,
-) -> Result<atrium_api::com::atproto::server::get_session::Output> {
-    log::info!("get_session");
-    Ok(app
-        .state::<State<R>>()
-        .agent
-        .lock()
-        .await
-        .api
-        .com
-        .atproto
-        .server
+pub async fn me<R: Runtime>(app: AppHandle<R>) -> Result<Did> {
+    log::info!("me");
+    let agent = app.state::<State<R>>().agent.lock().await.clone();
+    let session = TauriPluginStore { app }
         .get_session()
-        .await?)
+        .await
+        .ok_or(Error::NoSession)?;
+    let did = session.did.clone();
+    agent.resume_session(session).await?;
+    Ok(did)
 }
 
 #[tauri::command]

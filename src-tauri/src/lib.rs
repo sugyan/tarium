@@ -24,16 +24,14 @@ pub const STORE_SETTING_PATH: &str = "setting.json";
 
 fn setup(app: &mut tauri::App<Wry>) -> Result<(), Box<dyn std::error::Error>> {
     // TODO: how switch to different account?
-    let agent = Mutex::new(Arc::new(AtpAgent::new(
-        ReqwestClient::new("https://bsky.social"),
-        TauriPluginStore::new(app.handle().clone()),
-    )));
     app.manage(State {
-        agent,
+        agent: Mutex::new(Arc::new(AtpAgent::new(
+            ReqwestClient::new("https://bsky.social"),
+            TauriPluginStore::new(app.handle().clone()),
+        ))),
         subscription_sender: Mutex::new(None),
         notification_sender: Mutex::new(None),
     });
-
     app.handle()
         .plugin(
             tauri_plugin_store::Builder::new()
@@ -89,7 +87,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             command::login,
             command::logout,
-            command::get_session,
+            command::me,
             command::get_preferences,
             command::get_feed_generators,
             command::get_posts,
