@@ -56,10 +56,11 @@ function useUnreadCount() {
   return count;
 }
 
-const Sidebar: FC<{ onNewPost: () => void; onSettings: () => void }> = ({
-  onNewPost,
-  onSettings,
-}) => {
+const Sidebar: FC<{
+  did: string;
+  onNewPost: () => void;
+  onSettings: () => void;
+}> = ({ did, onNewPost, onSettings }) => {
   const navigate = useNavigate();
   const { state, pathname } = useLocation();
   const feedGenerators = useFeedGenerators();
@@ -73,10 +74,12 @@ const Sidebar: FC<{ onNewPost: () => void; onSettings: () => void }> = ({
       navigate("/signin");
     }
   };
+  console.log(did);
+
   return (
     <div className="w-16 flex flex-col h-full items-center select-none">
-      <div className={`p-2 ${pathname === "/home" && "bg-more-muted"}`}>
-        <Link to="/home">
+      <div className={`p-2 ${pathname === "/" && "bg-more-muted"}`}>
+        <Link to="/">
           <div className="flex justify-center items-center h-12 w-12 rounded-lg overflow-hidden border border-slate-500 bg-background">
             <HomeIcon className="h-10 w-10" />
           </div>

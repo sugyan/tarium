@@ -10,7 +10,7 @@ const Signin = () => {
   const signin = async () => {
     try {
       await invoke("login", { identifier, password });
-      navigate("/home");
+      navigate("/");
     } catch (e) {
       console.error(e);
       setMessage("Invalid identifier or password");
