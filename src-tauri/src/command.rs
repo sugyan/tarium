@@ -2,7 +2,7 @@ use crate::appdata;
 use crate::consts::EmitEvent;
 use crate::error::{Error, Result};
 use crate::event::NotificationEvent;
-use crate::session_store::{TauriPluginStore, CURRENT};
+use crate::session::{TauriPluginStore, APPDATA_CURRENT};
 use crate::state::State;
 use crate::task::{poll_feed, poll_notifications, poll_unread_notifications};
 use atrium_api::agent::store::SessionStore;
@@ -33,7 +33,7 @@ pub async fn login<R: Runtime>(
 
 #[tauri::command]
 pub async fn logout<R: Runtime>(app: AppHandle<R>) -> Result<()> {
-    Ok(appdata::delete(app, CURRENT)?)
+    Ok(appdata::delete_appdata(app, APPDATA_CURRENT.into())?)
 }
 
 #[tauri::command]
@@ -220,9 +220,11 @@ pub async fn create_post<R: Runtime>(
     app: tauri::AppHandle<R>,
 ) -> Result<atrium_api::com::atproto::repo::create_record::Output> {
     log::info!("create_post");
-    let did = from_value::<String>(appdata::get(app.clone(), CURRENT)?.ok_or(Error::NoSession)?)?
-        .parse()
-        .expect("failed to parse DID");
+    let did = from_value::<String>(
+        appdata::get_appdata(app.clone(), APPDATA_CURRENT.into())?.ok_or(Error::NoSession)?,
+    )?
+    .parse()
+    .expect("failed to parse DID");
     Ok(app
         .state::<State<R>>()
         .agent

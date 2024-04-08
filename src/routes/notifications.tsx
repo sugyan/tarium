@@ -3,7 +3,7 @@ import { OutputSchema } from "@/atproto/types/app/bsky/feed/getPosts";
 import { Notification } from "@/atproto/types/app/bsky/notification/listNotifications";
 import Column from "@/components/Column";
 import NotificationList from "@/components/NotificatinList";
-import { NotificationReason } from "@/constants";
+import { Command, NotificationReason } from "@/constants";
 import { useNotifications } from "@/hooks/useNotifications";
 import { BellIcon } from "@heroicons/react/24/outline";
 import { invoke } from "@tauri-apps/api/core";
@@ -70,7 +70,7 @@ function useGetPosts(notificationGroups: NotificationGroup[]) {
           Array.from(prev.entries()).concat(uris.map((uri) => [uri, null]))
         );
       });
-      const output = await invoke<OutputSchema>("get_posts", {
+      const output = await invoke<OutputSchema>(Command.GetPosts, {
         uris,
       });
       // set values
@@ -92,7 +92,7 @@ const Notifications = () => {
     const latest = notifications[0];
     if (latest) {
       (async () => {
-        await invoke("update_seen");
+        await invoke(Command.UpdateSeen);
       })();
     }
   }, [notifications]);

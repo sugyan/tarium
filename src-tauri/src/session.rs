@@ -1,10 +1,15 @@
-use crate::{STORE_APPDATA_PATH, STORE_SESSION_PATH};
+use crate::STORE_APPDATA_PATH;
 use atrium_api::agent::{store::SessionStore, Session};
 use serde_json::{from_value, to_value, Value};
 use tauri::{AppHandle, Manager, Runtime};
 use tauri_plugin_store::with_store;
 
-pub const CURRENT: &str = "current";
+#[cfg(debug_assertions)]
+pub const STORE_SESSION_PATH: &str = "session.dev.json";
+#[cfg(not(debug_assertions))]
+pub const STORE_SESSION_PATH: &str = "session.json";
+
+pub const APPDATA_CURRENT: &str = "current";
 
 pub struct TauriPluginStore<R: Runtime> {
     pub app: AppHandle<R>,
@@ -19,7 +24,7 @@ impl<R: Runtime> TauriPluginStore<R> {
             self.app.clone(),
             self.app.state(),
             STORE_APPDATA_PATH,
-            |store| Ok(store.get(CURRENT).cloned()),
+            |store| Ok(store.get(APPDATA_CURRENT).cloned()),
         )
         .expect("failed to get current session");
         if let Some(Value::String(did)) = value {
@@ -34,7 +39,7 @@ impl<R: Runtime> TauriPluginStore<R> {
             self.app.state(),
             STORE_APPDATA_PATH,
             |store| {
-                store.insert(CURRENT.into(), to_value(did)?)?;
+                store.insert(APPDATA_CURRENT.into(), to_value(did)?)?;
                 store.save()
             },
         )

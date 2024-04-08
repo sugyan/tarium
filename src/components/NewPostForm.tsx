@@ -1,9 +1,8 @@
-import { AppdataKey, STORE_APPDATA } from "@/constants";
+import { AppdataKey, Command } from "@/constants";
 import { LANGUAGES } from "@/data/languages";
 import { Popover, Transition } from "@headlessui/react";
 import { LanguageIcon } from "@heroicons/react/24/outline";
 import { invoke } from "@tauri-apps/api/core";
-import { Store } from "@tauri-apps/plugin-store";
 import { ChangeEvent, FC, useContext, useEffect, useState } from "react";
 import { FocusContext } from "./Modal";
 
@@ -16,7 +15,7 @@ const Languages: FC<{
       <Popover.Button>
         <div className="flex items-center">
           <LanguageIcon className="h-6 w-6 cursor-pointer mr-1" />
-          {Array.from(langs).sort().join(", ")}
+          {[...langs].sort().join(", ")}
         </div>
       </Popover.Button>
       <Transition
@@ -69,8 +68,10 @@ const NewPostForm: FC<{ onCancel: () => void }> = ({ onCancel }) => {
   const [isSubmitting, setSubmitting] = useState(false);
   useEffect(() => {
     (async () => {
-      const store = new Store(STORE_APPDATA);
-      setLangs(new Set(await store.get(AppdataKey.Lang)));
+      const langs = await invoke<string[] | null>(Command.GetAppdata, {
+        key: AppdataKey.Langs,
+      });
+      setLangs(new Set(langs));
     })();
   }, []);
   const onChangeLangs = (event: ChangeEvent<HTMLInputElement>) => {
@@ -82,9 +83,10 @@ const NewPostForm: FC<{ onCancel: () => void }> = ({ onCancel }) => {
         set.delete(id);
       }
       (async () => {
-        const store = new Store(STORE_APPDATA);
-        await store.set(AppdataKey.Lang, Array.from(set).sort());
-        await store.save();
+        await invoke(Command.SetAppdata, {
+          key: AppdataKey.Langs,
+          value: [...set].sort(),
+        });
       })();
       return new Set(set);
     });
@@ -92,7 +94,7 @@ const NewPostForm: FC<{ onCancel: () => void }> = ({ onCancel }) => {
   const onPost = async () => {
     try {
       setSubmitting(true);
-      await invoke("create_post", { text, langs: Array.from(langs) });
+      await invoke(Command.CreatePost, { text, langs: [...langs] });
       onCancel();
     } finally {
       setSubmitting(false);

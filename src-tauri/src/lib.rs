@@ -3,24 +3,23 @@ mod command;
 mod consts;
 mod error;
 mod event;
-mod session_store;
+mod session;
+mod setting;
 mod state;
 mod task;
 
+use crate::appdata::STORE_APPDATA_PATH;
+use crate::session::{TauriPluginStore, STORE_SESSION_PATH};
+use crate::setting::STORE_SETTING_PATH;
 use crate::state::State;
 use atrium_api::agent::AtpAgent;
 use atrium_xrpc_client::reqwest::ReqwestClient;
 use log::LevelFilter;
-use session_store::TauriPluginStore;
 use std::sync::Arc;
 use tauri::async_runtime::Mutex;
 use tauri::menu::{Menu, MenuItemBuilder, MenuItemKind};
 use tauri::{Manager, Wry};
 use tauri_plugin_store::StoreBuilder;
-
-pub const STORE_APPDATA_PATH: &str = "appdata.json";
-pub const STORE_SESSION_PATH: &str = "session.json";
-pub const STORE_SETTING_PATH: &str = "setting.json";
 
 fn setup(app: &mut tauri::App<Wry>) -> Result<(), Box<dyn std::error::Error>> {
     // TODO: how switch to different account?
@@ -85,6 +84,10 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
+            appdata::get_appdata,
+            appdata::set_appdata,
+            setting::get_setting,
+            setting::set_setting,
             command::login,
             command::logout,
             command::me,

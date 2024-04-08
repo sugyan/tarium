@@ -1,8 +1,9 @@
+use crate::appdata::{get_appdata, set_appdata};
 use crate::consts::{EmitEvent, SETTING_NOTIFICATION};
 use crate::error::Result;
 use crate::event::{NotificationEvent, PostEvent};
-use crate::session_store::TauriPluginStore;
-use crate::{appdata, STORE_SETTING_PATH};
+use crate::session::TauriPluginStore;
+use crate::setting::STORE_SETTING_PATH;
 use atrium_api::agent::AtpAgent;
 use atrium_api::records::{KnownRecord, Record};
 use atrium_api::types::Union;
@@ -167,7 +168,7 @@ pub async fn poll_unread_notifications<R: Runtime>(
             })
             .await?;
         if let Some(seen_at) = output.seen_at {
-            let notified = appdata::get(app.clone(), NOTIFIED_AT)?
+            let notified = get_appdata(app.clone(), NOTIFIED_AT.into())?
                 .and_then(|value| from_value::<String>(value).ok())
                 .and_then(|v| v.parse().ok())
                 .unwrap_or(seen_at.clone());
@@ -183,10 +184,10 @@ pub async fn poll_unread_notifications<R: Runtime>(
                             notification.clone(),
                             app.clone(),
                         ));
-                        appdata::set(
+                        set_appdata(
                             app.clone(),
-                            NOTIFIED_AT,
-                            &to_value(&notification.indexed_at)?,
+                            NOTIFIED_AT.into(),
+                            to_value(&notification.indexed_at)?,
                         )?;
                     }
                 }

@@ -1,17 +1,18 @@
 import { ThemeContext } from "@/App";
-import { STORE_SETTING, SettingKey, Theme } from "@/constants";
+import { Command, SettingKey, Theme } from "@/constants";
 import { BellAlertIcon, EyeIcon } from "@heroicons/react/24/outline";
-import { Store } from "@tauri-apps/plugin-store";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
+import { useContext, useEffect, useState } from "react";
 
 const Settings = () => {
   const { theme, setTheme } = useContext(ThemeContext);
   const [isChecked, setChecked] = useState(true);
   const [isLoaded, setLoaded] = useState(false);
-  const store = useMemo(() => new Store(STORE_SETTING), []);
   useEffect(() => {
     (async () => {
-      const value = await store.get<boolean>(SettingKey.Notification);
+      const value = await invoke<boolean | null>(Command.GetSetting, {
+        key: SettingKey.Notification,
+      });
       if (value !== null) {
         setChecked(value);
       }
@@ -21,8 +22,10 @@ const Settings = () => {
   useEffect(() => {
     if (!isLoaded) return;
     (async () => {
-      await store.set(SettingKey.Notification, isChecked);
-      await store.save();
+      await invoke(Command.SetSetting, {
+        key: SettingKey.Notification,
+        value: isChecked,
+      });
     })();
   }, [isChecked]);
   return isLoaded ? (
