@@ -1,18 +1,13 @@
-import {
-  EVENT_MENU_RELOAD,
-  STORE_SETTING,
-  SettingKey,
-  Theme,
-} from "@/constants";
+import { Command, EVENT_MENU_RELOAD, SettingKey, Theme } from "@/constants";
 import FeedGenerator from "@/routes/feed-generator";
 import Home from "@/routes/home";
 import Notifications from "@/routes/notifications";
 import Root from "@/routes/root";
 import Signin from "@/routes/signin";
+import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { getCurrent } from "@tauri-apps/api/window";
 import { message } from "@tauri-apps/plugin-dialog";
-import { Store } from "@tauri-apps/plugin-store";
 import { check } from "@tauri-apps/plugin-updater";
 import { createContext, useEffect, useRef, useState } from "react";
 import {
@@ -61,8 +56,9 @@ function listenEvents() {
 }
 
 async function mainLoader(): Promise<Theme | null> {
-  const store = new Store(STORE_SETTING);
-  const theme = await store.get<Theme>(SettingKey.Theme);
+  const theme = await invoke<Theme | null>(Command.GetSetting, {
+    key: SettingKey.Theme,
+  });
   if (theme !== null) {
     return theme;
   }
@@ -75,9 +71,7 @@ const Main = () => {
   listenEvents();
   useEffect(() => {
     (async () => {
-      const store = new Store(STORE_SETTING);
-      await store.set(SettingKey.Theme, theme);
-      await store.save();
+      await invoke(Command.SetSetting, { key: SettingKey.Theme, value: theme });
     })();
   }, [theme]);
   return (
