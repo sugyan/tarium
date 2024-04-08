@@ -2,6 +2,7 @@ import Modal from "@/components/Modal";
 import NewPostForm from "@/components/NewPostForm";
 import Settings from "@/components/Settings";
 import Sidebar from "@/components/Sidebar";
+import { Command } from "@/constants";
 import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
@@ -14,7 +15,7 @@ const Root = () => {
   useEffect(() => {
     (async () => {
       try {
-        setDid(await invoke("me"));
+        setDid(await invoke(Command.Me));
       } catch (e) {
         navigate("/signin");
       }

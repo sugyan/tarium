@@ -1,5 +1,5 @@
 import { GeneratorView } from "@/atproto/types/app/bsky/feed/defs";
-import { EventName } from "@/constants";
+import { Command, EventName } from "@/constants";
 import { UnreadNotification } from "@/events";
 import {
   BellIcon,
@@ -23,7 +23,7 @@ function useFeedGenerators() {
     isLoading.current = true;
     (async () => {
       const result = await invoke<{ feeds: GeneratorView[] }>(
-        "get_feed_generators"
+        Command.GetFeedGenerators
       );
       setFeedGenerators(result.feeds);
     })();
@@ -46,11 +46,16 @@ function useUnreadCount() {
         }
       );
     })();
-    return unlisten.current;
+    return () => {
+      unlisten.current();
+      (async () => {
+        await invoke(Command.UnsubscribeNotification);
+      })();
+    };
   }, []);
   useEffect(() => {
     (async () => {
-      await invoke("subscribe_notification");
+      await invoke(Command.SubscribeNotification);
     })();
   }, []);
   return count;
@@ -70,7 +75,7 @@ const Sidebar: FC<{
       kind: "warning",
     });
     if (ok) {
-      await invoke("logout");
+      await invoke(Command.Logout);
       navigate("/signin");
     }
   };

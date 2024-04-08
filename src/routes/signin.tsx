@@ -1,3 +1,4 @@
+import { Command } from "@/constants";
 import { invoke } from "@tauri-apps/api/core";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -9,7 +10,7 @@ const Signin = () => {
   const navigate = useNavigate();
   const signin = async () => {
     try {
-      await invoke("login", { identifier, password });
+      await invoke(Command.Login, { identifier, password });
       navigate("/");
     } catch (e) {
       console.error(e);

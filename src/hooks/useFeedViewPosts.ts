@@ -1,5 +1,5 @@
 import { FeedViewPost } from "@/atproto/types/app/bsky/feed/defs";
-import { EventName } from "@/constants";
+import { Command, EventName } from "@/constants";
 import {
   FeedPostEvent,
   isFeedPostAdd,
@@ -44,14 +44,14 @@ export function useFeedViewPosts(uri?: string) {
     return () => {
       unlisten.current();
       (async () => {
-        await invoke("unsubscribe", {});
+        await invoke(Command.Unsubscribe, {});
       })();
     };
   }, [uri]);
   useEffect(() => {
     setPosts([]);
     (async () => {
-      await invoke("subscribe", { subscription: { feed: { uri } } });
+      await invoke(Command.Subscribe, { subscription: { feed: { uri } } });
     })();
   }, [uri]);
   return posts;

@@ -94,7 +94,7 @@ const NewPostForm: FC<{ onCancel: () => void }> = ({ onCancel }) => {
   const onPost = async () => {
     try {
       setSubmitting(true);
-      await invoke("create_post", { text, langs: [...langs] });
+      await invoke(Command.CreatePost, { text, langs: [...langs] });
       onCancel();
     } finally {
       setSubmitting(false);
