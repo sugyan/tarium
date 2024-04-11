@@ -27,6 +27,8 @@ pub enum Error {
     #[error(transparent)]
     GetPreferences(#[from] XrpcError<atrium_api::app::bsky::actor::get_preferences::Error>),
     #[error(transparent)]
+    GetProfile(#[from] XrpcError<atrium_api::app::bsky::actor::get_profile::Error>),
+    #[error(transparent)]
     GetFeed(#[from] XrpcError<atrium_api::app::bsky::feed::get_feed::Error>),
     #[error(transparent)]
     GetFeedGenerators(#[from] XrpcError<atrium_api::app::bsky::feed::get_feed_generators::Error>),

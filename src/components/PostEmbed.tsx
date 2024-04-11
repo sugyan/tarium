@@ -71,7 +71,7 @@ const Record: FC<{ record: ViewRecord }> = ({ record }) => {
           <div className="flex justify-between">
             <div className="flex items-center">
               <div className="h-4 w-4 rounded-full overflow-hidden mr-1">
-                <Avatar author={record.author} />
+                <Avatar avatar={record.author.avatar} />
               </div>
               <span className="font-semibold">
                 {record.author.displayName || record.author.handle}

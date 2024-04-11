@@ -8,6 +8,7 @@ export const Command = {
   Login: "login",
   Logout: "logout",
   Me: "me",
+  GetProfile: "get_profile",
   GetFeedGenerators: "get_feed_generators",
   GetPosts: "get_posts",
   Subscribe: "subscribe",

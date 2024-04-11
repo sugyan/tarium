@@ -1,9 +1,11 @@
+import { ProfileViewDetailed } from "@/atproto/types/app/bsky/actor/defs";
 import { AppdataKey, Command } from "@/constants";
 import { LANGUAGES } from "@/data/languages";
 import { Popover, Transition } from "@headlessui/react";
 import { LanguageIcon } from "@heroicons/react/24/outline";
 import { invoke } from "@tauri-apps/api/core";
 import { ChangeEvent, FC, useContext, useEffect, useState } from "react";
+import Avatar from "./Avatar";
 import { FocusContext } from "./Modal";
 
 const Languages: FC<{
@@ -61,7 +63,10 @@ const Languages: FC<{
   );
 };
 
-const NewPostForm: FC<{ onCancel: () => void }> = ({ onCancel }) => {
+const NewPostForm: FC<{
+  profile: ProfileViewDetailed | null;
+  onCancel: () => void;
+}> = ({ profile, onCancel }) => {
   const focusRef = useContext(FocusContext);
   const [text, setText] = useState("");
   const [langs, setLangs] = useState<Set<string>>(new Set());
@@ -100,8 +105,9 @@ const NewPostForm: FC<{ onCancel: () => void }> = ({ onCancel }) => {
       setSubmitting(false);
     }
   };
+  const isTooLong = text.length > 300;
   return (
-    <div className="mx-4 my-2">
+    <div className="mx-4 my-2 w-[512px]">
       <div className="border-b border-more-muted mb-2 flex justify-between">
         <button className="text-red-500" onClick={onCancel}>
           Cancel
@@ -109,24 +115,31 @@ const NewPostForm: FC<{ onCancel: () => void }> = ({ onCancel }) => {
         <button
           className="bg-blue-500 disabled:bg-blue-800 text-white disabled:text-muted font-semibold text-sm px-4 py-1 my-2 rounded-full"
           onClick={onPost}
-          disabled={text.length === 0 || isSubmitting}
+          disabled={text.length === 0 || isTooLong || isSubmitting}
         >
           Post
         </button>
       </div>
-      <textarea
-        ref={focusRef}
-        className="w-full border-2 border-more-muted rounded bg-inherit resize-none p-2 focus:outline-none"
-        rows={5}
-        placeholder="What's up?"
-        value={text}
-        autoCorrect="off"
-        onChange={(e) => setText(e.target.value)}
-      ></textarea>
+      <div className="flex items-start">
+        <div className="h-16 w-16 rounded-full overflow-hidden m-2">
+          <Avatar avatar={profile?.avatar} />
+        </div>
+        <textarea
+          ref={focusRef}
+          className="w-full rounded bg-inherit resize-none p-2 focus:outline-none"
+          rows={5}
+          placeholder="What's up?"
+          value={text}
+          autoCorrect="off"
+          onChange={(e) => setText(e.target.value)}
+        ></textarea>
+      </div>
       <div className="flex justify-end items-center text-muted mt-2">
         <Languages langs={langs} onChange={onChangeLangs} />
-        <div className="ml-2 text-base font-mono text-muted">
-          {300 - text.length}
+        <div className="ml-2 text-base font-mono">
+          <span className={isTooLong ? "text-red-500" : "text-muted"}>
+            {300 - text.length}
+          </span>
         </div>
       </div>
     </div>
