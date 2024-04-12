@@ -23,7 +23,7 @@ const Post: FC<{ post: PostView; isParent?: boolean }> = ({
     <div className="flex overflow-hidden break-words">
       <div className="flex flex-col items-center mr-2">
         <div className="min-h-12 w-12 rounded-full overflow-hidden">
-          <Avatar author={post.author} />
+          <Avatar avatar={post.author.avatar} />
         </div>
         {isParent && <div className="w-0.5 h-full bg-more-muted" />}
       </div>

@@ -37,7 +37,7 @@ const NotificationView: FC<
           key={author.did}
           className="h-9 w-9 rounded-full overflow-hidden m-1"
         >
-          <Avatar author={author} />
+          <Avatar avatar={author.avatar} />
         </div>
       ))}
       {authors.length > 5 && (

@@ -1,3 +1,4 @@
+import { ProfileViewDetailed } from "@/atproto/types/app/bsky/actor/defs";
 import Modal from "@/components/Modal";
 import NewPostForm from "@/components/NewPostForm";
 import Settings from "@/components/Settings";
@@ -7,11 +8,23 @@ import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 
+function useProfile() {
+  const [profile, setProfile] = useState<ProfileViewDetailed | null>(null);
+  useEffect(() => {
+    (async () => {
+      const result = await invoke<ProfileViewDetailed>(Command.GetProfile);
+      setProfile(result);
+    })();
+  }, []);
+  return profile;
+}
+
 const Root = () => {
   const navigate = useNavigate();
   const [did, setDid] = useState(null);
   const [isNewPostOpen, setNewPostOpen] = useState(false);
   const [isSettingsOpen, setSettingsOpen] = useState(false);
+  const profile = useProfile();
   useEffect(() => {
     (async () => {
       try {
@@ -30,15 +43,19 @@ const Root = () => {
   return (
     <>
       <Modal isShow={isNewPostOpen} setShow={setNewPostOpen}>
-        <NewPostForm onCancel={() => setNewPostOpen(false)} />
+        <NewPostForm profile={profile} onCancel={() => setNewPostOpen(false)} />
       </Modal>
       <Modal isShow={isSettingsOpen} setShow={setSettingsOpen}>
         <Settings />
       </Modal>
       {did ? (
         <div className="flex">
-          <div className="flex-shrink-0 h-screen sticky top-0 border-r border-slate-500">
-            <Sidebar did={did} onNewPost={onNewPost} onSettings={onSettings} />
+          <div className="flex-shrink-0 h-screen sticky top-0 border-r border-slate-500 z-10">
+            <Sidebar
+              profile={profile}
+              onNewPost={onNewPost}
+              onSettings={onSettings}
+            />
           </div>
           <div className="flex-grow">
             <Outlet />

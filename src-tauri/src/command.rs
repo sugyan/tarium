@@ -49,11 +49,9 @@ pub async fn me<R: Runtime>(app: AppHandle<R>) -> Result<Did> {
     Ok(did)
 }
 
-#[tauri::command]
 pub async fn get_preferences<R: Runtime>(
     app: AppHandle<R>,
 ) -> Result<atrium_api::app::bsky::actor::get_preferences::Output> {
-    log::info!("get_preferences");
     Ok(app
         .state::<State<R>>()
         .agent
@@ -64,6 +62,24 @@ pub async fn get_preferences<R: Runtime>(
         .bsky
         .actor
         .get_preferences(atrium_api::app::bsky::actor::get_preferences::Parameters {})
+        .await?)
+}
+
+#[tauri::command]
+pub async fn get_profile<R: Runtime>(
+    app: AppHandle<R>,
+) -> Result<atrium_api::app::bsky::actor::get_profile::Output> {
+    let actor = did(app.clone())?.parse().expect("failed to parse DID");
+    Ok(app
+        .state::<State<R>>()
+        .agent
+        .lock()
+        .await
+        .api
+        .app
+        .bsky
+        .actor
+        .get_profile(atrium_api::app::bsky::actor::get_profile::Parameters { actor })
         .await?)
 }
 
@@ -220,11 +236,7 @@ pub async fn create_post<R: Runtime>(
     app: tauri::AppHandle<R>,
 ) -> Result<atrium_api::com::atproto::repo::create_record::Output> {
     log::info!("create_post");
-    let did = from_value::<String>(
-        appdata::get_appdata(app.clone(), APPDATA_CURRENT.into())?.ok_or(Error::NoSession)?,
-    )?
-    .parse()
-    .expect("failed to parse DID");
+    let did = did(app.clone())?.parse().expect("failed to parse DID");
     Ok(app
         .state::<State<R>>()
         .agent
@@ -257,4 +269,10 @@ pub async fn create_post<R: Runtime>(
             validate: None,
         })
         .await?)
+}
+
+pub fn did<R: Runtime>(app: AppHandle<R>) -> Result<String> {
+    Ok(from_value::<String>(
+        appdata::get_appdata(app, APPDATA_CURRENT.into())?.ok_or(Error::NoSession)?,
+    )?)
 }

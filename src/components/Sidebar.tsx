@@ -1,6 +1,8 @@
+import { ProfileViewDetailed } from "@/atproto/types/app/bsky/actor/defs";
 import { GeneratorView } from "@/atproto/types/app/bsky/feed/defs";
 import { Command, EventName } from "@/constants";
 import { UnreadNotification } from "@/events";
+import { Popover } from "@headlessui/react";
 import {
   BellIcon,
   Cog6ToothIcon,
@@ -14,13 +16,11 @@ import { listen } from "@tauri-apps/api/event";
 import { confirm } from "@tauri-apps/plugin-dialog";
 import { FC, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import Avatar from "./Avatar";
 
 function useFeedGenerators() {
   const [feedGenerators, setFeedGenerators] = useState<GeneratorView[]>([]);
-  const isLoading = useRef(false);
   useEffect(() => {
-    if (isLoading.current) return;
-    isLoading.current = true;
     (async () => {
       const result = await invoke<{ feeds: GeneratorView[] }>(
         Command.GetFeedGenerators
@@ -62,10 +62,10 @@ function useUnreadCount() {
 }
 
 const Sidebar: FC<{
-  did: string;
+  profile: ProfileViewDetailed | null;
   onNewPost: () => void;
   onSettings: () => void;
-}> = ({ onNewPost, onSettings }) => {
+}> = ({ profile, onNewPost, onSettings }) => {
   const navigate = useNavigate();
   const { state, pathname } = useLocation();
   const feedGenerators = useFeedGenerators();
@@ -137,12 +137,29 @@ const Sidebar: FC<{
           onClick={onSettings}
         />
       </div>
-      <div>
-        <UserMinusIcon
-          className="h-10 w-10 m-3 text-red-500 cursor-pointer"
-          onClick={onSignout}
-        />
-      </div>
+      <Popover className="relative">
+        <Popover.Button as="div">
+          <div className="h-12 w-12 m-2 rounded-full overflow-hidden">
+            {profile && <Avatar avatar={profile.avatar} />}
+          </div>
+        </Popover.Button>
+        <Popover.Panel className="absolute left-4 bottom-16">
+          {({ close }) => (
+            <div className="text-muted bg-background border border-more-muted w-64 rounded-lg">
+              <div
+                className="flex items-center cursor-pointer"
+                onClick={() => {
+                  close();
+                  onSignout();
+                }}
+              >
+                <UserMinusIcon className="h-8 w-8 m-3 text-red-500" />
+                Sign out
+              </div>
+            </div>
+          )}
+        </Popover.Panel>
+      </Popover>
     </div>
   );
 };
