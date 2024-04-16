@@ -1,5 +1,6 @@
 import { ProfileViewDetailed } from "@/atproto/types/app/bsky/actor/defs";
 import { GeneratorView } from "@/atproto/types/app/bsky/feed/defs";
+import Avatar from "@/components/Avatar";
 import { Command, EventName } from "@/constants";
 import { UnreadNotification } from "@/events";
 import { Popover } from "@headlessui/react";
@@ -16,7 +17,6 @@ import { listen } from "@tauri-apps/api/event";
 import { confirm } from "@tauri-apps/plugin-dialog";
 import { FC, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import Avatar from "./Avatar";
 
 function useFeedGenerators() {
   const [feedGenerators, setFeedGenerators] = useState<GeneratorView[]>([]);
