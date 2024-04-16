@@ -1,12 +1,12 @@
 import { ProfileViewDetailed } from "@/atproto/types/app/bsky/actor/defs";
+import Avatar from "@/components/Avatar";
+import { FocusContext } from "@/components/Modal";
 import { AppdataKey, Command } from "@/constants";
 import { LANGUAGES } from "@/data/languages";
 import { Popover, Transition } from "@headlessui/react";
 import { LanguageIcon } from "@heroicons/react/24/outline";
 import { invoke } from "@tauri-apps/api/core";
 import { ChangeEvent, FC, useContext, useEffect, useState } from "react";
-import Avatar from "./Avatar";
-import { FocusContext } from "./Modal";
 
 const Languages: FC<{
   langs: Set<string>;
