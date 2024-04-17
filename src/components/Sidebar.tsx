@@ -23,7 +23,7 @@ function useFeedGenerators() {
   useEffect(() => {
     (async () => {
       const result = await invoke<{ feeds: GeneratorView[] }>(
-        Command.GetFeedGenerators
+        Command.GetPinnedFeedGenerators
       );
       setFeedGenerators(result.feeds);
     })();

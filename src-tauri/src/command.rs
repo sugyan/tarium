@@ -8,7 +8,7 @@ use crate::task::{poll_feed, poll_notifications, poll_unread_notifications};
 use atrium_api::agent::store::SessionStore;
 use atrium_api::agent::AtpAgent;
 use atrium_api::records::Record;
-use atrium_api::types::string::{Datetime, Did, Language};
+use atrium_api::types::string::{AtIdentifier, Datetime, Did, Language};
 use atrium_api::types::{Collection, Union};
 use atrium_xrpc_client::reqwest::ReqwestClient;
 use serde::Deserialize;
@@ -67,9 +67,10 @@ pub async fn get_preferences<R: Runtime>(
 
 #[tauri::command]
 pub async fn get_profile<R: Runtime>(
+    actor: AtIdentifier,
     app: AppHandle<R>,
 ) -> Result<atrium_api::app::bsky::actor::get_profile::Output> {
-    let actor = did(app.clone())?.parse().expect("failed to parse DID");
+    log::info!("get_profile: {actor:?}");
     Ok(app
         .state::<State<R>>()
         .agent
@@ -84,12 +85,11 @@ pub async fn get_profile<R: Runtime>(
 }
 
 #[tauri::command]
-pub async fn get_feed_generators<R: Runtime>(
+pub async fn get_pinned_feed_generators<R: Runtime>(
     app: AppHandle<R>,
 ) -> Result<atrium_api::app::bsky::feed::get_feed_generators::Output> {
-    log::info!("get_feed_generators");
-    let agent = app.state::<State<R>>().agent.lock().await.clone();
-    let preferences = get_preferences(app).await?;
+    log::info!("get_pinned_feed_generators");
+    let preferences = get_preferences(app.clone()).await?;
     let feeds = preferences
         .preferences
         .iter()
@@ -104,7 +104,20 @@ pub async fn get_feed_generators<R: Runtime>(
             }
         })
         .unwrap_or_default();
-    Ok(agent
+    get_feed_generators(app, feeds).await
+}
+
+#[tauri::command]
+pub async fn get_feed_generators<R: Runtime>(
+    app: AppHandle<R>,
+    feeds: Vec<String>,
+) -> Result<atrium_api::app::bsky::feed::get_feed_generators::Output> {
+    log::info!("get_feed_generators: {feeds:?}");
+    Ok(app
+        .state::<State<R>>()
+        .agent
+        .lock()
+        .await
         .api
         .app
         .bsky
