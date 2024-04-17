@@ -18,9 +18,14 @@ import {
   View as RecordWithMediaView,
   isView as isRecordWithMediaView,
 } from "@/atproto/types/app/bsky/embed/recordWithMedia";
+import {
+  GeneratorView,
+  isGeneratorView,
+} from "@/atproto/types/app/bsky/feed/defs";
 import { isRecord } from "@/atproto/types/app/bsky/feed/post";
 import Avatar from "@/components/Avatar";
 import DistanceToNow from "@/components/DistanceToNow";
+import { RssIcon } from "@heroicons/react/24/solid";
 import { FC } from "react";
 
 export type EmbedView =
@@ -100,6 +105,35 @@ const Record: FC<{ record: ViewRecord }> = ({ record }) => {
   );
 };
 
+export const Generator: FC<{ generator: GeneratorView }> = ({ generator }) => {
+  return (
+    <div className="border border-slate-500 rounded-md w-full mt-2">
+      <div className="break-all m-2">
+        <div className="flex">
+          <div className="h-9 w-9 rounded-md overflow-hidden mt-0.5">
+            {generator.avatar ? (
+              <img src={generator.avatar} />
+            ) : (
+              <div className="bg-blue-500 p-0.5">
+                <RssIcon className="text-white" />
+              </div>
+            )}
+          </div>
+          <div className="text-sm ml-2">
+            <span className="font-semibold">{generator.displayName}</span>
+            <div className="text-muted">
+              Feed by @{generator.creator.handle}
+            </div>
+          </div>
+        </div>
+        <div className="text-sm text-muted mt-1">
+          Liked by {generator.likeCount || 0} users
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const PostEmbed: FC<{ embed?: EmbedView }> = ({ embed }) => {
   if (isImagesView(embed)) {
     return (
@@ -121,6 +155,13 @@ const PostEmbed: FC<{ embed?: EmbedView }> = ({ embed }) => {
       return (
         <div className="pb-2">
           <Record record={record} />
+        </div>
+      );
+    }
+    if (isGeneratorView(record)) {
+      return (
+        <div className="pb-2">
+          <Generator generator={record} />
         </div>
       );
     }

@@ -1,10 +1,15 @@
 import { ProfileView } from "@/atproto/types/app/bsky/actor/defs";
 import { isView } from "@/atproto/types/app/bsky/embed/images";
-import { PostView } from "@/atproto/types/app/bsky/feed/defs";
+import {
+  GeneratorView,
+  PostView,
+  isGeneratorView,
+  isPostView,
+} from "@/atproto/types/app/bsky/feed/defs";
 import { isRecord } from "@/atproto/types/app/bsky/feed/post";
 import Avatar from "@/components/Avatar";
 import DistanceToNow from "@/components/DistanceToNow";
-import PostEmbed from "@/components/PostEmbed";
+import PostEmbed, { Generator } from "@/components/PostEmbed";
 import Post from "@/components/PostView";
 import { NotificationReason } from "@/constants";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
@@ -23,12 +28,27 @@ export interface NotificationGroup {
   authors: ProfileView[];
 }
 
+const PostContent: FC<{ post: PostView }> = ({ post }) => {
+  return (
+    <>
+      {post.record && isRecord(post.record) && (
+        <div className="text-muted whitespace-pre-wrap">{post.record.text}</div>
+      )}
+      {isView(post.embed) && (
+        <div className="w-1/4">
+          <PostEmbed embed={post.embed} />
+        </div>
+      )}
+    </>
+  );
+};
+
 const NotificationView: FC<
   PropsWithChildren<{
     group: NotificationGroup;
-    post?: PostView | null;
+    content?: PostView | GeneratorView | null;
   }>
-> = ({ group, post, children }) => {
+> = ({ group, content, children }) => {
   const { reason, indexedAt, authors } = group;
   const avatars = (
     <div className="flex items-center mb-1">
@@ -89,16 +109,8 @@ const NotificationView: FC<
         <div>
           {subject} {children}
         </div>
-        {post?.record && isRecord(post.record) && (
-          <div className="text-muted whitespace-pre-wrap">
-            {post.record.text}
-          </div>
-        )}
-        {post && isView(post.embed) && (
-          <div className="w-1/4">
-            <PostEmbed embed={post.embed} />
-          </div>
-        )}
+        {isPostView(content) && <PostContent post={content} />}
+        {isGeneratorView(content) && <Generator generator={content} />}
       </div>
     </div>
   );
@@ -106,32 +118,38 @@ const NotificationView: FC<
 
 const NotificationItem: FC<{
   group: NotificationGroup;
-  post?: PostView | null;
-}> = ({ group, post }) => {
+  content?: PostView | GeneratorView | null;
+}> = ({ group, content }) => {
+  // TODO: other content?
+  const contentName = (() => {
+    if (isPostView(content)) return "your post";
+    if (isGeneratorView(content)) return "your custom feed";
+    return null;
+  })();
   switch (group.reason) {
     case NotificationReason.Like:
       return (
-        <NotificationView group={group} post={post}>
-          liked your post
+        <NotificationView group={group} content={content}>
+          liked {contentName}
         </NotificationView>
       );
     case NotificationReason.Repost:
       return (
-        <NotificationView group={group} post={post}>
+        <NotificationView group={group} content={content}>
           reposted your post
         </NotificationView>
       );
     case NotificationReason.Follow:
       return <NotificationView group={group}>followed you</NotificationView>;
     default:
-      return post && <Post post={post} />;
+      return content && isPostView(content) && <Post post={content} />;
   }
 };
 
 const NotificationList: FC<{
   groups: NotificationGroup[];
-  posts: Map<string, PostView | null>;
-}> = ({ groups, posts }) => {
+  contents: Map<string, PostView | GeneratorView | null>;
+}> = ({ groups, contents }) => {
   const [parent, _] = useAutoAnimate();
   return (
     <div ref={parent}>
@@ -139,7 +157,7 @@ const NotificationList: FC<{
         <div key={group.key} className="border-b border-slate-500 px-3 pt-3">
           <NotificationItem
             group={group}
-            post={group.uri ? posts.get(group.uri) : undefined}
+            content={group.uri ? contents.get(group.uri) : undefined}
           />
         </div>
       ))}

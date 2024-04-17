@@ -8,14 +8,17 @@ import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 
-function useProfile() {
+function useProfile(did: string | null) {
   const [profile, setProfile] = useState<ProfileViewDetailed | null>(null);
   useEffect(() => {
+    if (did === null) return;
     (async () => {
-      const result = await invoke<ProfileViewDetailed>(Command.GetProfile);
+      const result = await invoke<ProfileViewDetailed>(Command.GetProfile, {
+        actor: did,
+      });
       setProfile(result);
     })();
-  }, []);
+  }, [did]);
   return profile;
 }
 
@@ -24,7 +27,7 @@ const Root = () => {
   const [did, setDid] = useState(null);
   const [isNewPostOpen, setNewPostOpen] = useState(false);
   const [isSettingsOpen, setSettingsOpen] = useState(false);
-  const profile = useProfile();
+  const profile = useProfile(did);
   useEffect(() => {
     (async () => {
       try {

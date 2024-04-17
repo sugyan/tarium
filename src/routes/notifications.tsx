@@ -1,8 +1,9 @@
 import { ProfileView } from "@/atproto/types/app/bsky/actor/defs";
-import { OutputSchema } from "@/atproto/types/app/bsky/feed/getPosts";
+import { OutputSchema as GetFeedGeneratorsOutput } from "@/atproto/types/app/bsky/feed/getFeedGenerators";
+import { OutputSchema as GetPostsOutput } from "@/atproto/types/app/bsky/feed/getPosts";
 import { Notification } from "@/atproto/types/app/bsky/notification/listNotifications";
 import Column from "@/components/Column";
-import NotificationList from "@/components/NotificatinList";
+import NotificationList from "@/components/NotificationList";
 import { Command, NotificationReason } from "@/constants";
 import { useNotifications } from "@/hooks/useNotifications";
 import { BellIcon } from "@heroicons/react/24/outline";
@@ -50,44 +51,60 @@ function groupNotifications(notifications: Notification[]) {
   return groups;
 }
 
-function useGetPosts(notificationGroups: NotificationGroup[]) {
-  const [postViews, setPostViews] = useState(new Map());
+function useGetUriContents(notificationGroups: NotificationGroup[]) {
+  const [contents, setContents] = useState(new Map());
   // extract only unknown uris
-  const uris = Array.from(
-    notificationGroups.reduce((acc, n) => {
-      if (n.uri && !postViews.has(n.uri)) {
-        acc.add(n.uri);
-      }
-      return acc;
-    }, new Set())
-  );
+  const uris = [
+    ...new Set(
+      notificationGroups
+        .map((group) => group.uri)
+        .filter((uri): uri is string => uri !== undefined && !contents.has(uri))
+    ),
+  ];
   useEffect(() => {
     if (uris.length === 0) return;
-    (async () => {
-      // just add keys (with value `null`)
-      setPostViews((prev) => {
-        return new Map(
-          Array.from(prev.entries()).concat(uris.map((uri) => [uri, null]))
-        );
-      });
-      const output = await invoke<OutputSchema>(Command.GetPosts, {
-        uris,
-      });
-      // set values
-      setPostViews((prev) => {
-        return new Map(
-          Array.from(prev.entries()).concat(output.posts.map((p) => [p.uri, p]))
-        );
-      });
-    })();
+    // just add keys (with value `null`)
+    setContents((prev) => {
+      return new Map(
+        [...prev.entries()].concat(uris.map((uri) => [uri, null]))
+      );
+    });
+    // fetch contents
+    [
+      async () =>
+        (
+          await invoke<GetPostsOutput>(Command.GetPosts, {
+            uris: uris.filter((uri) => uri.includes("app.bsky.feed.post")),
+          })
+        ).posts.map((p) => ({ ...p, $type: "app.bsky.feed.defs#postView" })),
+      async () =>
+        (
+          await invoke<GetFeedGeneratorsOutput>(Command.GetFeedGenerators, {
+            feeds: uris.filter((uri) =>
+              uri.includes("app.bsky.feed.generator")
+            ),
+          })
+        ).feeds.map((p) => ({
+          ...p,
+          $type: "app.bsky.feed.defs#generatorView",
+        })),
+    ].forEach(async (f) => {
+      const output = await f();
+      setContents(
+        (prev) =>
+          new Map(
+            [...prev.entries()].concat(output.map((out) => [out.uri, out]))
+          )
+      );
+    });
   }, [uris]);
-  return postViews;
+  return contents;
 }
 
 const Notifications = () => {
   const notifications = useNotifications();
   const groups = groupNotifications(notifications);
-  const posts = useGetPosts(groups);
+  const contents = useGetUriContents(groups);
   useEffect(() => {
     const latest = notifications[0];
     if (latest) {
@@ -108,7 +125,7 @@ const Notifications = () => {
   );
   return (
     <Column headerContent={headerContent}>
-      <NotificationList groups={groups} posts={posts} />
+      <NotificationList groups={groups} contents={contents} />
     </Column>
   );
 };

@@ -92,6 +92,7 @@ pub fn run() {
             command::logout,
             command::me,
             command::get_profile,
+            command::get_pinned_feed_generators,
             command::get_feed_generators,
             command::get_posts,
             command::subscribe,

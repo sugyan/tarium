@@ -9,6 +9,7 @@ export const Command = {
   Logout: "logout",
   Me: "me",
   GetProfile: "get_profile",
+  GetPinnedFeedGenerators: "get_pinned_feed_generators",
   GetFeedGenerators: "get_feed_generators",
   GetPosts: "get_posts",
   Subscribe: "subscribe",
