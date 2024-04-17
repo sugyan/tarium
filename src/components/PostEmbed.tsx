@@ -99,6 +99,24 @@ const Record: FC<{ record: ViewRecord }> = ({ record }) => {
           {record.embeds?.map((embed, index) => (
             <PostEmbed key={index} embed={embed as EmbedView} />
           ))}
+          <div className="flex mt-2">
+            {record.repostCount ? (
+              <div className="mr-2">
+                <span className="font-semibold">{record.repostCount}</span>{" "}
+                <span className="text-muted">
+                  {record.repostCount > 1 ? "reposts" : "repost"}
+                </span>
+              </div>
+            ) : null}
+            {record.likeCount ? (
+              <div>
+                <span className="font-semibold">{record.likeCount}</span>{" "}
+                <span className="text-muted">
+                  {record.likeCount > 1 ? "likes" : "like"}
+                </span>
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
     </div>
