@@ -142,7 +142,10 @@ const NotificationItem: FC<{
     case NotificationReason.Follow:
       return <NotificationView group={group}>followed you</NotificationView>;
     default:
-      return content && isPostView(content) && <Post post={content} />;
+      return (
+        content &&
+        isPostView(content) && <Post post={content} showReplyAuthor={true} />
+      );
   }
 };
 

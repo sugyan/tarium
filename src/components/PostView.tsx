@@ -1,9 +1,12 @@
 import { PostView } from "@/atproto/types/app/bsky/feed/defs";
+import { OutputSchema } from "@/atproto/types/app/bsky/feed/getPosts";
 import { isRecord } from "@/atproto/types/app/bsky/feed/post";
 import Avatar from "@/components/Avatar";
 import DistanceToNow from "@/components/DistanceToNow";
 import PostEmbed, { EmbedView } from "@/components/PostEmbed";
 import PostText from "@/components/PostText";
+import { Command } from "@/constants";
+import { ArrowUturnLeftIcon } from "@heroicons/react/16/solid";
 import {
   ArrowPathRoundedSquareIcon,
   ChatBubbleBottomCenterIcon,
@@ -13,12 +16,32 @@ import {
   ArrowPathRoundedSquareIcon as ArrowPathRoundedSquareIconSolid,
   HeartIcon as HeartIconSolid,
 } from "@heroicons/react/24/solid";
-import { FC } from "react";
+import { invoke } from "@tauri-apps/api/core";
+import { FC, useEffect, useState } from "react";
 
-const Post: FC<{ post: PostView; isParent?: boolean }> = ({
-  post,
-  isParent = false,
-}) => {
+const Post: FC<{
+  post: PostView;
+  isParent?: boolean;
+  showReplyAuthor?: boolean;
+}> = ({ post, isParent = false, showReplyAuthor = false }) => {
+  const [replyParentAuthor, setReplyParentAuthor] = useState<string | null>(
+    null
+  );
+  if (
+    (isParent || showReplyAuthor) &&
+    isRecord(post.record) &&
+    post.record.reply
+  ) {
+    const uri = post.record.reply.parent.uri;
+    useEffect(() => {
+      (async () => {
+        const author = (
+          await invoke<OutputSchema>(Command.GetPosts, { uris: [uri] })
+        ).posts[0].author;
+        setReplyParentAuthor(author.displayName || author.handle);
+      })();
+    }, []);
+  }
   return (
     <div className="flex overflow-hidden break-words">
       <div className="flex flex-col items-center mr-2">
@@ -41,6 +64,12 @@ const Post: FC<{ post: PostView; isParent?: boolean }> = ({
             <DistanceToNow date={post.indexedAt} />
           </div>
         </div>
+        {replyParentAuthor && (
+          <div className="flex items-center text-sm text-muted">
+            <ArrowUturnLeftIcon className="h-4 w-4 mr-1" />
+            Reply to {replyParentAuthor}
+          </div>
+        )}
         {isRecord(post.record) && <PostText record={post.record} />}
         <PostEmbed embed={post.embed as EmbedView} />
         <div className="flex text-sm text-slate-500 mt-2">
