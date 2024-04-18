@@ -2,7 +2,7 @@ use crate::appdata;
 use crate::consts::EmitEvent;
 use crate::error::{Error, Result};
 use crate::event::NotificationEvent;
-use crate::session::{TauriPluginStore, APPDATA_CURRENT};
+use crate::session::{values, TauriPluginStore, APPDATA_CURRENT};
 use crate::state::State;
 use crate::task::{poll_feed, poll_notifications, poll_unread_notifications};
 use atrium_api::agent::store::SessionStore;
@@ -11,8 +11,9 @@ use atrium_api::records::Record;
 use atrium_api::types::string::{AtIdentifier, Datetime, Did, Language};
 use atrium_api::types::{Collection, Union};
 use atrium_xrpc_client::reqwest::ReqwestClient;
+use itertools::Itertools;
 use serde::Deserialize;
-use serde_json::from_value;
+use serde_json::{from_value, to_value};
 use std::sync::Arc;
 use tauri::{AppHandle, Manager, Runtime};
 
@@ -47,6 +48,29 @@ pub async fn me<R: Runtime>(app: AppHandle<R>) -> Result<Did> {
     let did = session.did.clone();
     agent.resume_session(session).await?;
     Ok(did)
+}
+
+#[tauri::command]
+pub async fn list_sessions<R: Runtime>(
+    app: AppHandle<R>,
+) -> Result<Vec<atrium_api::agent::Session>> {
+    log::info!("list_sessions");
+    Ok(values(app.clone())?
+        .into_iter()
+        .sorted_by(|a, b| Ord::cmp(&b.updated_at, &a.updated_at))
+        .map(|data| data.session)
+        .collect())
+}
+
+#[tauri::command]
+pub async fn switch_session<R: Runtime>(did: String, app: AppHandle<R>) -> Result<Did> {
+    log::info!("switch_session: {did}");
+    appdata::set_appdata(app.clone(), APPDATA_CURRENT.into(), to_value(&did)?)?;
+    *app.state::<State<R>>().agent.lock().await = Arc::new(AtpAgent::new(
+        ReqwestClient::new("https://bsky.social"),
+        TauriPluginStore::new(app.clone()),
+    ));
+    me(app).await
 }
 
 pub async fn get_preferences<R: Runtime>(

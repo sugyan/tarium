@@ -3,6 +3,7 @@ mod command;
 mod consts;
 mod error;
 mod event;
+mod public;
 mod session;
 mod setting;
 mod state;
@@ -88,9 +89,12 @@ pub fn run() {
             appdata::set_appdata,
             setting::get_setting,
             setting::set_setting,
+            public::get_public_profile,
             command::login,
             command::logout,
             command::me,
+            command::list_sessions,
+            command::switch_session,
             command::get_profile,
             command::get_pinned_feed_generators,
             command::get_feed_generators,
