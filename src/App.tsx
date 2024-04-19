@@ -3,7 +3,7 @@ import FeedGenerator from "@/routes/feed-generator";
 import Home from "@/routes/home";
 import Notifications from "@/routes/notifications";
 import Root from "@/routes/root";
-import Signin from "@/routes/signin";
+import Signin, { loader as SigninLoader } from "@/routes/signin";
 import SigninIndex from "@/routes/signin/index";
 import SigninNew from "@/routes/signin/new";
 import { invoke } from "@tauri-apps/api/core";
@@ -114,6 +114,8 @@ const App = () => {
     {
       path: "/signin",
       element: <Signin />,
+      id: "signin",
+      loader: SigninLoader,
       children: [
         { index: true, element: <SigninIndex /> },
         { path: "new", element: <SigninNew /> },

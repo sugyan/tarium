@@ -1,9 +1,11 @@
 import { Command } from "@/constants";
+import { Session } from "@/util";
 import { invoke } from "@tauri-apps/api/core";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useRouteLoaderData } from "react-router-dom";
 
 const SigninNew = () => {
+  const sessions = useRouteLoaderData("signin") as Session[];
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -47,14 +49,16 @@ const SigninNew = () => {
           Sign in
         </button>
       </form>
-      <div className="py-4 text-left">
-        <button
-          className="border border-more-muted rounded p-2 text-muted"
-          onClick={() => navigate(-1)}
-        >
-          Back
-        </button>
-      </div>
+      {sessions.length > 0 && (
+        <div className="py-4 text-left">
+          <button
+            className="border border-more-muted rounded p-2 text-muted"
+            onClick={() => navigate("/signin")}
+          >
+            Back
+          </button>
+        </div>
+      )}
       <div className=" text-red-500 text-center">{message}</div>
     </>
   );

@@ -63,14 +63,14 @@ pub async fn list_sessions<R: Runtime>(
 }
 
 #[tauri::command]
-pub async fn switch_session<R: Runtime>(did: String, app: AppHandle<R>) -> Result<Did> {
+pub async fn switch_session<R: Runtime>(did: String, app: AppHandle<R>) -> Result<()> {
     log::info!("switch_session: {did}");
     appdata::set_appdata(app.clone(), APPDATA_CURRENT.into(), to_value(&did)?)?;
     *app.state::<State<R>>().agent.lock().await = Arc::new(AtpAgent::new(
         ReqwestClient::new("https://bsky.social"),
         TauriPluginStore::new(app.clone()),
     ));
-    me(app).await
+    Ok(())
 }
 
 pub async fn get_preferences<R: Runtime>(

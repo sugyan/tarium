@@ -1,22 +1,12 @@
 import { ProfileViewDetailed } from "@/atproto/types/app/bsky/actor/defs";
-import { OutputSchema } from "@/atproto/types/com/atproto/server/createSession";
 import Avatar from "@/components/Avatar";
 import { Command } from "@/constants";
+import { Session } from "@/util";
 import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useRouteLoaderData } from "react-router-dom";
 
-function useSessions() {
-  const [sessions, setSessions] = useState<OutputSchema[]>([]);
-  useEffect(() => {
-    (async () => {
-      setSessions(await invoke(Command.ListSessions));
-    })();
-  }, []);
-  return sessions;
-}
-
-function useProfiles(sessions: OutputSchema[]) {
+function useProfiles(sessions: Session[]) {
   const [profiles, setProfiles] = useState<Map<string, ProfileViewDetailed>>(
     new Map()
   );
@@ -44,9 +34,12 @@ function useProfiles(sessions: OutputSchema[]) {
 }
 
 const SigninIndex = () => {
-  const sessions = useSessions();
+  const sessions = useRouteLoaderData("signin") as Session[];
   const profiles = useProfiles(sessions);
   const navigate = useNavigate();
+  useEffect(() => {
+    if (sessions.length === 0) navigate("/signin/new");
+  }, []);
   const onClickSession = async (did: string) => {
     try {
       await invoke(Command.SwitchSession, { did });
