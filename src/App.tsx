@@ -95,7 +95,6 @@ const App = () => {
     {
       path: "/",
       element: <Root />,
-      shouldRevalidate: () => false,
       children: [
         {
           index: true,

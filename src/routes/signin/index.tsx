@@ -1,41 +1,14 @@
-import { ProfileViewDetailed } from "@/atproto/types/app/bsky/actor/defs";
 import Avatar from "@/components/Avatar";
 import { Command } from "@/constants";
+import { useProfiles } from "@/hooks/useProfiles";
 import { Session } from "@/util";
 import { invoke } from "@tauri-apps/api/core";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link, useNavigate, useRouteLoaderData } from "react-router-dom";
-
-function useProfiles(sessions: Session[]) {
-  const [profiles, setProfiles] = useState<Map<string, ProfileViewDetailed>>(
-    new Map()
-  );
-  const dids = sessions
-    .map((session) => session.did)
-    .filter((did) => !profiles.has(did));
-  useEffect(() => {
-    if (dids.length === 0) return;
-    (async () => {
-      const results = await Promise.all(
-        dids.map((did) =>
-          invoke<ProfileViewDetailed>(Command.GetPublicProfile, { actor: did })
-        )
-      );
-      setProfiles((prev) => {
-        return new Map(
-          [...prev.entries()].concat(
-            results.map((result) => [result.did, result])
-          )
-        );
-      });
-    })();
-  }, [dids]);
-  return profiles;
-}
 
 const SigninIndex = () => {
   const sessions = useRouteLoaderData("signin") as Session[];
-  const profiles = useProfiles(sessions);
+  const profiles = useProfiles(sessions.map((session) => session.did));
   const navigate = useNavigate();
   useEffect(() => {
     if (sessions.length === 0) navigate("/signin/new");

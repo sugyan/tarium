@@ -1,4 +1,5 @@
 import { ProfileViewDetailed } from "@/atproto/types/app/bsky/actor/defs";
+import AccountSwitch from "@/components/AccountSwitch";
 import Modal from "@/components/Modal";
 import NewPostForm from "@/components/NewPostForm";
 import Settings from "@/components/Settings";
@@ -27,6 +28,7 @@ const Root = () => {
   const [did, setDid] = useState(null);
   const [isNewPostOpen, setNewPostOpen] = useState(false);
   const [isSettingsOpen, setSettingsOpen] = useState(false);
+  const [isAccountOpen, setAccountOpen] = useState(false);
   const profile = useProfile(did);
   useEffect(() => {
     (async () => {
@@ -37,12 +39,6 @@ const Root = () => {
       }
     })();
   }, []);
-  const onNewPost = () => {
-    setNewPostOpen(true);
-  };
-  const onSettings = () => {
-    setSettingsOpen(true);
-  };
   return (
     <>
       <Modal isShow={isNewPostOpen} setShow={setNewPostOpen}>
@@ -51,13 +47,17 @@ const Root = () => {
       <Modal isShow={isSettingsOpen} setShow={setSettingsOpen}>
         <Settings />
       </Modal>
+      <Modal isShow={isAccountOpen} setShow={setAccountOpen}>
+        <AccountSwitch current={profile} />
+      </Modal>
       {did ? (
         <div className="flex">
           <div className="flex-shrink-0 h-screen sticky top-0 border-r border-slate-500 z-10">
             <Sidebar
               profile={profile}
-              onNewPost={onNewPost}
-              onSettings={onSettings}
+              onNewPost={() => setNewPostOpen(true)}
+              onSettings={() => setSettingsOpen(true)}
+              onAccount={() => setAccountOpen(true)}
             />
           </div>
           <div className="flex-grow">

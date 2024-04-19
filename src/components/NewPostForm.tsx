@@ -121,8 +121,10 @@ const NewPostForm: FC<{
         </button>
       </div>
       <div className="flex items-start">
-        <div className="h-16 w-16 rounded-full overflow-hidden m-2">
-          <Avatar avatar={profile?.avatar} />
+        <div className="m-2">
+          <div className="h-12 w-12 rounded-full overflow-hidden">
+            <Avatar avatar={profile?.avatar} />
+          </div>
         </div>
         <textarea
           ref={focusRef}

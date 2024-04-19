@@ -3,19 +3,17 @@ import { GeneratorView } from "@/atproto/types/app/bsky/feed/defs";
 import Avatar from "@/components/Avatar";
 import { Command, EventName } from "@/constants";
 import { UnreadNotification } from "@/events";
-import { Popover } from "@headlessui/react";
 import {
   BellIcon,
   Cog6ToothIcon,
   HomeIcon,
   PencilSquareIcon,
-  UserMinusIcon,
 } from "@heroicons/react/24/outline";
 import { RssIcon } from "@heroicons/react/24/solid";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { FC, useEffect, useRef, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 function useFeedGenerators() {
   const [feedGenerators, setFeedGenerators] = useState<GeneratorView[]>([]);
@@ -60,29 +58,12 @@ function useUnreadCount() {
   return count;
 }
 
-const AccountPanel = () => {
-  const navigate = useNavigate();
-  const onSignout = async () => {
-    await invoke(Command.Logout);
-    navigate("/signin");
-  };
-  return (
-    <Popover.Panel className="absolute left-4 bottom-16">
-      <div className="text-muted bg-background border border-more-muted w-64 rounded-lg">
-        <div className="flex items-center cursor-pointer" onClick={onSignout}>
-          <UserMinusIcon className="h-8 w-8 m-3 text-red-500" />
-          Sign out
-        </div>
-      </div>
-    </Popover.Panel>
-  );
-};
-
 const Sidebar: FC<{
   profile: ProfileViewDetailed | null;
   onNewPost: () => void;
   onSettings: () => void;
-}> = ({ profile, onNewPost, onSettings }) => {
+  onAccount: () => void;
+}> = ({ profile, onNewPost, onSettings, onAccount }) => {
   const { state, pathname } = useLocation();
   const feedGenerators = useFeedGenerators();
   const unread = useUnreadCount();
@@ -144,14 +125,14 @@ const Sidebar: FC<{
           onClick={onSettings}
         />
       </div>
-      <Popover className="relative">
-        <Popover.Button as="div">
-          <div className="h-12 w-12 m-2 rounded-full overflow-hidden">
-            {profile && <Avatar avatar={profile.avatar} />}
-          </div>
-        </Popover.Button>
-        <AccountPanel />
-      </Popover>
+      <div>
+        <div
+          className="h-12 w-12 m-2 rounded-full overflow-hidden cursor-pointer"
+          onClick={onAccount}
+        >
+          {profile && <Avatar avatar={profile.avatar} />}
+        </div>
+      </div>
     </div>
   );
 };
