@@ -3,7 +3,9 @@ import FeedGenerator from "@/routes/feed-generator";
 import Home from "@/routes/home";
 import Notifications from "@/routes/notifications";
 import Root from "@/routes/root";
-import Signin from "@/routes/signin";
+import Signin, { loader as SigninLoader } from "@/routes/signin";
+import SigninIndex from "@/routes/signin/index";
+import SigninNew from "@/routes/signin/new";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { getCurrent } from "@tauri-apps/api/window";
@@ -93,18 +95,17 @@ const App = () => {
     {
       path: "/",
       element: <Root />,
-      shouldRevalidate: () => false,
       children: [
         {
           index: true,
           element: <Home />,
         },
         {
-          path: "/notifications",
+          path: "notifications",
           element: <Notifications />,
         },
         {
-          path: "/feed_generator",
+          path: "feed_generator",
           element: <FeedGenerator />,
         },
       ],
@@ -112,6 +113,12 @@ const App = () => {
     {
       path: "/signin",
       element: <Signin />,
+      id: "signin",
+      loader: SigninLoader,
+      children: [
+        { index: true, element: <SigninIndex /> },
+        { path: "new", element: <SigninNew /> },
+      ],
     },
   ];
   const router = createBrowserRouter([

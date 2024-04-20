@@ -1,4 +1,5 @@
 import { ProfileViewDetailed } from "@/atproto/types/app/bsky/actor/defs";
+import AccountSwitch from "@/components/AccountSwitch";
 import Modal from "@/components/Modal";
 import NewPostForm from "@/components/NewPostForm";
 import Settings from "@/components/Settings";
@@ -6,12 +7,12 @@ import Sidebar from "@/components/Sidebar";
 import { Command } from "@/constants";
 import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
 function useProfile(did: string | null) {
   const [profile, setProfile] = useState<ProfileViewDetailed | null>(null);
   useEffect(() => {
-    if (did === null) return;
+    if (did === null) return setProfile(null);
     (async () => {
       const result = await invoke<ProfileViewDetailed>(Command.GetProfile, {
         actor: did,
@@ -24,11 +25,14 @@ function useProfile(did: string | null) {
 
 const Root = () => {
   const navigate = useNavigate();
+  const { state } = useLocation();
   const [did, setDid] = useState(null);
   const [isNewPostOpen, setNewPostOpen] = useState(false);
   const [isSettingsOpen, setSettingsOpen] = useState(false);
+  const [isAccountOpen, setAccountOpen] = useState(false);
   const profile = useProfile(did);
   useEffect(() => {
+    if (did) return;
     (async () => {
       try {
         setDid(await invoke(Command.Me));
@@ -36,28 +40,34 @@ const Root = () => {
         navigate("/signin");
       }
     })();
-  }, []);
-  const onNewPost = () => {
-    setNewPostOpen(true);
-  };
-  const onSettings = () => {
-    setSettingsOpen(true);
-  };
+  }, [did]);
+  useEffect(() => {
+    if (state?.refresh) {
+      setDid(null);
+    }
+  }, [state]);
   return (
     <>
       <Modal isShow={isNewPostOpen} setShow={setNewPostOpen}>
-        <NewPostForm profile={profile} onCancel={() => setNewPostOpen(false)} />
+        <NewPostForm profile={profile} onClose={() => setNewPostOpen(false)} />
       </Modal>
       <Modal isShow={isSettingsOpen} setShow={setSettingsOpen}>
         <Settings />
+      </Modal>
+      <Modal isShow={isAccountOpen} setShow={setAccountOpen}>
+        <AccountSwitch
+          current={profile}
+          onClose={() => setAccountOpen(false)}
+        />
       </Modal>
       {did ? (
         <div className="flex">
           <div className="flex-shrink-0 h-screen sticky top-0 border-r border-slate-500 z-10">
             <Sidebar
               profile={profile}
-              onNewPost={onNewPost}
-              onSettings={onSettings}
+              onNewPost={() => setNewPostOpen(true)}
+              onSettings={() => setSettingsOpen(true)}
+              onAccount={() => setAccountOpen(true)}
             />
           </div>
           <div className="flex-grow">

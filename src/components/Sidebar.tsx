@@ -3,20 +3,17 @@ import { GeneratorView } from "@/atproto/types/app/bsky/feed/defs";
 import Avatar from "@/components/Avatar";
 import { Command, EventName } from "@/constants";
 import { UnreadNotification } from "@/events";
-import { Popover } from "@headlessui/react";
 import {
   BellIcon,
   Cog6ToothIcon,
   HomeIcon,
   PencilSquareIcon,
-  UserMinusIcon,
 } from "@heroicons/react/24/outline";
 import { RssIcon } from "@heroicons/react/24/solid";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
-import { confirm } from "@tauri-apps/plugin-dialog";
 import { FC, useEffect, useRef, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 function useFeedGenerators() {
   const [feedGenerators, setFeedGenerators] = useState<GeneratorView[]>([]);
@@ -65,20 +62,11 @@ const Sidebar: FC<{
   profile: ProfileViewDetailed | null;
   onNewPost: () => void;
   onSettings: () => void;
-}> = ({ profile, onNewPost, onSettings }) => {
-  const navigate = useNavigate();
+  onAccount: () => void;
+}> = ({ profile, onNewPost, onSettings, onAccount }) => {
   const { state, pathname } = useLocation();
   const feedGenerators = useFeedGenerators();
   const unread = useUnreadCount();
-  const onSignout = async () => {
-    const ok = await confirm("Are you sure you want to sign out?", {
-      kind: "warning",
-    });
-    if (ok) {
-      await invoke(Command.Logout);
-      navigate("/signin");
-    }
-  };
   return (
     <div className="w-16 flex flex-col h-full items-center select-none">
       <div className={`p-2 ${pathname === "/" && "bg-more-muted"}`}>
@@ -137,29 +125,14 @@ const Sidebar: FC<{
           onClick={onSettings}
         />
       </div>
-      <Popover className="relative">
-        <Popover.Button as="div">
-          <div className="h-12 w-12 m-2 rounded-full overflow-hidden">
-            {profile && <Avatar avatar={profile.avatar} />}
-          </div>
-        </Popover.Button>
-        <Popover.Panel className="absolute left-4 bottom-16">
-          {({ close }) => (
-            <div className="text-muted bg-background border border-more-muted w-64 rounded-lg">
-              <div
-                className="flex items-center cursor-pointer"
-                onClick={() => {
-                  close();
-                  onSignout();
-                }}
-              >
-                <UserMinusIcon className="h-8 w-8 m-3 text-red-500" />
-                Sign out
-              </div>
-            </div>
-          )}
-        </Popover.Panel>
-      </Popover>
+      <div>
+        <div
+          className="h-12 w-12 m-2 rounded-full overflow-hidden cursor-pointer"
+          onClick={onAccount}
+        >
+          {profile && <Avatar avatar={profile.avatar} />}
+        </div>
+      </div>
     </div>
   );
 };
