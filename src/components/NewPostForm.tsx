@@ -65,8 +65,8 @@ const Languages: FC<{
 
 const NewPostForm: FC<{
   profile: ProfileViewDetailed | null;
-  onCancel: () => void;
-}> = ({ profile, onCancel }) => {
+  onClose: () => void;
+}> = ({ profile, onClose: onCancel }) => {
   const focusRef = useContext(FocusContext);
   const [text, setText] = useState("");
   const [langs, setLangs] = useState<Set<string>>(new Set());

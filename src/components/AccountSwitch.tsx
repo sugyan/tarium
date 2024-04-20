@@ -39,9 +39,10 @@ const Account: FC<{ handle: string; profile: ProfileViewDetailed | null }> = ({
   );
 };
 
-const AccountSwitch: FC<{ current: ProfileViewDetailed | null }> = ({
-  current,
-}) => {
+const AccountSwitch: FC<{
+  current: ProfileViewDetailed | null;
+  onClose: () => void;
+}> = ({ current, onClose }) => {
   const navigate = useNavigate();
   const sessions = useSessions().filter(
     (session) => session.did !== current?.did
@@ -50,8 +51,8 @@ const AccountSwitch: FC<{ current: ProfileViewDetailed | null }> = ({
   const switchAccount = async (did: string) => {
     try {
       await invoke(Command.SwitchSession, { did });
-      navigate("/");
-      location.reload();
+      onClose();
+      navigate("/", { state: { refresh: true } });
     } catch {
       navigate("/signin");
     }
@@ -75,15 +76,13 @@ const AccountSwitch: FC<{ current: ProfileViewDetailed | null }> = ({
         return (
           <div
             key={session.did}
-            className="border-b border-muted cursor-pointer"
+            className="border-b border-muted cursor-pointer h-14"
             onClick={() => switchAccount(session.did)}
           >
-            {profiles.get(session.did) && (
-              <Account
-                handle={session.handle}
-                profile={profiles.get(session.did) || null}
-              />
-            )}
+            <Account
+              handle={session.handle}
+              profile={profiles.get(session.did) || null}
+            />
           </div>
         );
       })}
