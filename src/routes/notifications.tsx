@@ -51,6 +51,33 @@ function groupNotifications(notifications: Notification[]) {
   return groups;
 }
 
+async function getPosts(uris: string[]) {
+  if (uris.length === 0) return [];
+  // TODO: split into multiple chunks
+  const output = await invoke<GetPostsOutput>(Command.GetPosts, {
+    uris,
+  });
+  return output.posts.map((p) => ({
+    ...p,
+    $type: "app.bsky.feed.defs#postView",
+  }));
+}
+
+async function getGenerators(uris: string[]) {
+  if (uris.length === 0) return [];
+  // TODO: split into multiple chunks
+  const output = await invoke<GetFeedGeneratorsOutput>(
+    Command.GetFeedGenerators,
+    {
+      feeds: uris,
+    }
+  );
+  return output.feeds.map((p) => ({
+    ...p,
+    $type: "app.bsky.feed.defs#generatorView",
+  }));
+}
+
 function useGetUriContents(notificationGroups: NotificationGroup[]) {
   const [contents, setContents] = useState(new Map());
   // extract only unknown uris
@@ -70,33 +97,23 @@ function useGetUriContents(notificationGroups: NotificationGroup[]) {
       );
     });
     // fetch contents
-    [
-      async () =>
-        (
-          await invoke<GetPostsOutput>(Command.GetPosts, {
-            uris: uris.filter((uri) => uri.includes("app.bsky.feed.post")),
-          })
-        ).posts.map((p) => ({ ...p, $type: "app.bsky.feed.defs#postView" })),
-      async () =>
-        (
-          await invoke<GetFeedGeneratorsOutput>(Command.GetFeedGenerators, {
-            feeds: uris.filter((uri) =>
-              uri.includes("app.bsky.feed.generator")
-            ),
-          })
-        ).feeds.map((p) => ({
-          ...p,
-          $type: "app.bsky.feed.defs#generatorView",
-        })),
-    ].forEach(async (f) => {
-      const output = await f();
-      setContents(
-        (prev) =>
-          new Map(
-            [...prev.entries()].concat(output.map((out) => [out.uri, out]))
-          )
-      );
-    });
+    (async () => {
+      (
+        await Promise.all([
+          getPosts(uris.filter((uri) => uri.includes("app.bsky.feed.post"))),
+          getGenerators(
+            uris.filter((uri) => uri.includes("app.bsky.feed.generator"))
+          ),
+        ])
+      ).forEach((output) => {
+        setContents(
+          (prev) =>
+            new Map(
+              [...prev.entries()].concat(output.map((out) => [out.uri, out]))
+            )
+        );
+      });
+    })();
   }, [uris]);
   return contents;
 }
