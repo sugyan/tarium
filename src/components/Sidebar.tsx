@@ -1,29 +1,26 @@
+import { ProfileViewDetailed } from "@/atproto/types/app/bsky/actor/defs";
 import { GeneratorView } from "@/atproto/types/app/bsky/feed/defs";
-import { EventName } from "@/constants";
+import Avatar from "@/components/Avatar";
+import { Command, EventName } from "@/constants";
 import { UnreadNotification } from "@/events";
 import {
   BellIcon,
   Cog6ToothIcon,
   HomeIcon,
   PencilSquareIcon,
-  UserMinusIcon,
 } from "@heroicons/react/24/outline";
 import { RssIcon } from "@heroicons/react/24/solid";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
-import { confirm } from "@tauri-apps/plugin-dialog";
 import { FC, useEffect, useRef, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 function useFeedGenerators() {
   const [feedGenerators, setFeedGenerators] = useState<GeneratorView[]>([]);
-  const isLoading = useRef(false);
   useEffect(() => {
-    if (isLoading.current) return;
-    isLoading.current = true;
     (async () => {
       const result = await invoke<{ feeds: GeneratorView[] }>(
-        "get_feed_generators"
+        Command.GetPinnedFeedGenerators
       );
       setFeedGenerators(result.feeds);
     })();
@@ -46,37 +43,34 @@ function useUnreadCount() {
         }
       );
     })();
-    return unlisten.current;
+    return () => {
+      unlisten.current();
+      (async () => {
+        await invoke(Command.UnsubscribeNotification);
+      })();
+    };
   }, []);
   useEffect(() => {
     (async () => {
-      await invoke("subscribe_notification");
+      await invoke(Command.SubscribeNotification);
     })();
   }, []);
   return count;
 }
 
-const Sidebar: FC<{ onNewPost: () => void; onSettings: () => void }> = ({
-  onNewPost,
-  onSettings,
-}) => {
-  const navigate = useNavigate();
+const Sidebar: FC<{
+  profile: ProfileViewDetailed | null;
+  onNewPost: () => void;
+  onSettings: () => void;
+  onAccount: () => void;
+}> = ({ profile, onNewPost, onSettings, onAccount }) => {
   const { state, pathname } = useLocation();
   const feedGenerators = useFeedGenerators();
   const unread = useUnreadCount();
-  const onSignout = async () => {
-    const ok = await confirm("Are you sure you want to sign out?", {
-      kind: "warning",
-    });
-    if (ok) {
-      await invoke("logout");
-      navigate("/signin");
-    }
-  };
   return (
     <div className="w-16 flex flex-col h-full items-center select-none">
-      <div className={`p-2 ${pathname === "/home" && "bg-more-muted"}`}>
-        <Link to="/home">
+      <div className={`p-2 ${pathname === "/" && "bg-more-muted"}`}>
+        <Link to="/">
           <div className="flex justify-center items-center h-12 w-12 rounded-lg overflow-hidden border border-slate-500 bg-background">
             <HomeIcon className="h-10 w-10" />
           </div>
@@ -132,10 +126,12 @@ const Sidebar: FC<{ onNewPost: () => void; onSettings: () => void }> = ({
         />
       </div>
       <div>
-        <UserMinusIcon
-          className="h-10 w-10 m-3 text-red-500 cursor-pointer"
-          onClick={onSignout}
-        />
+        <div
+          className="h-12 w-12 m-2 rounded-full overflow-hidden cursor-pointer"
+          onClick={onAccount}
+        >
+          {profile && <Avatar avatar={profile.avatar} />}
+        </div>
       </div>
     </div>
   );

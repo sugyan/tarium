@@ -3,37 +3,35 @@ mod command;
 mod consts;
 mod error;
 mod event;
-mod session_store;
+mod public;
+mod session;
+mod setting;
 mod state;
 mod task;
 
+use crate::appdata::STORE_APPDATA_PATH;
+use crate::session::{TauriPluginStore, STORE_SESSION_PATH};
+use crate::setting::STORE_SETTING_PATH;
 use crate::state::State;
 use atrium_api::agent::AtpAgent;
 use atrium_xrpc_client::reqwest::ReqwestClient;
 use log::LevelFilter;
-use session_store::TauriPluginStore;
 use std::sync::Arc;
 use tauri::async_runtime::Mutex;
 use tauri::menu::{Menu, MenuItemBuilder, MenuItemKind};
 use tauri::{Manager, Wry};
 use tauri_plugin_store::StoreBuilder;
 
-pub const STORE_APPDATA_PATH: &str = "appdata.json";
-pub const STORE_SESSION_PATH: &str = "session.json";
-pub const STORE_SETTING_PATH: &str = "setting.json";
-
 fn setup(app: &mut tauri::App<Wry>) -> Result<(), Box<dyn std::error::Error>> {
     // TODO: how switch to different account?
-    let agent = Mutex::new(Arc::new(AtpAgent::new(
-        ReqwestClient::new("https://bsky.social"),
-        TauriPluginStore::new(app.handle().clone()),
-    )));
     app.manage(State {
-        agent,
+        agent: Mutex::new(Arc::new(AtpAgent::new(
+            ReqwestClient::new("https://bsky.social"),
+            TauriPluginStore::new(app.handle().clone()),
+        ))),
         subscription_sender: Mutex::new(None),
         notification_sender: Mutex::new(None),
     });
-
     app.handle()
         .plugin(
             tauri_plugin_store::Builder::new()
@@ -87,10 +85,18 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
+            appdata::get_appdata,
+            appdata::set_appdata,
+            setting::get_setting,
+            setting::set_setting,
+            public::get_public_profile,
             command::login,
             command::logout,
-            command::get_session,
-            command::get_preferences,
+            command::me,
+            command::list_sessions,
+            command::switch_session,
+            command::get_profile,
+            command::get_pinned_feed_generators,
             command::get_feed_generators,
             command::get_posts,
             command::subscribe,

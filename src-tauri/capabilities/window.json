@@ -9,5 +9,7 @@
     "macOS",
     "windows"
   ],
-  "permissions": []
+  "permissions": [
+    "window:allow-theme"
+  ]
 }

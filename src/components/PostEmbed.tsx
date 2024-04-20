@@ -18,9 +18,14 @@ import {
   View as RecordWithMediaView,
   isView as isRecordWithMediaView,
 } from "@/atproto/types/app/bsky/embed/recordWithMedia";
+import {
+  GeneratorView,
+  isGeneratorView,
+} from "@/atproto/types/app/bsky/feed/defs";
 import { isRecord } from "@/atproto/types/app/bsky/feed/post";
 import Avatar from "@/components/Avatar";
 import DistanceToNow from "@/components/DistanceToNow";
+import { RssIcon } from "@heroicons/react/24/solid";
 import { FC } from "react";
 
 export type EmbedView =
@@ -68,19 +73,23 @@ const Record: FC<{ record: ViewRecord }> = ({ record }) => {
     <div className="border border-slate-500 rounded-md w-full overflow-hidden mt-2">
       <div className="flex overflow-hidden break-all m-2">
         <div className="w-full">
-          <div className="flex justify-between">
-            <div className="flex items-center">
-              <div className="h-4 w-4 rounded-full overflow-hidden mr-1">
-                <Avatar author={record.author} />
+          <div className="flex justify-between items-center">
+            <div className="flex items-center pr-2">
+              <div className="mr-1">
+                <div className="h-5 w-5 rounded-full overflow-hidden">
+                  <Avatar avatar={record.author.avatar} />
+                </div>
               </div>
-              <span className="font-semibold">
-                {record.author.displayName || record.author.handle}
-              </span>
-              <span className="text-sm font-mono pl-2 text-muted">
-                @{record.author.handle}
-              </span>
+              <div className="break-all line-clamp-1 text-muted">
+                <span className="font-semibold text-foreground">
+                  {record.author.displayName || record.author.handle}
+                </span>
+                <span className="text-sm font-mono pl-2">
+                  @{record.author.handle}
+                </span>
+              </div>
             </div>
-            <div className="flex items-center text-sm text-muted">
+            <div className="text-sm text-muted whitespace-nowrap">
               <DistanceToNow date={record.indexedAt} />
             </div>
           </div>
@@ -90,6 +99,53 @@ const Record: FC<{ record: ViewRecord }> = ({ record }) => {
           {record.embeds?.map((embed, index) => (
             <PostEmbed key={index} embed={embed as EmbedView} />
           ))}
+          <div className="flex mt-2">
+            {record.repostCount ? (
+              <div className="mr-2">
+                <span className="font-semibold">{record.repostCount}</span>{" "}
+                <span className="text-muted">
+                  {record.repostCount > 1 ? "reposts" : "repost"}
+                </span>
+              </div>
+            ) : null}
+            {record.likeCount ? (
+              <div>
+                <span className="font-semibold">{record.likeCount}</span>{" "}
+                <span className="text-muted">
+                  {record.likeCount > 1 ? "likes" : "like"}
+                </span>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const Generator: FC<{ generator: GeneratorView }> = ({ generator }) => {
+  return (
+    <div className="border border-slate-500 rounded-md w-full mt-2">
+      <div className="break-all m-2">
+        <div className="flex">
+          <div className="h-9 w-9 rounded-md overflow-hidden mt-0.5">
+            {generator.avatar ? (
+              <img src={generator.avatar} />
+            ) : (
+              <div className="bg-blue-500 p-0.5">
+                <RssIcon className="text-white" />
+              </div>
+            )}
+          </div>
+          <div className="text-sm ml-2">
+            <span className="font-semibold">{generator.displayName}</span>
+            <div className="text-muted">
+              Feed by @{generator.creator.handle}
+            </div>
+          </div>
+        </div>
+        <div className="text-sm text-muted mt-1">
+          Liked by {generator.likeCount || 0} users
         </div>
       </div>
     </div>
@@ -117,6 +173,13 @@ const PostEmbed: FC<{ embed?: EmbedView }> = ({ embed }) => {
       return (
         <div className="pb-2">
           <Record record={record} />
+        </div>
+      );
+    }
+    if (isGeneratorView(record)) {
+      return (
+        <div className="pb-2">
+          <Generator generator={record} />
         </div>
       );
     }

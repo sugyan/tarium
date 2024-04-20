@@ -1,5 +1,5 @@
 import { Notification } from "@/atproto/types/app/bsky/notification/listNotifications";
-import { EventName } from "@/constants";
+import { Command, EventName } from "@/constants";
 import { invoke } from "@tauri-apps/api/core";
 import { UnlistenFn, listen } from "@tauri-apps/api/event";
 import { useEffect, useRef, useState } from "react";
@@ -22,14 +22,14 @@ export function useNotifications() {
     return () => {
       unlisten.current();
       (async () => {
-        await invoke("unsubscribe", {});
+        await invoke(Command.Unsubscribe, {});
       })();
     };
   }, []);
   useEffect(() => {
     setNotifications([]);
     (async () => {
-      await invoke("subscribe", { subscription: "notification" });
+      await invoke(Command.Subscribe, { subscription: "notification" });
     })();
   }, []);
   return notifications;

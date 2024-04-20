@@ -1,5 +1,4 @@
-// use crate::session_store::{FileSessionStore, FileStore};
-use crate::session_store::TauriPluginStore;
+use crate::session::TauriPluginStore;
 use atrium_api::agent::AtpAgent;
 use atrium_xrpc_client::reqwest::ReqwestClient;
 use std::sync::Arc;
