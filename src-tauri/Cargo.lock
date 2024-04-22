@@ -333,15 +333,15 @@ dependencies = [
 
 [[package]]
 name = "atrium-xrpc"
-version = "0.10.4"
+version = "0.10.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b8bba792238ed87ef477feff6a0c71dfd70fd389fcabcdf3d899ddbe9143d1a6"
+checksum = "07a6ea80bd6021da1ab88054b3f41f56caedbb9559aad7c2aef844741902485c"
 dependencies = [
  "async-trait",
  "http 1.1.0",
  "serde",
+ "serde_html_form",
  "serde_json",
- "serde_qs",
  "thiserror",
 ]
 
@@ -4015,6 +4015,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde_html_form"
+version = "0.2.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8de514ef58196f1fc96dcaef80fe6170a1ce6215df9687a93fe8300e773fefc5"
+dependencies = [
+ "form_urlencoded",
+ "indexmap 2.2.5",
+ "itoa 1.0.10",
+ "ryu",
+ "serde",
+]
+
+[[package]]
 name = "serde_json"
 version = "1.0.114"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4023,17 +4036,6 @@ dependencies = [
  "itoa 1.0.10",
  "ryu",
  "serde",
-]
-
-[[package]]
-name = "serde_qs"
-version = "0.12.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0431a35568651e363364210c91983c1da5eb29404d9f0928b67d4ebcfa7d330c"
-dependencies = [
- "percent-encoding",
- "serde",
- "thiserror",
 ]
 
 [[package]]
