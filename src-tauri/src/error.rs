@@ -17,6 +17,8 @@ pub enum Error {
     #[error(transparent)]
     TauriPluginStore(#[from] tauri_plugin_store::Error),
     #[error(transparent)]
+    TokioJoin(#[from] tokio::task::JoinError),
+    #[error(transparent)]
     CreateRecord(#[from] XrpcError<atrium_api::com::atproto::repo::create_record::Error>),
     #[error(transparent)]
     CreateSession(#[from] XrpcError<atrium_api::com::atproto::server::create_session::Error>),
