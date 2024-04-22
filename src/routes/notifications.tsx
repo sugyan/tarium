@@ -53,7 +53,6 @@ function groupNotifications(notifications: Notification[]) {
 
 async function getPosts(uris: string[]) {
   if (uris.length === 0) return [];
-  // TODO: split into multiple chunks
   const output = await invoke<GetPostsOutput>(Command.GetPosts, {
     uris,
   });
@@ -65,7 +64,6 @@ async function getPosts(uris: string[]) {
 
 async function getGenerators(uris: string[]) {
   if (uris.length === 0) return [];
-  // TODO: split into multiple chunks
   const output = await invoke<GetFeedGeneratorsOutput>(
     Command.GetFeedGenerators,
     {
