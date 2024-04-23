@@ -16,6 +16,7 @@ use serde::Deserialize;
 use serde_json::{from_value, to_value};
 use std::sync::Arc;
 use tauri::{AppHandle, Manager, Runtime};
+use tokio::task::JoinSet;
 
 #[tauri::command]
 pub async fn login<R: Runtime>(
@@ -128,13 +129,13 @@ pub async fn get_pinned_feed_generators<R: Runtime>(
             }
         })
         .unwrap_or_default();
-    get_feed_generators(app, feeds).await
+    get_feed_generators(feeds, app).await
 }
 
 #[tauri::command]
 pub async fn get_feed_generators<R: Runtime>(
-    app: AppHandle<R>,
     feeds: Vec<String>,
+    app: AppHandle<R>,
 ) -> Result<atrium_api::app::bsky::feed::get_feed_generators::Output> {
     log::info!("get_feed_generators: {feeds:?}");
     Ok(app
@@ -156,17 +157,26 @@ pub async fn get_posts<R: Runtime>(
     app: AppHandle<R>,
 ) -> Result<atrium_api::app::bsky::feed::get_posts::Output> {
     log::info!("get_posts: {uris:?}");
-    Ok(app
-        .state::<State<R>>()
-        .agent
-        .lock()
-        .await
-        .api
-        .app
-        .bsky
-        .feed
-        .get_posts(atrium_api::app::bsky::feed::get_posts::Parameters { uris })
-        .await?)
+    let agent = app.state::<State<R>>().agent.lock().await.clone();
+    let mut set = JoinSet::new();
+    for chunk in uris.chunks(25) {
+        let agent = agent.clone();
+        let uris = chunk.to_vec();
+        set.spawn(async move {
+            agent
+                .api
+                .app
+                .bsky
+                .feed
+                .get_posts(atrium_api::app::bsky::feed::get_posts::Parameters { uris })
+                .await
+        });
+    }
+    let mut posts = Vec::new();
+    while let Some(result) = set.join_next().await {
+        posts.extend(result??.posts);
+    }
+    Ok(atrium_api::app::bsky::feed::get_posts::Output { posts })
 }
 
 #[derive(Debug, Deserialize)]

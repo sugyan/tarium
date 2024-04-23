@@ -5,6 +5,7 @@ use crate::event::{NotificationEvent, PostEvent};
 use crate::session::TauriPluginStore;
 use crate::setting::STORE_SETTING_PATH;
 use atrium_api::agent::AtpAgent;
+use atrium_api::app::bsky::feed::defs::FeedViewPostReasonRefs;
 use atrium_api::records::{KnownRecord, Record};
 use atrium_api::types::Union;
 use atrium_xrpc_client::reqwest::ReqwestClient;
@@ -63,11 +64,25 @@ pub async fn poll_feed<R: Runtime>(
             let cid = post.post.cid.as_ref().to_string();
             if let Some(prev) = cids.get(&cid) {
                 if post.reason != prev.reason {
-                    app.emit(
-                        EmitEvent::Post.as_ref(),
-                        PostEvent::Delete(prev.post.clone()),
-                    )?;
-                    app.emit(EmitEvent::Post.as_ref(), PostEvent::Add(post.clone()))?;
+                    // only update if reposted reason is newer
+                    if match (&post.reason, &prev.reason) {
+                        (Some(_), None) => true,
+                        (
+                            Some(Union::Refs(FeedViewPostReasonRefs::ReasonRepost(curr))),
+                            Some(Union::Refs(FeedViewPostReasonRefs::ReasonRepost(prev))),
+                        ) => curr.indexed_at > prev.indexed_at,
+                        _ => false,
+                    } {
+                        app.emit(
+                            EmitEvent::Post.as_ref(),
+                            PostEvent::Delete(prev.post.clone()),
+                        )?;
+                        app.emit(EmitEvent::Post.as_ref(), PostEvent::Add(post.clone()))?;
+                    }
+                    // otherwise, skip saving to cids
+                    else {
+                        continue;
+                    }
                 } else if post != prev {
                     app.emit(EmitEvent::Post.as_ref(), PostEvent::Update(post.clone()))?;
                 }
