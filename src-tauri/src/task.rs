@@ -62,7 +62,7 @@ pub async fn poll_feed<R: Runtime>(
         for post in posts.iter().rev() {
             let cid = post.post.cid.as_ref().to_string();
             if let Some(prev) = cids.get(&cid) {
-                if post.reason != prev.reason {
+                if post.reason != prev.reason && post.post.indexed_at > prev.post.indexed_at {
                     app.emit(
                         EmitEvent::Post.as_ref(),
                         PostEvent::Delete(prev.post.clone()),
