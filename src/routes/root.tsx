@@ -36,7 +36,7 @@ const Root = () => {
     (async () => {
       try {
         setDid(await invoke(Command.Me));
-      } catch (e) {
+      } catch {
         navigate("/signin");
       }
     })();
