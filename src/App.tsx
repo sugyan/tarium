@@ -9,7 +9,8 @@ import SigninNew from "@/routes/signin/new";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { getCurrent } from "@tauri-apps/api/window";
-import { message } from "@tauri-apps/plugin-dialog";
+import { confirm } from "@tauri-apps/plugin-dialog";
+import { relaunch } from "@tauri-apps/plugin-process";
 import { check } from "@tauri-apps/plugin-updater";
 import { createContext, useEffect, useRef, useState } from "react";
 import {
@@ -35,8 +36,18 @@ function checkForUpdate() {
     (async () => {
       const update = await check();
       if (update) {
-        // TODO: downloadAndInstall
-        message(`${update.version} is now avaiable`);
+        if (
+          await confirm("Do you want to update?", {
+            title: `${update.version} is now avaiable`,
+          })
+        ) {
+          try {
+            await update.downloadAndInstall();
+            await relaunch();
+          } catch (e) {
+            console.error(`Failed to update: ${e}`);
+          }
+        }
       }
     })();
   }, []);

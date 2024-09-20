@@ -10,7 +10,7 @@
     "windows"
   ],
   "permissions": [
-    "event:allow-listen",
-    "event:allow-unlisten"
+    "core:event:allow-listen",
+    "core:event:allow-unlisten"
   ]
 }
