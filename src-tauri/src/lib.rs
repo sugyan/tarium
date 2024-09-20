@@ -19,7 +19,7 @@ use log::LevelFilter;
 use std::sync::Arc;
 use tauri::async_runtime::Mutex;
 use tauri::menu::{Menu, MenuItemBuilder, MenuItemKind};
-use tauri::{Manager, Wry};
+use tauri::{Emitter, Manager, Wry};
 use tauri_plugin_store::StoreBuilder;
 
 fn setup(app: &mut tauri::App<Wry>) -> Result<(), Box<dyn std::error::Error>> {

@@ -10,6 +10,6 @@
     "windows"
   ],
   "permissions": [
-    "webview:allow-internal-toggle-devtools"
+    "core:webview:allow-internal-toggle-devtools"
   ]
 }
