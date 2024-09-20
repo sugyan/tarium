@@ -13,7 +13,7 @@ use serde_json::{from_value, to_value};
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 use std::time::Duration;
-use tauri::{Manager, Runtime};
+use tauri::{Emitter, Manager, Runtime};
 use tauri_plugin_notification::NotificationExt;
 use tauri_plugin_store::with_store;
 

@@ -15,7 +15,7 @@ use itertools::Itertools;
 use serde::Deserialize;
 use serde_json::{from_value, to_value};
 use std::sync::Arc;
-use tauri::{AppHandle, Manager, Runtime};
+use tauri::{AppHandle, Emitter, Manager, Runtime};
 use tokio::task::JoinSet;
 
 #[tauri::command]

@@ -12,7 +12,7 @@ name = "tarium_lib"
 crate-type = ["lib", "cdylib", "staticlib"]
 
 [build-dependencies]
-tauri-build = { version = "2.0.0-beta", features = [] }
+tauri-build = { version = "2.0.0-rc", features = [] }
 
 [dependencies]
 async-trait = "0.1.77"
@@ -22,13 +22,13 @@ itertools = "0.12.1"
 log = "0.4.21"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tauri = { version = "2.0.0-beta", features = [] }
-tauri-plugin-dialog = "2.0.0-beta"
-tauri-plugin-log = { version = "2.0.0-beta", features = ["colored"] }
-tauri-plugin-notification = "2.0.0-beta"
-tauri-plugin-process = "2.0.0-beta"
-tauri-plugin-shell = "2.0.0-beta"
-tauri-plugin-store = "2.0.0-beta"
-tauri-plugin-updater = "2.0.0-beta"
+tauri = { version = "2.0.0-rc", features = [] }
+tauri-plugin-dialog = "2.0.0-rc"
+tauri-plugin-log = { version = "2.0.0-rc", features = ["colored"] }
+tauri-plugin-notification = "2.0.0-rc"
+tauri-plugin-process = "2.0.0-rc"
+tauri-plugin-shell = "2.0.0-rc"
+tauri-plugin-store = "2.0.0-rc"
+tauri-plugin-updater = "2.0.0-rc"
 thiserror = "1.0.57"
 tokio = { version = "1.36.0", features = ["macros", "fs", "time"] }
