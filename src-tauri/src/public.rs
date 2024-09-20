@@ -13,7 +13,7 @@ pub async fn get_public_profile(
             .app
             .bsky
             .actor
-            .get_profile(atrium_api::app::bsky::actor::get_profile::Parameters { actor })
+            .get_profile(atrium_api::app::bsky::actor::get_profile::ParametersData { actor }.into())
             .await?,
     )
 }

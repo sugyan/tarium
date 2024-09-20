@@ -7,9 +7,8 @@ use crate::state::State;
 use crate::task::{poll_feed, poll_notifications, poll_unread_notifications};
 use atrium_api::agent::store::SessionStore;
 use atrium_api::agent::AtpAgent;
-use atrium_api::records::Record;
 use atrium_api::types::string::{AtIdentifier, Datetime, Did, Language};
-use atrium_api::types::{Collection, Union};
+use atrium_api::types::{Collection, TryIntoUnknown, Union};
 use atrium_xrpc_client::reqwest::ReqwestClient;
 use itertools::Itertools;
 use serde::Deserialize;
@@ -86,7 +85,7 @@ pub async fn get_preferences<R: Runtime>(
         .app
         .bsky
         .actor
-        .get_preferences(atrium_api::app::bsky::actor::get_preferences::Parameters {})
+        .get_preferences(atrium_api::app::bsky::actor::get_preferences::ParametersData {}.into())
         .await?)
 }
 
@@ -105,7 +104,7 @@ pub async fn get_profile<R: Runtime>(
         .app
         .bsky
         .actor
-        .get_profile(atrium_api::app::bsky::actor::get_profile::Parameters { actor })
+        .get_profile(atrium_api::app::bsky::actor::get_profile::ParametersData { actor }.into())
         .await?)
 }
 
@@ -147,7 +146,9 @@ pub async fn get_feed_generators<R: Runtime>(
         .app
         .bsky
         .feed
-        .get_feed_generators(atrium_api::app::bsky::feed::get_feed_generators::Parameters { feeds })
+        .get_feed_generators(
+            atrium_api::app::bsky::feed::get_feed_generators::ParametersData { feeds }.into(),
+        )
         .await?)
 }
 
@@ -168,15 +169,15 @@ pub async fn get_posts<R: Runtime>(
                 .app
                 .bsky
                 .feed
-                .get_posts(atrium_api::app::bsky::feed::get_posts::Parameters { uris })
+                .get_posts(atrium_api::app::bsky::feed::get_posts::ParametersData { uris }.into())
                 .await
         });
     }
     let mut posts = Vec::new();
     while let Some(result) = set.join_next().await {
-        posts.extend(result??.posts);
+        posts.extend(result??.data.posts);
     }
-    Ok(atrium_api::app::bsky::feed::get_posts::Output { posts })
+    Ok(atrium_api::app::bsky::feed::get_posts::OutputData { posts }.into())
 }
 
 #[derive(Debug, Deserialize)]
@@ -268,7 +269,7 @@ pub async fn update_seen<R: Runtime>(app: tauri::AppHandle<R>) -> Result<()> {
         .app
         .bsky
         .notification
-        .update_seen(atrium_api::app::bsky::notification::update_seen::Input { seen_at })
+        .update_seen(atrium_api::app::bsky::notification::update_seen::InputData { seen_at }.into())
         .await?;
     Ok(app.emit(
         EmitEvent::UnreadCount.as_ref(),
@@ -293,28 +294,34 @@ pub async fn create_post<R: Runtime>(
         .com
         .atproto
         .repo
-        .create_record(atrium_api::com::atproto::repo::create_record::Input {
-            collection: atrium_api::app::bsky::feed::Post::NSID
-                .parse()
-                .expect("failed to parse NSID"),
-            record: Record::Known(atrium_api::records::KnownRecord::AppBskyFeedPost(Box::new(
-                atrium_api::app::bsky::feed::post::Record {
-                    created_at: atrium_api::types::string::Datetime::now(),
-                    embed: None,
-                    entities: None,
-                    facets: None,
-                    labels: None,
-                    langs,
-                    reply: None,
-                    tags: None,
-                    text,
-                },
-            ))),
-            repo: did,
-            rkey: None,
-            swap_commit: None,
-            validate: None,
-        })
+        .create_record(
+            atrium_api::com::atproto::repo::create_record::InputData {
+                collection: atrium_api::app::bsky::feed::Post::NSID
+                    .parse()
+                    .expect("failed to parse NSID"),
+                record: atrium_api::record::KnownRecord::AppBskyFeedPost(Box::new(
+                    atrium_api::app::bsky::feed::post::RecordData {
+                        created_at: atrium_api::types::string::Datetime::now(),
+                        embed: None,
+                        entities: None,
+                        facets: None,
+                        labels: None,
+                        langs,
+                        reply: None,
+                        tags: None,
+                        text,
+                    }
+                    .into(),
+                ))
+                .try_into_unknown()
+                .expect("failed to convert to unknown"),
+                repo: did,
+                rkey: None,
+                swap_commit: None,
+                validate: None,
+            }
+            .into(),
+        )
         .await?)
 }
 

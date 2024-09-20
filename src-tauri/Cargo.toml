@@ -16,8 +16,8 @@ tauri-build = { version = "2.0.0-rc", features = [] }
 
 [dependencies]
 async-trait = "0.1.77"
-atrium-api = "0.20.1"
-atrium-xrpc-client = "0.5.2"
+atrium-api = "0.24.5"
+atrium-xrpc-client = "0.5.7"
 itertools = "0.12.1"
 log = "0.4.21"
 serde = { version = "1", features = ["derive"] }

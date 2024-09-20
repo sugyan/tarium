@@ -6,8 +6,7 @@ use crate::session::TauriPluginStore;
 use crate::setting::STORE_SETTING_PATH;
 use atrium_api::agent::AtpAgent;
 use atrium_api::app::bsky::feed::defs::FeedViewPostReasonRefs;
-use atrium_api::records::{KnownRecord, Record};
-use atrium_api::types::Union;
+use atrium_api::types::{TryFromUnknown, Union};
 use atrium_xrpc_client::reqwest::ReqwestClient;
 use serde_json::{from_value, to_value};
 use std::collections::{HashMap, HashSet};
@@ -39,12 +38,16 @@ pub async fn poll_feed<R: Runtime>(
                 .app
                 .bsky
                 .feed
-                .get_feed(atrium_api::app::bsky::feed::get_feed::Parameters {
-                    cursor: None,
-                    feed: feed.into(),
-                    limit: 30.try_into().ok(),
-                })
+                .get_feed(
+                    atrium_api::app::bsky::feed::get_feed::ParametersData {
+                        cursor: None,
+                        feed: feed.into(),
+                        limit: 30.try_into().ok(),
+                    }
+                    .into(),
+                )
                 .await?
+                .data
                 .feed
         } else {
             agent
@@ -52,12 +55,16 @@ pub async fn poll_feed<R: Runtime>(
                 .app
                 .bsky
                 .feed
-                .get_timeline(atrium_api::app::bsky::feed::get_timeline::Parameters {
-                    algorithm: None,
-                    cursor: None,
-                    limit: 30.try_into().ok(),
-                })
+                .get_timeline(
+                    atrium_api::app::bsky::feed::get_timeline::ParametersData {
+                        algorithm: None,
+                        cursor: None,
+                        limit: 30.try_into().ok(),
+                    }
+                    .into(),
+                )
                 .await?
+                .data
                 .feed
         };
         for post in posts.iter().rev() {
@@ -110,7 +117,11 @@ pub async fn poll_feed<R: Runtime>(
             _ = &mut receiver => {
                 break;
             }
-            _ = interval.tick() => fetch_posts(&uri, &agent, &app, &mut cids).await?,
+            _ = interval.tick() => {
+                if let Err(e) = fetch_posts(&uri, &agent, &app, &mut cids).await {
+                    log::error!("fetch posts error: {:?}", e);
+                }
+            }
         }
     }
     Ok(())
@@ -121,7 +132,7 @@ pub async fn poll_notifications<R: Runtime>(
     mut receiver: tokio::sync::oneshot::Receiver<()>,
     app: tauri::AppHandle<R>,
 ) -> Result<()> {
-    use atrium_api::app::bsky::notification::list_notifications::Parameters;
+    use atrium_api::app::bsky::notification::list_notifications::ParametersData;
     async fn fetch_notifications<R: Runtime>(
         app: &tauri::AppHandle<R>,
         agent: &Arc<AtpAgent<TauriPluginStore<R>, ReqwestClient>>,
@@ -133,11 +144,15 @@ pub async fn poll_notifications<R: Runtime>(
             .app
             .bsky
             .notification
-            .list_notifications(Parameters {
-                cursor: None,
-                limit: 30.try_into().ok(),
-                seen_at: None,
-            })
+            .list_notifications(
+                ParametersData {
+                    cursor: None,
+                    limit: 30.try_into().ok(),
+                    priority: None,
+                    seen_at: None,
+                }
+                .into(),
+            )
             .await?;
         for notification in output.notifications.iter().rev() {
             let cid = notification.cid.as_ref().to_string();
@@ -167,7 +182,7 @@ pub async fn poll_unread_notifications<R: Runtime>(
     mut receiver: tokio::sync::oneshot::Receiver<()>,
     app: tauri::AppHandle<R>,
 ) -> Result<()> {
-    use atrium_api::app::bsky::notification::list_notifications::Parameters;
+    use atrium_api::app::bsky::notification::list_notifications::ParametersData;
     async fn fetch_notifications<R: Runtime>(
         agent: &Arc<AtpAgent<TauriPluginStore<R>, ReqwestClient>>,
         app: &tauri::AppHandle<R>,
@@ -178,19 +193,23 @@ pub async fn poll_unread_notifications<R: Runtime>(
             .app
             .bsky
             .notification
-            .list_notifications(Parameters {
-                cursor: None,
-                limit: 40.try_into().ok(),
-                seen_at: None,
-            })
+            .list_notifications(
+                ParametersData {
+                    cursor: None,
+                    limit: 40.try_into().ok(),
+                    priority: None,
+                    seen_at: None,
+                }
+                .into(),
+            )
             .await?;
-        if let Some(seen_at) = output.seen_at {
+        if let Some(seen_at) = output.data.seen_at {
             let notified = get_appdata(app.clone(), NOTIFIED_AT.into())?
                 .and_then(|value| from_value::<String>(value).ok())
                 .and_then(|v| v.parse().ok())
                 .unwrap_or(seen_at.clone());
             let mut count = 0;
-            for notification in output.notifications.iter().rev() {
+            for notification in output.data.notifications.iter().rev() {
                 if notification.indexed_at > seen_at {
                     // TODO: more filtering
                     count += 1;
@@ -245,32 +264,34 @@ async fn notify<R: Runtime>(
     let author = notification.author.clone();
     let author_name = author
         .display_name
+        .as_ref()
         .filter(|s| !s.is_empty())
+        .cloned()
         .unwrap_or(author.handle.to_string());
     let (title, uri) = match notification.reason.as_str() {
         "like" => (
             format!("{author_name} liked your post"),
-            notification.reason_subject,
+            notification.data.reason_subject,
         ),
         "repost" => (
             format!("{author_name} reposted your post"),
-            notification.reason_subject,
+            notification.data.reason_subject,
         ),
         "follow" => (
             format!("{author_name} followed you"),
-            notification.reason_subject,
+            notification.data.reason_subject,
         ),
         "mention" => (
             format!("{author_name} mentioned you"),
-            Some(notification.uri),
+            Some(notification.data.uri),
         ),
         "reply" => (
             format!("{author_name} replied to you"),
-            Some(notification.uri),
+            Some(notification.data.uri),
         ),
         "quote" => (
             format!("{author_name} quoted your post"),
-            Some(notification.uri),
+            Some(notification.data.uri),
         ),
         _ => unreachable!(),
     };
@@ -281,9 +302,13 @@ async fn notify<R: Runtime>(
             .app
             .bsky
             .feed
-            .get_posts(atrium_api::app::bsky::feed::get_posts::Parameters { uris: vec![uri] })
+            .get_posts(
+                atrium_api::app::bsky::feed::get_posts::ParametersData { uris: vec![uri] }.into(),
+            )
             .await?;
-        if let Record::Known(KnownRecord::AppBskyFeedPost(record)) = &output.posts[0].record {
+        if let Ok(record) = atrium_api::app::bsky::feed::post::Record::try_from_unknown(
+            output.posts[0].record.clone(),
+        ) {
             builder = builder.body(record.text.clone())
         }
     }
