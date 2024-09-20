@@ -8,7 +8,7 @@ import SigninIndex from "@/routes/signin/index";
 import SigninNew from "@/routes/signin/new";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
-import { getCurrent } from "@tauri-apps/api/window";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { confirm } from "@tauri-apps/plugin-dialog";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { check } from "@tauri-apps/plugin-updater";
@@ -75,7 +75,7 @@ async function mainLoader(): Promise<Theme | null> {
   if (theme !== null) {
     return theme;
   }
-  return await getCurrent().theme();
+  return await getCurrentWindow().theme();
 }
 
 const Main = () => {
