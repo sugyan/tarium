@@ -4396,7 +4396,7 @@ checksum = "e1fc403891a21bcfb7c37834ba66a547a8f402146eba7265b5a6d88059c9ff2f"
 
 [[package]]
 name = "tarium"
-version = "0.0.13"
+version = "0.0.14"
 dependencies = [
  "async-trait",
  "atrium-api",
